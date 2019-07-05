@@ -37,6 +37,7 @@ public:
     KLog();
 
     static void sysLogText(const char* file, int line, LogLevel level, const char* format, ...);
+    static void sysLogText(const char* file, int line, LogLevel level, const QString& output);
     static void sysLogHex(const unsigned char *data, int count);
     static void sysLogHex(const char *data, int count) { sysLogHex(reinterpret_cast<const unsigned char*>(data), count); }
     static void sysLogHex(QByteArray &data) { sysLogHex(reinterpret_cast<const unsigned char*>(data.constData()), data.length()); }

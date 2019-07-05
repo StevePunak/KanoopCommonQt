@@ -66,6 +66,11 @@ void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const ch
     _systemLog->logText(file, line, level, outputBuffer);
 }
 
+void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const QString &output)
+{
+    _systemLog->logText(file, line, level, (const char*)output.constData());
+}
+
 void KLog::outputToDestinations(QString& text)
 {
     if(_outputFlags & OutputFlags::File)
