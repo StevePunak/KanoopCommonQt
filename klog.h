@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QDebug>
 #include <QString>
+#include <QFile>
 #include <QTextStream>
 
 class KLog
@@ -31,7 +32,7 @@ public:
         Marker                      = 0x00004000,
         QDebug                      = 0x00008000,
 
-        Standard = LineNumbers | Timestamp | Level | QDebug
+        Standard = LineNumbers | Timestamp | Level | Console
     };
 
     KLog();
@@ -41,14 +42,33 @@ public:
     static void sysLogHex(const unsigned char *data, int count);
     static void sysLogHex(const char *data, int count) { sysLogHex(reinterpret_cast<const unsigned char*>(data), count); }
     static void sysLogHex(QByteArray &data) { sysLogHex(reinterpret_cast<const unsigned char*>(data.constData()), data.length()); }
+    static void setSystemLogFile(const QString& fileName);
+
+    static void setSystemOutputFlags(OutputFlags flags) { systemLog()->setOutputFlags(flags); };
+    static OutputFlags systemOutputFlags() { return systemLog()->outputFlags(); };
+
+    static int systemVerbosity() { return systemLog()->_verbosity; }
+    static void setSystemVerbosity(int value) { systemLog()->_verbosity = value; }
 
     void logText(const char *file, int line, KLog::LogLevel level, const char *format...);
+    void setLogFile(const QString& fileName);
+
+    int verbosity() const { return _verbosity; }
+    void setVerbosity(int value) { _verbosity = value; }
+
+    void setOutputFlags(OutputFlags flags) { _outputFlags = flags; }
+    OutputFlags outputFlags() const { return _outputFlags; };
+
 private:
     OutputFlags _outputFlags;
     LogLevel _level;
     QTextStream _stdout;
+    QTextStream* _fileOutputStream;
+    QString _fileName;
+    QFile* _file;
+    int _verbosity;
 
-    void outputToDestinations(QString &text);
+    void outputToDestinations(QString text);
     void writeTimestamp(QTextStream &output);
 
     static void openSystemLog();
@@ -58,6 +78,8 @@ private:
     static KLog* _systemLog;
     static OutputFlags _defaultOutputFlags;
     static LogLevel _defaultLogLevel;
+
+    static KLog* systemLog();
 };
 
 #define KLOG_DEBUG      __FILE__,__LINE__,KLog::LogLevel::Debug

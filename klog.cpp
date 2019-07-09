@@ -15,7 +15,9 @@ KLog::LogLevel KLog::_defaultLogLevel = KLog::LogLevel::Debug;
 KLog::KLog() :
     _outputFlags(_defaultOutputFlags),
     _level(_defaultLogLevel),
-    _stdout(stdout)
+    _stdout(stdout),
+    _file(nullptr),
+    _verbosity(0)
 {
 }
 
@@ -46,15 +48,28 @@ void KLog::logText(const char *file, int line, KLog::LogLevel level, const char 
 
     text << outputBuffer;
 
-    qDebug() << output;
+    QString final = output;
+    outputToDestinations(final);
+}
 
+void KLog::setLogFile(const QString &fileName)
+{
+    _fileName = fileName;
+    _file = new QFile(fileName);
+    _file->open(QIODevice::Append | QIODevice::WriteOnly);
+    if(_file->isOpen())
+    {
+        _fileOutputStream = new QTextStream(_file);
+        _outputFlags = (OutputFlags)(_outputFlags | OutputFlags::File);
+    }
+    else
+    {
+        qDebug() << "Could not open file " << fileName << " " << _file->errorString();
+    }
 }
 
 void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const char *format, ...)
 {
-    if(_systemLog == nullptr)
-        _systemLog = new KLog();
-
     va_list vargs;
     va_start(vargs, format);
 
@@ -63,19 +78,24 @@ void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const ch
     vsnprintf(outputBuffer, sizeof(outputBuffer), format, vargs);
     va_end(vargs);
 
-    _systemLog->logText(file, line, level, outputBuffer);
+    systemLog()->logText(file, line, level, outputBuffer);
 }
 
 void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const QString &output)
 {
-    _systemLog->logText(file, line, level, (const char*)output.constData());
+    char buffer[32768];
+    size_t count = qMin((size_t)output.length(), sizeof(buffer) - 1);
+    memcpy(buffer, output.toLocal8Bit().constData(), count);
+    buffer[count] = 0;
+    systemLog()->logText(file, line, level, buffer);
 }
 
-void KLog::outputToDestinations(QString& text)
+void KLog::outputToDestinations(QString text)
 {
     if(_outputFlags & OutputFlags::File)
     {
-        // todo
+        *_fileOutputStream << text << endl;
+        _fileOutputStream->flush();
     }
     if(_outputFlags & OutputFlags::Console)
     {
@@ -109,9 +129,23 @@ void KLog::sysLogHex(const unsigned char *data, int count)
     qDebug() << output;
 }
 
+void KLog::setSystemLogFile(const QString &fileName)
+{
+    systemLog()->setLogFile(fileName);
+}
+
 void KLog::openSystemLog()
 {
     _systemLog = new KLog();
+}
+
+KLog *KLog::systemLog()
+{
+    if(_systemLog == nullptr)
+    {
+        openSystemLog();
+    }
+    return _systemLog;
 }
 
 

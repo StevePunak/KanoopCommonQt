@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += network
-
 QT       -= gui
 
 TARGET = KanoopCommon
@@ -25,16 +24,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-PLX=/home/spunak/$(PLATFORM_LIBS)
 message(PLATFORM is $(PLATFORM_LIBS))
-target.path = /home/spunak/$(PLATFORM_LIBS)
+target.path = $$(HOME)/$(PLATFORM_LIBS)
+message(TARGET PATH is $(target.path))
 
 SOURCES += \
+    addresshelper.cpp \
         kanoopcommon.cpp \
     klog.cpp \
     pathutil.cpp
 
 HEADERS += \
+    addresshelper.h \
         kanoopcommon.h \
     klog.h \
     pathutil.h
