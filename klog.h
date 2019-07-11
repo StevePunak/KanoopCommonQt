@@ -51,6 +51,9 @@ public:
     static void setSystemVerbosity(int value) { systemLog()->_verbosity = value; }
 
     void logText(const char *file, int line, KLog::LogLevel level, const char *format...);
+    void logHex(const unsigned char *data, int count);
+    void logHex(QByteArray& data) { logHex(reinterpret_cast<const unsigned char*>(data.constData()), data.length()); }
+
     void setLogFile(const QString& fileName);
 
     int verbosity() const { return _verbosity; }

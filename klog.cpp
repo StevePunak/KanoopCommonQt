@@ -52,6 +52,41 @@ void KLog::logText(const char *file, int line, KLog::LogLevel level, const char 
     outputToDestinations(final);
 }
 
+void KLog::logHex(const unsigned char *data, int count)
+{
+    QString output;
+    output.reserve(count * 3 + count + 30);
+    QTextStream text(&output);
+    char outBuffer[128];
+    char dotBuffer[128];
+    int lineOffset = 0;
+    for(int x = 0;x < count;x++)
+    {
+        lineOffset = x % 16;
+        if(lineOffset == 0)
+        {
+            snprintf(outBuffer, sizeof(outBuffer), "%06x: ", x);
+            text << outBuffer;
+            memset(dotBuffer, 0, sizeof(dotBuffer));
+        }
+        snprintf(outBuffer, sizeof(outBuffer), "%02X ", data[x]);
+        text << outBuffer;
+
+        dotBuffer[lineOffset] = QChar::isPrint(data[x]) ? data[x] : '.';
+        if(lineOffset == 15)
+        {
+            text << "  " << dotBuffer << endl;
+        }
+    }
+    if(lineOffset < 15)
+    {
+        for(++lineOffset;lineOffset < 16;lineOffset++)
+            text << "   ";
+        text << "  " << dotBuffer << endl;
+    }
+    outputToDestinations(output);
+}
+
 void KLog::setLogFile(const QString &fileName)
 {
     _fileName = fileName;
@@ -118,15 +153,7 @@ void KLog::writeTimestamp(QTextStream& output)
 
 void KLog::sysLogHex(const unsigned char *data, int count)
 {
-    QString output;
-    QTextStream text(&output);
-    for(int x = 0;x < count;x++)
-    {
-        char outByte[10];
-        snprintf(outByte, sizeof(outByte), "%02X ", data[x]);
-        text << outByte;
-    }
-    qDebug() << output;
+    systemLog()->logHex(data, count);
 }
 
 void KLog::setSystemLogFile(const QString &fileName)
