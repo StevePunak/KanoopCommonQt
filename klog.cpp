@@ -127,6 +127,8 @@ void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const QS
 
 void KLog::outputToDestinations(QString text)
 {
+    _outputLock.lock();
+
     if(_outputFlags & OutputFlags::File)
     {
         *_fileOutputStream << text << endl;
@@ -140,6 +142,8 @@ void KLog::outputToDestinations(QString text)
     {
         qDebug() << text;
     }
+
+    _outputLock.unlock();
 }
 
 void KLog::writeTimestamp(QTextStream& output)

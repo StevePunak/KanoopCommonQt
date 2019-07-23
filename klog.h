@@ -6,6 +6,7 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include <QMutex>
 
 class KLog
 {
@@ -70,6 +71,7 @@ private:
     QString _fileName;
     QFile* _file;
     int _verbosity;
+    QMutex _outputLock;
 
     void outputToDestinations(QString text);
     void writeTimestamp(QTextStream &output);
