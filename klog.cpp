@@ -149,7 +149,7 @@ void KLog::outputToDestinations(QString text)
 void KLog::writeTimestamp(QTextStream& output)
 {
     QDateTime now = QDateTime::currentDateTimeUtc();
-    QString formatted = QString().sprintf("%04d-%02d-%02d %02d:%02d:%02d.%03d",
+    QString formatted = QString().asprintf("%04d-%02d-%02d %02d:%02d:%02d.%03d",
                                           now.date().year(), now.date().month(), now.date().day(),
                                           now.time().hour(), now.time().minute(), now.time().second(), now.time().msec());
     output << formatted << ' ';
