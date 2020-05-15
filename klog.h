@@ -42,11 +42,11 @@ public:
     static void sysLogText(const char* file, int line, LogLevel level, const QString& output);
     static void sysLogHex(const unsigned char *data, int count);
     static void sysLogHex(const char *data, int count) { sysLogHex(reinterpret_cast<const unsigned char*>(data), count); }
-    static void sysLogHex(QByteArray &data) { sysLogHex(reinterpret_cast<const unsigned char*>(data.constData()), data.length()); }
+    static void sysLogHex(const QByteArray &data) { sysLogHex(reinterpret_cast<const unsigned char*>(data.constData()), data.length()); }
     static void setSystemLogFile(const QString& fileName);
 
-    static void setSystemOutputFlags(OutputFlags flags) { systemLog()->setOutputFlags(flags); };
-    static OutputFlags systemOutputFlags() { return systemLog()->outputFlags(); };
+    static void setSystemOutputFlags(OutputFlags flags) { systemLog()->setOutputFlags(flags); }
+    static OutputFlags systemOutputFlags() { return systemLog()->outputFlags(); }
 
     static int systemVerbosity() { return systemLog()->_verbosity; }
     static void setSystemVerbosity(int value) { systemLog()->_verbosity = value; }
@@ -61,7 +61,7 @@ public:
     void setVerbosity(int value) { _verbosity = value; }
 
     void setOutputFlags(OutputFlags flags) { _outputFlags = flags; }
-    OutputFlags outputFlags() const { return _outputFlags; };
+    OutputFlags outputFlags() const { return _outputFlags; }
 
 private:
     OutputFlags _outputFlags;

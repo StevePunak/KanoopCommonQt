@@ -9,7 +9,6 @@ QT       -= gui
 
 TARGET = KanoopCommon
 TEMPLATE = lib
-CONFIG += staticlib
 
 QMAKE_CXXFLAGS += -Wno-format-nonliteral
 
@@ -25,25 +24,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 unix:
-contains(CONFIG, cross_compile):{
-        message("building for PI")
-        target.path = /${HOME}/lib/arm
-
-    }else{
-        message("Not building for PI")
-        target.path = /${HOME}/lib/x86
-    }
+target.path = $$[QT_SYSROOT]/usr/local/lib/Kanoop
 
 SOURCES += \
     addresshelper.cpp \
-        kanoopcommon.cpp \
+    jsonhelper.cpp \
+    kanoopcommon.cpp \
     klog.cpp \
-    pathutil.cpp
+    mutexevent.cpp \
+    pathutil.cpp \
+    ratemonitor.cpp
 
 HEADERS += \
     addresshelper.h \
-        kanoopcommon.h \
+    jsonhelper.h \
+    kanoopcommon.h \
     klog.h \
-    pathutil.h
+    lockingqueue.h \
+    mutexevent.h \
+    pathutil.h \
+    ratemonitor.h
 
+header_files.files = $$HEADERS
+header_files.path = $$[QT_SYSROOT]/usr/local/include/Kanoop
 INSTALLS = target
+INSTALLS += header_files
+

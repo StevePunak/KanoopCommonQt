@@ -6,6 +6,7 @@ class PathUtil
 {
 public:
     static QString fileName(const QString& path);
+    static QString dirName(const QString& path);
 };
 
 #endif // PATHUTIL_H

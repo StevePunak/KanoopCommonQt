@@ -7,6 +7,8 @@ class AddressHelper
 {
 public:
     static bool tryParseAddressPort(const QString& addressString, QString& address, quint16& port);
+    static bool tryParseAddressPort(const QString& addressString, QHostAddress& address, quint16& port);
+    static QHostAddress getLocalIP();
 
 private:
     AddressHelper();

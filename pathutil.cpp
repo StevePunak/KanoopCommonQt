@@ -13,3 +13,16 @@ QString PathUtil::fileName(const QString &path)
 
     return ret;
 }
+
+QString PathUtil::dirName(const QString &path)
+{
+    QString ret;
+    int index = path.lastIndexOf(QDir::separator());
+    if(index < 0)
+        ret = path;
+    else
+        ret = path.mid(0, index);
+
+    return ret;
+
+}
