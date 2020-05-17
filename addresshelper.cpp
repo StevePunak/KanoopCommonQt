@@ -1,11 +1,14 @@
 #include "addresshelper.h"
+#include <QHostInfo>
 #include <QNetworkInterface>
 #include <QStringList>
+#include <klog.h>
 
 bool AddressHelper::tryParseAddressPort(const QString &addressString, QString &address, quint16 &port)
 {
     bool result = false;
     QStringList parts = addressString.split(':');
+
     if(parts.length() == 2)
     {
         address = parts[0];
@@ -19,7 +22,18 @@ bool AddressHelper::tryParseAddressPort(const QString &addressString, QHostAddre
     QString addr;
     if(tryParseAddressPort(addressString, addr, port))
     {
-        address.setAddress(addr);
+        // if it's not a ip address, resolve it
+        if(addr[0].isDigit() == false)
+        {
+            QHostInfo hostInfo = QHostInfo::fromName(addr);
+            if(hostInfo.addresses().isEmpty())
+                return false;
+            address = hostInfo.addresses().first();
+        }
+        else
+        {
+            address.setAddress(addr);
+        }
         return true;
     }
     return false;

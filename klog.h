@@ -7,8 +7,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMutex>
+#include "kanoopcommon.h"
 
-class KLog
+class KANOOP_EXPORT KLog
 {
 public:
     enum LogLevel

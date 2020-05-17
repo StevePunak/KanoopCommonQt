@@ -3,8 +3,9 @@
 #include <QString>
 #include <QJsonArray>
 #include <QJsonObject>
+#include "kanoopcommon.h"
 
-class JsonHelper
+class KANOOP_EXPORT JsonHelper
 {
 public:
     static bool tryGetString(const QJsonObject& object, const QString& key, QString& value);

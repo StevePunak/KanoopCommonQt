@@ -3,8 +3,9 @@
 
 #include <QWaitCondition>
 #include <QMutex>
+#include "kanoopcommon.h"
 
-class MutexEvent
+class KANOOP_EXPORT MutexEvent
 {
 public:
     MutexEvent() {}

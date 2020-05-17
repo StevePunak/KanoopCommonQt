@@ -2,8 +2,9 @@
 #define ADDRESSHELPER_H
 #include <QHostAddress>
 #include <QString>
+#include "kanoopcommon.h"
 
-class AddressHelper
+class KANOOP_EXPORT AddressHelper
 {
 public:
     static bool tryParseAddressPort(const QString& addressString, QString& address, quint16& port);
