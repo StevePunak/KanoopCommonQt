@@ -18,6 +18,10 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 unix:
 target.path = $$[QT_SYSROOT]/usr/local/lib
 
+android: {
+    target.path = /usr/local/lib/android
+}
+
 SOURCES += \
     addresshelper.cpp \
     jsonhelper.cpp \
@@ -38,6 +42,11 @@ HEADERS += \
 
 header_files.files = $$HEADERS
 header_files.path = $$[QT_SYSROOT]/usr/local/include/Kanoop
+android: {
+    header_files.path = /usr/local/include/android/Kanoop
+}
+
+message($$target.path);
 
 INSTALLS = target
 INSTALLS += header_files
