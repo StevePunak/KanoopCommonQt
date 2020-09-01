@@ -75,14 +75,14 @@ void KLog::logHex(const unsigned char *data, int count)
         dotBuffer[lineOffset] = QChar::isPrint(data[x]) ? data[x] : '.';
         if(lineOffset == 15)
         {
-            text << "  " << dotBuffer << endl;
+            text << "  " << dotBuffer << Qt::endl;
         }
     }
     if(lineOffset < 15)
     {
         for(++lineOffset;lineOffset < 16;lineOffset++)
             text << "   ";
-        text << "  " << dotBuffer << endl;
+        text << "  " << dotBuffer << Qt::endl;
     }
     outputToDestinations(output);
 }
@@ -131,12 +131,12 @@ void KLog::outputToDestinations(QString text)
 
     if(_outputFlags & OutputFlags::File)
     {
-        *_fileOutputStream << text << endl;
+        *_fileOutputStream << text << Qt::endl;
         _fileOutputStream->flush();
     }
     if(_outputFlags & OutputFlags::Console)
     {
-        _stdout << text << endl;
+        _stdout << text << Qt::endl;
     }
     if(_outputFlags & OutputFlags::QDebug)
     {

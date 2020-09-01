@@ -10,9 +10,11 @@ public:
     static bool tryParseAddressPort(const QString& addressString, QString& address, quint16& port);
     static bool tryParseAddressPort(const QString& addressString, QHostAddress& address, quint16& port);
     static QHostAddress getLocalIP();
+    static QHostAddress getLocalIP(const QStringList& allowedInterfaces);
 
 private:
     AddressHelper();
+    static int indexOfRegEx(const QStringList &regexList, const QString& ifName);
 };
 
 #endif // ADDRESSHELPER_H
