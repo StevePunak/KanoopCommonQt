@@ -15,10 +15,18 @@ DEFINES += KANOOP_LIBRARY
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-unix:
-target.path = $$[QT_SYSROOT]/usr/local/lib
 
-android: {
+# load qmake variables which need to be brought in from from environment
+OUTPUT_PREFIX=$$(OUTPUT_PREFIX)
+!isEmpty(OUTPUT_PREFIX) {
+    OUTPUT_PREFIX=$$OUTPUT_PREFIX/$$basename(QMAKESPEC)
+}
+
+# If QT_BUILD_OUTPUT_ROOT is set, we will output to (QT_SYSROOT)/(OUTPUT_PREFIX)/usr/local/lib
+# Otherwise, it's (QT_SYSROOT)/usr/local/lib
+!android {
+    target.path = $$OUTPUT_PREFIX/usr/local/lib
+} else {
     target.path = /usr/local/lib/android
 }
 
@@ -41,12 +49,10 @@ HEADERS += \
     ratemonitor.h
 
 header_files.files = $$HEADERS
-header_files.path = $$[QT_SYSROOT]/usr/local/include/Kanoop
+header_files.path = $$OUTPUT_PREFIX/usr/local/include/Kanoop
 android: {
     header_files.path = /usr/local/include/android/Kanoop
 }
-
-message($$target.path);
 
 INSTALLS = target
 INSTALLS += header_files

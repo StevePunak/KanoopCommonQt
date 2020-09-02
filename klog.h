@@ -14,13 +14,14 @@ class KANOOP_EXPORT KLog
 public:
     enum LogLevel
     {
-        Always		= 0,
-        Debug 		= 1,
-        Info		= 2,
-        Warning		= 3,
-        Error		= 4,
-        Fatal		= 5,
-        Nothing		= 6
+        Emergency		= 0,
+        Alert           = 1,
+        Critical        = 2,
+        Error           = 3,
+        Warning         = 4,
+        Notice          = 5,
+        Informational   = 6,
+        Debug           = 7,
     };
 
     enum OutputFlags
@@ -33,6 +34,7 @@ public:
         File                        = 0x00002000,
         Marker                      = 0x00004000,
         QDebug                      = 0x00008000,
+        Syslog                      = 0x00010000,
 
         Standard = LineNumbers | Timestamp | Level | Console
     };
