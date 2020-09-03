@@ -19,7 +19,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 # load qmake variables which need to be brought in from from environment
 OUTPUT_PREFIX=$$(OUTPUT_PREFIX)
 !isEmpty(OUTPUT_PREFIX) {
-    OUTPUT_PREFIX=$$OUTPUT_PREFIX/$$basename(QMAKESPEC)
+    OUTPUT_PREFIX=$$OUTPUT_PREFIX/target/$$basename(QMAKESPEC)
 }
 
 # If QT_BUILD_OUTPUT_ROOT is set, we will output to (QT_SYSROOT)/(OUTPUT_PREFIX)/usr/local/lib
