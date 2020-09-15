@@ -1,4 +1,3 @@
-#include <stdarg.h>
 #include "klog.h"
 #include <QDateTime>
 #include "pathutil.h"
@@ -113,6 +112,14 @@ void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const ch
     vsnprintf(outputBuffer, sizeof(outputBuffer), format, vargs);
     va_end(vargs);
 
+    systemLog()->logText(file, line, level, outputBuffer);
+}
+
+void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const char *format, va_list args)
+{
+    char outputBuffer[0xffff];
+
+    vsnprintf(outputBuffer, sizeof(outputBuffer), format, args);
     systemLog()->logText(file, line, level, outputBuffer);
 }
 

@@ -6,7 +6,7 @@ TEMPLATE = lib
 CONFIG += c++11
 
 unix {
-    QMAKE_CXXFLAGS += -Wno-format-nonliteral
+    QMAKE_CXXFLAGS += -Wno-format-nonliteral -Wno-format-security
     TARGET = KanoopCommon
     }
 
@@ -57,3 +57,5 @@ android: {
 INSTALLS = target
 INSTALLS += header_files
 
+
+QMAKE_POST_LINK=$(MAKE) install

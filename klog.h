@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QMutex>
 #include "kanoopcommon.h"
+#include <stdarg.h>
 
 class KANOOP_EXPORT KLog
 {
@@ -42,6 +43,7 @@ public:
     KLog();
 
     static void sysLogText(const char* file, int line, LogLevel level, const char* format, ...);
+    static void sysLogText(const char* file, int line, LogLevel level, const char* format, va_list args);
     static void sysLogText(const char* file, int line, LogLevel level, const QString& output);
     static void sysLogHex(const unsigned char *data, int count);
     static void sysLogHex(const char *data, int count) { sysLogHex(reinterpret_cast<const unsigned char*>(data), count); }
@@ -95,6 +97,6 @@ private:
 #define KLOG_WARNING    __FILE__,__LINE__,KLog::LogLevel::Warning
 #define KLOG_ERROR      __FILE__,__LINE__,KLog::LogLevel::Error
 #define KLOG_FATAL      __FILE__,__LINE__,KLog::LogLevel::Fatal
-#define LLOG_ALWAYS     __FILE__,__LINE__,KLog::LogLevel::Always
+#define KLOG_ALWAYS     __FILE__,__LINE__,KLog::LogLevel::Always
 
 #endif // KLOG_H
