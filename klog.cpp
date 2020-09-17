@@ -1,16 +1,15 @@
-#include <stdarg.h>
 #include "klog.h"
 #include <QDateTime>
 #include "pathutil.h"
 
 const char *KLog::_levelStrings[] =
     {
-        "ALW", "DBG", "INF", "WRN", "ERR", "FAT", "NOT"
+        "EMRG", "ALRT", "CRIT", "ERR ", "WARN", "NOT ", "INF", "DBG"
     };
 
 KLog* KLog::_systemLog = nullptr;
 KLog::OutputFlags KLog::_defaultOutputFlags = KLog::OutputFlags::Standard;
-KLog::LogLevel KLog::_defaultLogLevel = KLog::LogLevel::Debug;
+KLog::LogLevel KLog::_defaultLogLevel = KLog::LogLevel::Alert;
 
 KLog::KLog() :
     _outputFlags(_defaultOutputFlags),
@@ -43,7 +42,7 @@ void KLog::logText(const char *file, int line, KLog::LogLevel level, const char 
         text << QString::number(line).leftJustified(4, ' ', true) << ' ';
     }
 
-    if(_outputFlags & OutputFlags::Level && level <= LogLevel::Nothing)
+    if(_outputFlags & OutputFlags::Level && level <= LogLevel::Debug)
         text << _levelStrings[level] << ' ';
 
     text << outputBuffer;
@@ -113,6 +112,14 @@ void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const ch
     vsnprintf(outputBuffer, sizeof(outputBuffer), format, vargs);
     va_end(vargs);
 
+    systemLog()->logText(file, line, level, outputBuffer);
+}
+
+void KLog::sysLogText(const char *file, int line, KLog::LogLevel level, const char *format, va_list args)
+{
+    char outputBuffer[0xffff];
+
+    vsnprintf(outputBuffer, sizeof(outputBuffer), format, args);
     systemLog()->logText(file, line, level, outputBuffer);
 }
 

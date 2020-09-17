@@ -8,19 +8,21 @@
 #include <QTextStream>
 #include <QMutex>
 #include "kanoopcommon.h"
+#include <stdarg.h>
 
 class KANOOP_EXPORT KLog
 {
 public:
     enum LogLevel
     {
-        Always		= 0,
-        Debug 		= 1,
-        Info		= 2,
-        Warning		= 3,
-        Error		= 4,
-        Fatal		= 5,
-        Nothing		= 6
+        Emergency		= 0,
+        Alert           = 1,
+        Critical        = 2,
+        Error           = 3,
+        Warning         = 4,
+        Notice          = 5,
+        Informational   = 6,
+        Debug           = 7,
     };
 
     enum OutputFlags
@@ -33,6 +35,7 @@ public:
         File                        = 0x00002000,
         Marker                      = 0x00004000,
         QDebug                      = 0x00008000,
+        Syslog                      = 0x00010000,
 
         Standard = LineNumbers | Timestamp | Level | Console
     };
@@ -40,6 +43,7 @@ public:
     KLog();
 
     static void sysLogText(const char* file, int line, LogLevel level, const char* format, ...);
+    static void sysLogText(const char* file, int line, LogLevel level, const char* format, va_list args);
     static void sysLogText(const char* file, int line, LogLevel level, const QString& output);
     static void sysLogHex(const unsigned char *data, int count);
     static void sysLogHex(const char *data, int count) { sysLogHex(reinterpret_cast<const unsigned char*>(data), count); }
@@ -93,6 +97,6 @@ private:
 #define KLOG_WARNING    __FILE__,__LINE__,KLog::LogLevel::Warning
 #define KLOG_ERROR      __FILE__,__LINE__,KLog::LogLevel::Error
 #define KLOG_FATAL      __FILE__,__LINE__,KLog::LogLevel::Fatal
-#define LLOG_ALWAYS     __FILE__,__LINE__,KLog::LogLevel::Always
+#define KLOG_ALWAYS     __FILE__,__LINE__,KLog::LogLevel::Always
 
 #endif // KLOG_H
