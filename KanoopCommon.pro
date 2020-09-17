@@ -32,6 +32,7 @@ OUTPUT_PREFIX=$$(OUTPUT_PREFIX)
 
 SOURCES += \
     addresshelper.cpp \
+    datetimeutil.cpp \
     jsonhelper.cpp \
     klog.cpp \
     mutexevent.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     addresshelper.h \
+    datetimeutil.h \
     jsonhelper.h \
     kanoopcommon.h \
     klog.h \
@@ -56,6 +58,5 @@ android: {
 
 INSTALLS = target
 INSTALLS += header_files
-
 
 QMAKE_POST_LINK=$(MAKE) install
