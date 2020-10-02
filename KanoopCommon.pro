@@ -22,17 +22,14 @@ OUTPUT_PREFIX=$$(OUTPUT_PREFIX)
     OUTPUT_PREFIX=$$OUTPUT_PREFIX/target/$$basename(QMAKESPEC)
 }
 
-# If QT_BUILD_OUTPUT_ROOT is set, we will output to (QT_SYSROOT)/(OUTPUT_PREFIX)/usr/local/lib
-# Otherwise, it's (QT_SYSROOT)/usr/local/lib
-!android {
-    target.path = $$OUTPUT_PREFIX/usr/local/lib
-} else {
-    target.path = /usr/local/lib/android
-}
+# add target include path
+INCLUDEPATH += $$OUTPUT_PREFIX/usr/local/include
+
 
 SOURCES += \
     addresshelper.cpp \
     datetimeutil.cpp \
+    fileutil.cpp \
     jsonhelper.cpp \
     klog.cpp \
     mutexevent.cpp \
@@ -42,6 +39,7 @@ SOURCES += \
 HEADERS += \
     addresshelper.h \
     datetimeutil.h \
+    fileutil.h \
     jsonhelper.h \
     kanoopcommon.h \
     klog.h \
@@ -56,7 +54,9 @@ android: {
     header_files.path = /usr/local/include/android/Kanoop
 }
 
-INSTALLS = target
+target.path = $$OUTPUT_PREFIX/usr/local/lib
+
+INSTALLS += target
 INSTALLS += header_files
 
 QMAKE_POST_LINK=$(MAKE) install
