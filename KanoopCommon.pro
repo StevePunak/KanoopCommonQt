@@ -54,7 +54,13 @@ android: {
     header_files.path = /usr/local/include/android/Kanoop
 }
 
-target.path = $$OUTPUT_PREFIX/usr/local/lib
+# If QT_BUILD_OUTPUT_ROOT is set, we will output to (QT_SYSROOT)/(OUTPUT_PREFIX)/usr/local/lib
+# Otherwise, it's (QT_SYSROOT)/usr/local/lib
+!android {
+    target.path = $$OUTPUT_PREFIX/usr/local/lib
+} else {
+    target.path = /usr/local/lib/android
+}
 
 INSTALLS += target
 INSTALLS += header_files
