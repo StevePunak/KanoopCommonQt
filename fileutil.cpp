@@ -11,7 +11,7 @@ QString FileUtil::getMD5String(const QString &filename)
     {
         result.reserve(32);
         for(int x = 0;x < hash.length();x++)
-            result.append(QString("%1").arg(hash[x], 2, 16, QChar('0')));
+            result.append(QStringLiteral("%1").arg((quint8)hash.constData()[x], 2, 16, QLatin1Char('0')));
     }
     return result;
 }

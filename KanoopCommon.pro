@@ -34,7 +34,8 @@ SOURCES += \
     klog.cpp \
     mutexevent.cpp \
     pathutil.cpp \
-    ratemonitor.cpp
+    ratemonitor.cpp \
+    timespan.cpp
 
 HEADERS += \
     addresshelper.h \
@@ -46,20 +47,22 @@ HEADERS += \
     lockingqueue.h \
     mutexevent.h \
     pathutil.h \
-    ratemonitor.h
+    ratemonitor.h \
+    timeconstants.h \
+    timespan.h
 
 header_files.files = $$HEADERS
-header_files.path = $$OUTPUT_PREFIX/usr/local/include/Kanoop
+header_files.path = $$OUTPUT_PREFIX/usr/include/Kanoop
 android: {
-    header_files.path = /usr/local/include/android/Kanoop
+    header_files.path = /usr/include/android/Kanoop
 }
 
 # If QT_BUILD_OUTPUT_ROOT is set, we will output to (QT_SYSROOT)/(OUTPUT_PREFIX)/usr/local/lib
 # Otherwise, it's (QT_SYSROOT)/usr/local/lib
 !android {
-    target.path = $$OUTPUT_PREFIX/usr/local/lib
+    target.path = $$OUTPUT_PREFIX/usr/lib
 } else {
-    target.path = /usr/local/lib/android
+    target.path = /usr/lib/android
 }
 
 INSTALLS += target
