@@ -8,23 +8,21 @@ CONFIG += c++11
 unix {
     QMAKE_CXXFLAGS += -Wno-format-nonliteral -Wno-format-security
     TARGET = KanoopCommon
-    }
+}
 
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += KANOOP_LIBRARY
-
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
 
 # load qmake variables which need to be brought in from from environment
 OUTPUT_PREFIX=$$(OUTPUT_PREFIX)
-!isEmpty(OUTPUT_PREFIX) {
+IS_TARGET_BUILD=$$(IS_TARGET_BUILD)
+
+if(!isEmpty(OUTPUT_PREFIX):isEmpty(IS_TARGET_BUILD)) {
     OUTPUT_PREFIX=$$OUTPUT_PREFIX/target/$$basename(QMAKESPEC)
 }
 
-# add target include path
-INCLUDEPATH += $$OUTPUT_PREFIX/usr/local/include
-
+target.path = $$OUTPUT_PREFIX/usr/lib
 
 SOURCES += \
     addresshelper.cpp \
@@ -53,17 +51,6 @@ HEADERS += \
 
 header_files.files = $$HEADERS
 header_files.path = $$OUTPUT_PREFIX/usr/include/Kanoop
-android: {
-    header_files.path = /usr/include/android/Kanoop
-}
-
-# If QT_BUILD_OUTPUT_ROOT is set, we will output to (QT_SYSROOT)/(OUTPUT_PREFIX)/usr/local/lib
-# Otherwise, it's (QT_SYSROOT)/usr/local/lib
-!android {
-    target.path = $$OUTPUT_PREFIX/usr/lib
-} else {
-    target.path = /usr/lib/android
-}
 
 INSTALLS += target
 INSTALLS += header_files
