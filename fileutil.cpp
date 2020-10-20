@@ -31,3 +31,14 @@ QByteArray FileUtil::getMD5Bytes(const QString &filename)
     }
     return result;
 }
+
+bool FileUtil::readAllBytes(const QString &filename, QByteArray &data)
+{
+    QFile file(filename);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        data = file.readAll();
+        return true;
+    }
+    return false;
+}

@@ -33,7 +33,9 @@ SOURCES += \
     mutexevent.cpp \
     pathutil.cpp \
     ratemonitor.cpp \
-    timespan.cpp
+    threadutil.cpp \
+    timespan.cpp \
+    userutil.cpp
 
 HEADERS += \
     addresshelper.h \
@@ -46,8 +48,10 @@ HEADERS += \
     mutexevent.h \
     pathutil.h \
     ratemonitor.h \
+    threadutil.h \
     timeconstants.h \
-    timespan.h
+    timespan.h \
+    userutil.h
 
 header_files.files = $$HEADERS
 header_files.path = $$OUTPUT_PREFIX/usr/include/Kanoop

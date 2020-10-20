@@ -26,3 +26,11 @@ QString PathUtil::dirName(const QString &path)
     return ret;
 
 }
+
+QString PathUtil::trimTrailingSlash(const QString &path)
+{
+    int i = path.length();
+    for(--i;i >= 0 && (path[i].isSpace() || path[i] == '/');i--);
+    QString trimmed = ++i > 0 ? path.mid(0, i) : "";
+    return trimmed;
+}
