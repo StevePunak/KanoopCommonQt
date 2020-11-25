@@ -42,3 +42,14 @@ bool FileUtil::readAllBytes(const QString &filename, QByteArray &data)
     }
     return false;
 }
+
+bool FileUtil::writeAllBytes(const QString &filename, const QByteArray &data)
+{
+    QFile file(filename);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        file.write(data);
+        return true;
+    }
+    return false;
+}
