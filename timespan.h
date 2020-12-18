@@ -72,6 +72,7 @@ public:
   static TimeSpan fromMinutes(int minutes);
   static TimeSpan fromHours(int hours);
   static TimeSpan fromDays(int days);
+  static TimeSpan fromString(const QString& timeString);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
 
@@ -80,6 +81,8 @@ public:
 
 private:
   void loadFromMilliseconds(uint64_t milliseconds);
+  static TimeSpan parseAbbreviatedString(const QString& timeString);
+  static int parseIntToToken(QString &remaining, const QString &until);
 
   int      _days;
   int      _hours;

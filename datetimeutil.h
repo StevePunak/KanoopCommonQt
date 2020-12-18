@@ -12,6 +12,8 @@ public:
 
     static QString toStandardString(const QDateTime& date) { return date.toString("yyyy-MM-dd hh:mm:ss.zzz"); }
     static QString toStandardString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz"); }
+    static QString toSquashedString() { return QDateTime::currentDateTimeUtc().toString("yyyyMMddhhmmsszzz"); }
+    static QString toSquashedString(QDateTime date) { return date.toString("yyyyMMddhhmmsszzz"); }
 };
 
 #endif // DATETIMEUTIL_H

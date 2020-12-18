@@ -168,6 +168,62 @@ TimeSpan TimeSpan::fromDays(int days)
     return fromMilliseconds(days * MillisecondsPerDay);
 }
 
+TimeSpan TimeSpan::fromString(const QString &timeString)
+{
+    if(timeString.contains('d') || timeString.contains('h') || timeString.contains('m') || timeString.contains('s'))
+        return parseAbbreviatedString(timeString);
+    else if(timeString.length() > 0 && timeString[0].isDigit())
+    {
+        return TimeSpan::fromMilliseconds(timeString.toInt());
+    }
+    return TimeSpan::zero();
+}
+
+TimeSpan TimeSpan::parseAbbreviatedString(const QString &timeString)
+{
+    QString remaining = timeString.trimmed();
+    TimeSpan result = TimeSpan::zero();
+
+    int days = parseIntToToken(remaining, "d");
+    if(days >= 0)
+        result = result + TimeSpan::fromDays(days);
+
+    int hours = parseIntToToken(remaining, "h");
+    if(hours >= 0)
+        result = result + TimeSpan::fromHours(hours);
+
+    int minutes = parseIntToToken(remaining, "m");
+    if(minutes >= 0)
+        result = result + TimeSpan::fromMinutes(minutes);
+
+    int milliseconds = parseIntToToken(remaining, "ms");
+    if(milliseconds >= 0)
+        result = result + TimeSpan::fromMilliseconds(milliseconds);
+    return result;
+}
+
+int TimeSpan::parseIntToToken(QString &remaining, const QString& token)
+{
+    int result = -1;
+    int index = remaining.indexOf(token);
+
+    // make sure the token has no adjoining alpha characters
+    if(index > 0)
+    {
+        int tokenSizeAtLocation = 0;
+        for(;index + tokenSizeAtLocation < remaining.length() && remaining[index + tokenSizeAtLocation].isLetter();tokenSizeAtLocation++);
+        if(tokenSizeAtLocation == token.length())
+        {
+            QString part = remaining.mid(0, index);
+            result = part.toInt();
+            remaining = part.length() + index < remaining.length()
+                    ? remaining.mid(index + part.length()).trimmed()
+                    : QString();
+        }
+    }
+    return result;
+}
+
 TimeSpan TimeSpan::absDiff(const QDateTime &t1, const QDateTime &t2)
 {
     TimeSpan result;

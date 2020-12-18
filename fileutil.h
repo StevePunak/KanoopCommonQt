@@ -13,6 +13,10 @@ public:
     static QByteArray getMD5Bytes(const QString& filename);
     static bool readAllBytes(const QString& filename, QByteArray& data);
     static bool writeAllBytes(const QString& filename, const QByteArray& data);
+    static bool exists(const QString& filename);
+    static bool remove(const QString& filename);
+    static bool move(const QString& source, const QString& destination);
+    static bool moveToDirectory(const QString& sourceFilename, const QString& destinationDirectory);
 };
 
 #endif // FILEUTIL_H

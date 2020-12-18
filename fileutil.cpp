@@ -1,4 +1,5 @@
 #include "fileutil.h"
+#include "pathutil.h"
 
 #include <QCryptographicHash>
 #include <QFile>
@@ -52,4 +53,39 @@ bool FileUtil::writeAllBytes(const QString &filename, const QByteArray &data)
         return true;
     }
     return false;
+}
+
+bool FileUtil::exists(const QString &filename)
+{
+    QFile file(filename);
+    return file.exists();
+}
+
+bool FileUtil::remove(const QString &filename)
+{
+    return QFile(filename).remove();
+}
+
+bool FileUtil::move(const QString &source, const QString &destination)
+{
+    bool result = false;
+    QFile currentFile(source);
+    if(currentFile.exists())
+    {
+        result = currentFile.rename(destination);
+    }
+    return result;
+}
+
+bool FileUtil::moveToDirectory(const QString &sourceFilename, const QString &destinationDirectory)
+{
+    bool result = false;
+    QFile currentFile(sourceFilename);
+    if(currentFile.exists())
+    {
+        QFileInfo currentInfo(sourceFilename);
+        QString destFilename = PathUtil::combine(destinationDirectory, currentInfo.fileName());
+        result = currentFile.rename(destFilename);
+    }
+    return result;
 }
