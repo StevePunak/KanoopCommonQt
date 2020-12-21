@@ -34,3 +34,17 @@ QString PathUtil::trimTrailingSlash(const QString &path)
     QString trimmed = ++i > 0 ? path.mid(0, i) : "";
     return trimmed;
 }
+
+QString PathUtil::combine(const QStringList &parts)
+{
+    QString result;
+    result.reserve(1024);
+    QTextStream output(&result);
+    for(int i = 0;i < parts.length();i++)
+    {
+        output << parts[i];
+        if(i < parts.length() - 1)
+            output << '/';
+    }
+    return result;
+}

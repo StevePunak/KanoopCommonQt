@@ -13,6 +13,7 @@ public:
     static QString combine(const QString& p1, const QString& p2, const QString& p3) { return QDir::cleanPath(p1 + '/' + p2 + '/' + p3); }
     static QString combine(const QString& p1, const QString& p2, const QString& p3, const QString& p4) { return QDir::cleanPath(p1 + '/' + p2 + '/' + p3 + '/' + p4); }
     static QString combine(const QString& p1, const QString& p2, const QString& p3, const QString& p4, const QString& p5) { return QDir::cleanPath(p1 + '/' + p2 + '/' + p3 + '/' + p4 + '/' + p5); }
+    static QString combine(const QStringList& parts);
 };
 
 #endif // PATHUTIL_H
