@@ -27,6 +27,18 @@ QString PathUtil::dirName(const QString &path)
 
 }
 
+QString PathUtil::extension(const QString &path)
+{
+    QString ret;
+    int index = path.lastIndexOf('.');
+    if(index < 0)
+        ret = path;
+    else
+        ret = path.mid(index);
+
+    return ret;
+}
+
 QString PathUtil::trimTrailingSlash(const QString &path)
 {
     int i = path.length();
