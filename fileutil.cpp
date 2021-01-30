@@ -3,6 +3,7 @@
 
 #include <QCryptographicHash>
 #include <QFile>
+#include <QTextStream>
 
 QString FileUtil::getMD5String(const QString &filename)
 {
@@ -39,6 +40,22 @@ bool FileUtil::readAllBytes(const QString &filename, QByteArray &data)
     if(file.open(QIODevice::ReadOnly))
     {
         data = file.readAll();
+        return true;
+    }
+    return false;
+}
+
+bool FileUtil::readAllLines(const QString &filename, QStringList &lines)
+{
+    QFile file(filename);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QTextStream ts(&file);
+        while(ts.atEnd() == false)
+        {
+            QString line = ts.readLine();
+            lines.append(line);
+        }
         return true;
     }
     return false;
