@@ -33,6 +33,7 @@ SOURCES += \
     mutexevent.cpp \
     pathutil.cpp \
     ratemonitor.cpp \
+    stringutil.cpp \
     threadutil.cpp \
     timespan.cpp \
     userutil.cpp
@@ -48,6 +49,7 @@ HEADERS += \
     mutexevent.h \
     pathutil.h \
     ratemonitor.h \
+    stringutil.h \
     threadutil.h \
     timeconstants.h \
     timespan.h \
