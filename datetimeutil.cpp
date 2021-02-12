@@ -11,3 +11,10 @@ QDateTime DateTimeUtil::fromString(const QString &date)
     }
     return result;
 }
+
+QDateTime DateTimeUtil::fromVariant(const QVariant &date)
+{
+    QDateTime result = date.toDateTime();
+    result.setOffsetFromUtc(0);
+    return result;
+}

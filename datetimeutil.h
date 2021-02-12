@@ -2,6 +2,7 @@
 #define DATETIMEUTIL_H
 #include <QDateTime>
 #include <QString>
+#include <QVariant>
 
 class DateTimeUtil
 {
@@ -11,6 +12,7 @@ public:
     static QDateTime fromISOString(const QString& date) { return QDateTime::fromString(date, Qt::DateFormat::ISODateWithMs); }
     static QDateTime fromStandardString(const QString& date) { return QDateTime::fromString(date, "yyyy-MM-dd hh:mm:ss.zzz"); }
     static QDateTime fromString(const QString& date);
+    static QDateTime fromVariant(const QVariant& date);
 
     static QString toStandardString(const QDateTime& date) { return date.toString("yyyy-MM-dd hh:mm:ss.zzz"); }
     static QString toStandardString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz"); }
