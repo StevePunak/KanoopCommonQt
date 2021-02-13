@@ -4,14 +4,13 @@
 #include <QByteArray>
 #include <QString>
 
-
-
 class FileUtil
 {
 public:
     static QString getMD5String(const QString& filename);
     static QByteArray getMD5Bytes(const QString& filename);
     static bool readAllBytes(const QString& filename, QByteArray& data);
+    static bool readAllLines(const QString& filename, QStringList& data);
     static bool writeAllBytes(const QString& filename, const QByteArray& data);
     static bool exists(const QString& filename);
     static bool remove(const QString& filename);

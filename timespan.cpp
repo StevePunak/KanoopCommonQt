@@ -172,6 +172,8 @@ TimeSpan TimeSpan::fromString(const QString &timeString)
 {
     if(timeString.contains('d') || timeString.contains('h') || timeString.contains('m') || timeString.contains('s'))
         return parseAbbreviatedString(timeString);
+    else if(timeString.contains(':'))
+        return parseColonDelimitedString(timeString);
     else if(timeString.length() > 0 && timeString[0].isDigit())
     {
         return TimeSpan::fromMilliseconds(timeString.toInt());
@@ -199,6 +201,40 @@ TimeSpan TimeSpan::parseAbbreviatedString(const QString &timeString)
     int milliseconds = parseIntToToken(remaining, "ms");
     if(milliseconds >= 0)
         result = result + TimeSpan::fromMilliseconds(milliseconds);
+    return result;
+}
+
+TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString)
+{
+    QStringList parts = timeString.split(':');
+    int days = 0;
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+    int ms = 0;
+    if(parts.length() > 0)
+    {
+        double s = parts.last().toDouble();
+        seconds = (int)s;
+        ms = (int)(s - seconds);
+        parts.removeLast();
+    }
+    if(parts.length() > 0)
+    {
+        minutes = parts.last().toInt();
+        parts.removeLast();
+    }
+    if(parts.length() > 0)
+    {
+        hours = parts.last().toInt();
+        parts.removeLast();
+    }
+    if(parts.length() > 0)
+    {
+        days = parts.last().toInt();
+    }
+
+    TimeSpan result = TimeSpan(days, hours, minutes, seconds, ms);
     return result;
 }
 

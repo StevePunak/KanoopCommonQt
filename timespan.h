@@ -82,6 +82,7 @@ public:
 private:
   void loadFromMilliseconds(uint64_t milliseconds);
   static TimeSpan parseAbbreviatedString(const QString& timeString);
+  static TimeSpan parseColonDelimitedString(const QString& timeString);
   static int parseIntToToken(QString &remaining, const QString &until);
 
   int      _days;
