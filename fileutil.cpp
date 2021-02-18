@@ -1,5 +1,6 @@
 #include "fileutil.h"
 #include "pathutil.h"
+#include "cryptoutil.h"
 
 #include <QCryptographicHash>
 #include <QFile>
@@ -20,18 +21,7 @@ QString FileUtil::getMD5String(const QString &filename)
 
 QByteArray FileUtil::getMD5Bytes(const QString &filename)
 {
-    QFile f(filename);
-    QByteArray result;
-    if (f.open(QFile::ReadOnly))
-    {
-        QCryptographicHash hash(QCryptographicHash::Md5);
-        char buffer[65536];
-        int bytesRead;
-        while((bytesRead = f.read(buffer, sizeof(buffer))) > 0)
-            hash.addData(buffer, bytesRead);
-        result = hash.result();
-    }
-    return result;
+    return CryptoUtil::fileMd5(filename);
 }
 
 bool FileUtil::readAllBytes(const QString &filename, QByteArray &data)

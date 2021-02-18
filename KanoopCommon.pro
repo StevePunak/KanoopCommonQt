@@ -26,6 +26,7 @@ target.path = $$OUTPUT_PREFIX/usr/lib
 
 SOURCES += \
     addresshelper.cpp \
+    cryptoutil.cpp \
     datetimeutil.cpp \
     fileutil.cpp \
     jsonhelper.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     addresshelper.h \
+    cryptoutil.h \
     datetimeutil.h \
     fileutil.h \
     jsonhelper.h \
