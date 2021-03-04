@@ -141,29 +141,29 @@ bool TimeSpan::operator <=(const TimeSpan& other) const
     return totalMilliseconds() <= other.totalMilliseconds();
 }
 
-TimeSpan TimeSpan::fromMilliseconds(int milliseconds)
+TimeSpan TimeSpan::fromMilliseconds(int64_t milliseconds)
 {
     TimeSpan ts;
     ts.loadFromMilliseconds(milliseconds);
     return ts;
 }
 
-TimeSpan TimeSpan::fromSeconds(int seconds)
+TimeSpan TimeSpan::fromSeconds(int64_t seconds)
 {
     return fromMilliseconds(seconds * MillisecondsPerSecond);
 }
 
-TimeSpan TimeSpan::fromMinutes(int minutes)
+TimeSpan TimeSpan::fromMinutes(int64_t minutes)
 {
     return fromMilliseconds(minutes * MillisecondsPerMinute);
 }
 
-TimeSpan TimeSpan::fromHours(int hours)
+TimeSpan TimeSpan::fromHours(int64_t hours)
 {
     return fromMilliseconds(hours * MillisecondsPerHour);
 }
 
-TimeSpan TimeSpan::fromDays(int days)
+TimeSpan TimeSpan::fromDays(int64_t days)
 {
     return fromMilliseconds(days * MillisecondsPerDay);
 }

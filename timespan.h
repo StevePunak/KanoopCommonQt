@@ -67,11 +67,11 @@ public:
   QString toString() const;
   QString toAbbreviatedFormat(bool milliseconds = false);
 
-  static TimeSpan fromMilliseconds(int milliseconds);
-  static TimeSpan fromSeconds(int seconds);
-  static TimeSpan fromMinutes(int minutes);
-  static TimeSpan fromHours(int hours);
-  static TimeSpan fromDays(int days);
+  static TimeSpan fromMilliseconds(int64_t milliseconds);
+  static TimeSpan fromSeconds(int64_t seconds);
+  static TimeSpan fromMinutes(int64_t minutes);
+  static TimeSpan fromHours(int64_t hours);
+  static TimeSpan fromDays(int64_t days);
   static TimeSpan fromString(const QString& timeString);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
