@@ -13,18 +13,13 @@ public:
         result.setTimeSpec(Qt::UTC);
         return result;
     }
-    static QDateTime fromSquashedString(const QString& date)
-    {
-        QDateTime result = QDateTime::fromString(date, "yyyyMMddhhmmsszzz");
-        result.setTimeSpec(Qt::UTC);
-        return result;
-    }
     static QDateTime fromStandardString(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd hh:mm:ss.zzz");
         result.setTimeSpec(Qt::UTC);
         return result;
     }
+    static QDateTime fromSquashedString(const QString& date);
     static QDateTime fromString(const QString& date);
     static QDateTime fromVariant(const QVariant& date);
 
