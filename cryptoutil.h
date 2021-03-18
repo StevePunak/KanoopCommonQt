@@ -4,8 +4,9 @@
 #include <QByteArray>
 #include <QString>
 #include <QStringList>
+#include "kanoopcommon.h"
 
-class CryptoUtil
+class KANOOP_EXPORT CryptoUtil
 {
 public:
     static QByteArray fileMd5(const QString& filename);

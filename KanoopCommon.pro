@@ -22,6 +22,10 @@ if(!isEmpty(OUTPUT_PREFIX):isEmpty(IS_TARGET_BUILD)) {
     OUTPUT_PREFIX=$$OUTPUT_PREFIX/target/$$basename(QMAKESPEC)
 }
 
+win32 {
+    OUTPUT_PREFIX=$$replace(OUTPUT_PREFIX, \+, p)
+}
+
 target.path = $$OUTPUT_PREFIX/usr/lib
 
 SOURCES += \

@@ -2,8 +2,9 @@
 #define PATHUTIL_H
 #include <QString>
 #include <QDir>
+#include "kanoopcommon.h"
 
-class PathUtil
+class KANOOP_EXPORT PathUtil
 {
 public:
     static QString fileName(const QString& path);
