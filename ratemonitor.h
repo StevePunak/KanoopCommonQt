@@ -4,8 +4,9 @@
 #include <QDateTime>
 #include <QList>
 #include <QMutex>
+#include "kanoopcommon.h"
 
-class RateMonitor
+class KANOOP_EXPORT RateMonitor
 {
 public:
     RateMonitor();

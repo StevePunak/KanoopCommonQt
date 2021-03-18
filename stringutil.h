@@ -2,8 +2,9 @@
 #define STRINGUTIL_H
 
 #include <QString>
+#include "kanoopcommon.h"
 
-class StringUtil
+class KANOOP_EXPORT StringUtil
 {
 public:
     static bool toBool(const QString& value) { return value.toLower() == "true" || value == "1"; }

@@ -5,10 +5,11 @@
 #include <QDateTime>
 #include <time.h>
 #include <sys/time.h>
+#include "kanoopcommon.h"
 
 using namespace std;
 
-class TimeSpan
+class KANOOP_EXPORT TimeSpan
 {
   friend class DateTime;
 public:

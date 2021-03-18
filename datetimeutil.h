@@ -3,8 +3,9 @@
 #include <QDateTime>
 #include <QString>
 #include <QVariant>
+#include "kanoopcommon.h"
 
-class DateTimeUtil
+class KANOOP_EXPORT DateTimeUtil
 {
 public:
     static QDateTime fromISOString(const QString& date)
