@@ -3,25 +3,25 @@
 
 #include <QTextStream>
 
-const uint64_t TimeSpan::MicrosecondsPerMillisecond    = __MicrosecondsPerMillisecond;
-const uint64_t TimeSpan::MicrosecondsPerSecond         = __MicrosecondsPerSecond;
-const uint64_t TimeSpan::MicrosecondsPerMinute         = __MicrosecondsPerMinute;
-const uint64_t TimeSpan::MicrosecondsPerHour           = __MicrosecondsPerHour;
-const uint64_t TimeSpan::MicrosecondsPerDay            = __MicrosecondsPerDay;
+const int64_t TimeSpan::MicrosecondsPerMillisecond    = __MicrosecondsPerMillisecond;
+const int64_t TimeSpan::MicrosecondsPerSecond         = __MicrosecondsPerSecond;
+const int64_t TimeSpan::MicrosecondsPerMinute         = __MicrosecondsPerMinute;
+const int64_t TimeSpan::MicrosecondsPerHour           = __MicrosecondsPerHour;
+const int64_t TimeSpan::MicrosecondsPerDay            = __MicrosecondsPerDay;
 
-const uint64_t TimeSpan::MillisecondsPerSecond         = __MillisecondsPerSecond;
-const uint64_t TimeSpan::MillisecondsPerMinute         = __MillisecondsPerMinute;
-const uint64_t TimeSpan::MillisecondsPerHour           = __MillisecondsPerHour;
-const uint64_t TimeSpan::MillisecondsPerDay            = __MillisecondsPerDay;
+const int64_t TimeSpan::MillisecondsPerSecond         = __MillisecondsPerSecond;
+const int64_t TimeSpan::MillisecondsPerMinute         = __MillisecondsPerMinute;
+const int64_t TimeSpan::MillisecondsPerHour           = __MillisecondsPerHour;
+const int64_t TimeSpan::MillisecondsPerDay            = __MillisecondsPerDay;
 
-const uint64_t TimeSpan::SecondsPerMinute              = __SecondsPerMinute;
-const uint64_t TimeSpan::SecondsPerHour                = __SecondsPerHour;
-const uint64_t TimeSpan::SecondsPerDay                 = __SecondsPerDay;
+const int64_t TimeSpan::SecondsPerMinute              = __SecondsPerMinute;
+const int64_t TimeSpan::SecondsPerHour                = __SecondsPerHour;
+const int64_t TimeSpan::SecondsPerDay                 = __SecondsPerDay;
 
-const uint64_t TimeSpan::MinutesPerHour                = __MinutesPerHour;
-const uint64_t TimeSpan::MinutesPerDay                 = __MinutesPerDay;
+const int64_t TimeSpan::MinutesPerHour                = __MinutesPerHour;
+const int64_t TimeSpan::MinutesPerDay                 = __MinutesPerDay;
 
-const uint64_t TimeSpan::HoursPerDay                   = __HoursPerDay;
+const int64_t TimeSpan::HoursPerDay                   = __HoursPerDay;
 
 const double TimeSpan::DaysPerYear                     = __DaysPerYear;
 
@@ -198,6 +198,10 @@ TimeSpan TimeSpan::parseAbbreviatedString(const QString &timeString)
     if(minutes >= 0)
         result = result + TimeSpan::fromMinutes(minutes);
 
+    int seconds = parseIntToToken(remaining, "s");
+    if(seconds >= 0)
+        result = result + TimeSpan::fromSeconds(seconds);
+
     int milliseconds = parseIntToToken(remaining, "ms");
     if(milliseconds >= 0)
         result = result + TimeSpan::fromMilliseconds(milliseconds);
@@ -276,7 +280,7 @@ void TimeSpan::toTimeSpec(struct timespec& timespec) const
     timespec.tv_nsec = _milliseconds * 1000000;
 }
 
-void TimeSpan::loadFromMilliseconds(uint64_t milliseconds)
+void TimeSpan::loadFromMilliseconds(int64_t milliseconds)
 {
     _days = milliseconds / MillisecondsPerDay;
     if(_days > 0)
@@ -322,7 +326,7 @@ QString TimeSpan::toString() const
     return result;
 }
 
-QString TimeSpan::toAbbreviatedFormat(bool milliseconds)
+QString TimeSpan::toAbbreviatedFormat(bool milliseconds) const
 {
     QString result;
     QTextStream output(&result);
