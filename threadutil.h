@@ -2,8 +2,9 @@
 #define THREADUTIL_H
 #include <QString>
 #include <QThread>
+#include "kanoopcommon.h"
 
-class ThreadUtil
+class KANOOP_EXPORT ThreadUtil
 {
 public:
     static QString currentThreadString() { return QString("0x%1").arg((quint64)QThread::currentThreadId(), 8, 16, QChar('0')); }

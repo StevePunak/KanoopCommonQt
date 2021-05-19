@@ -5,10 +5,11 @@
 #include <QDateTime>
 #include <time.h>
 #include <sys/time.h>
+#include "kanoopcommon.h"
 
 using namespace std;
 
-class TimeSpan
+class KANOOP_EXPORT TimeSpan
 {
   friend class DateTime;
 public:
@@ -65,13 +66,13 @@ public:
 
   void toTimeSpec(struct timespec& timespec) const;
   QString toString() const;
-  QString toAbbreviatedFormat(bool milliseconds = false);
+  QString toAbbreviatedFormat(bool milliseconds = false) const;
 
-  static TimeSpan fromMilliseconds(int milliseconds);
-  static TimeSpan fromSeconds(int seconds);
-  static TimeSpan fromMinutes(int minutes);
-  static TimeSpan fromHours(int hours);
-  static TimeSpan fromDays(int days);
+  static TimeSpan fromMilliseconds(int64_t milliseconds);
+  static TimeSpan fromSeconds(int64_t seconds);
+  static TimeSpan fromMinutes(int64_t minutes);
+  static TimeSpan fromHours(int64_t hours);
+  static TimeSpan fromDays(int64_t days);
   static TimeSpan fromString(const QString& timeString);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
@@ -80,7 +81,7 @@ public:
   static TimeSpan min(const TimeSpan& t1, const TimeSpan& t2) { return t1 < t2 ? t1 : t2; }
 
 private:
-  void loadFromMilliseconds(uint64_t milliseconds);
+  void loadFromMilliseconds(int64_t milliseconds);
   static TimeSpan parseAbbreviatedString(const QString& timeString);
   static TimeSpan parseColonDelimitedString(const QString& timeString);
   static int parseIntToToken(QString &remaining, const QString &until);
@@ -92,25 +93,25 @@ private:
   int      _milliseconds;
 
 // Constants
-  static const uint64_t MicrosecondsPerMillisecond;
-  static const uint64_t MicrosecondsPerSecond;
-  static const uint64_t MicrosecondsPerMinute;
-  static const uint64_t MicrosecondsPerHour;
-  static const uint64_t MicrosecondsPerDay;
+  static const int64_t MicrosecondsPerMillisecond;
+  static const int64_t MicrosecondsPerSecond;
+  static const int64_t MicrosecondsPerMinute;
+  static const int64_t MicrosecondsPerHour;
+  static const int64_t MicrosecondsPerDay;
 
-  static const uint64_t MillisecondsPerSecond;
-  static const uint64_t MillisecondsPerMinute;
-  static const uint64_t MillisecondsPerHour;
-  static const uint64_t MillisecondsPerDay;
+  static const int64_t MillisecondsPerSecond;
+  static const int64_t MillisecondsPerMinute;
+  static const int64_t MillisecondsPerHour;
+  static const int64_t MillisecondsPerDay;
 
-  static const uint64_t SecondsPerMinute;
-  static const uint64_t SecondsPerHour;
-  static const uint64_t SecondsPerDay;
+  static const int64_t SecondsPerMinute;
+  static const int64_t SecondsPerHour;
+  static const int64_t SecondsPerDay;
 
-  static const uint64_t MinutesPerHour;
-  static const uint64_t MinutesPerDay;
+  static const int64_t MinutesPerHour;
+  static const int64_t MinutesPerDay;
 
-  static const uint64_t HoursPerDay;
+  static const int64_t HoursPerDay;
 
   static const double   DaysPerYear;
 };

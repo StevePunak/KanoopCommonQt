@@ -3,8 +3,9 @@
 
 #include <QByteArray>
 #include <QString>
+#include "kanoopcommon.h"
 
-class FileUtil
+class KANOOP_EXPORT FileUtil
 {
 public:
     static QString getMD5String(const QString& filename);

@@ -1,5 +1,6 @@
 #include "userutil.h"
 
+#ifndef __WIN32
 
 gid_t UserUtil::gidFromName(const QString &name)
 {
@@ -40,3 +41,5 @@ bool UserUtil::isUserMemberOfGroup(uid_t uid, gid_t gid)
 
     return false;
 }
+
+#endif
