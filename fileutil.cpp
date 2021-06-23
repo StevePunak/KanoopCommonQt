@@ -41,9 +41,9 @@ bool FileUtil::readAllLines(const QString &filename, QStringList &lines)
     if(file.open(QIODevice::ReadOnly))
     {
         QTextStream ts(&file);
-        while(ts.atEnd() == false)
+        QString line;
+        while((line = ts.readLine()).isNull() == false)
         {
-            QString line = ts.readLine();
             lines.append(line);
         }
         return true;
