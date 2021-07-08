@@ -1,36 +1,42 @@
 #include "ratemonitor.h"
 
-#define EVALUATION_PERIOD_MS    1000
-
-RateMonitor::RateMonitor()
-{
-}
-
 void RateMonitor::addEvent(int count)
 {
     qint64 now = QDateTime::currentMSecsSinceEpoch();
+
     _lock.lock();
-
-    while(count--)
-        _events.append(now);
-
+    _events.append(RateEvent(now, count));
     _lock.unlock();
 }
 
-int RateMonitor::eventsPerSecond()
+double RateMonitor::eventsPerSecond()
 {
     qint64 now = QDateTime::currentMSecsSinceEpoch();
-    qint64 base = now - EVALUATION_PERIOD_MS;
+    qint64 startTime = now - _evaluationMsecs;
 
-    int result = 0;
+    double result = 0;
     _lock.lock();
 
-    while(_events.count() > 0 && _events[0] < base)
+    // get rid of old events
+    while(_events.count() > 0 && _events[0]._timestamp < startTime)
         _events.removeFirst();
 
-    result = _events.count();
+    // count new events
+    qint64 firstEventTime = 0;
+    for(const RateEvent& e: _events)
+    {
+        result += e._count;
+        if(firstEventTime == 0)
+            firstEventTime = e._timestamp;
+    }
 
     _lock.unlock();
+
+    if(firstEventTime == 0)
+        firstEventTime = startTime;
+
+    double secondsEvaluated = (double)(now - firstEventTime) / 1000.0;
+    result /= secondsEvaluated;
 
     return result;
 }
