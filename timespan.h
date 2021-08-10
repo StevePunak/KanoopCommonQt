@@ -2,6 +2,7 @@
 #define TIMESPAN_H_
 
 #include <QString>
+#include <QObject>
 #include <QDateTime>
 #include <time.h>
 #include <sys/time.h>
@@ -115,6 +116,8 @@ private:
 
   static const double   DaysPerYear;
 };
+
+Q_DECLARE_METATYPE(TimeSpan)
 
 #endif /* TIMESPAN_H_ */
 
