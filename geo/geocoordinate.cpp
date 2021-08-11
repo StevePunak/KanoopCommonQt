@@ -1,5 +1,6 @@
 #include "geocoordinate.h"
 #include <QStringList>
+#include "earthgeo.h"
 
 QString GeoCoordinate::TOSTRING_DELIM       = "Lat/Long: ";
 
@@ -14,12 +15,25 @@ bool GeoCoordinate::operator==(const GeoCoordinate &other)
             _cardinalLongitude == other._cardinalLongitude;
 }
 
-QString GeoCoordinate::toString(int precision)
+QString GeoCoordinate::toString(Format format, int precision)
 {
-    return QString("%1%2, %3")
-            .arg(TOSTRING_DELIM)
-            .arg(_latitude, precision, 'f')
-            .arg(_longitude, precision, 'f');
+    QString result;
+    switch(format)
+    {
+    case Parsable:
+        result = QString("%1%2, %3")
+                .arg(TOSTRING_DELIM)
+                .arg(_latitude, precision, 'f')
+                .arg(_longitude, precision, 'f');
+        break;
+    case Degrees:
+    default:
+        result = QString("%1, %2")
+                .arg(_latitude, precision, 'f')
+                .arg(_longitude, precision, 'f');
+        break;
+    }
+    return result;
 }
 
 bool GeoCoordinate::tryParse(const QString &stringValue, GeoCoordinate& point)
@@ -57,4 +71,20 @@ bool GeoCoordinate::tryParse(const QString &stringValue, GeoCoordinate& point)
         }
     }
     return result;
+}
+
+double GeoCoordinate::getDistance(const GeoCoordinate &pt1, const GeoCoordinate &pt2)
+{
+    // get the arc between the two earth points in radians
+    double deltaLat = radians(pt2.latitude() - pt1.latitude());
+    double deltaLong = radians(pt2.longitude() - pt1.longitude());
+
+    double latitudeHelix = qPow(qSin(deltaLat * 0.5), 2);
+    double longitudeHelix = qPow(qSin(deltaLong * 0.5), 2);
+
+    double tmp = qCos(radians(pt1.latitude())) * qCos(radians(pt2.latitude()));
+    double rad = 2.0 * qAsin(qSqrt(latitudeHelix + tmp * longitudeHelix));
+
+    // Multiply the radians by the earth radius in meters for a distance measurement in meters
+    return (EarthGeo::EarthRadius * rad);
 }

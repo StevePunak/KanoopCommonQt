@@ -3,6 +3,7 @@
 #include "geotypes.h"
 
 #include <QString>
+#include <QtMath>
 
 class GeoCoordinate
 {
@@ -25,6 +26,12 @@ public:
 
     GeoCoordinate(const QString& value);
 
+    enum Format
+    {
+        Degrees,
+        Parsable,
+    };
+
     bool operator==(const GeoCoordinate& other);
     bool operator!=(const GeoCoordinate& other) { return !(*this == other); }
 
@@ -40,6 +47,8 @@ public:
     int precision() const { return _precision; }
     void setPrecision(int value) { _precision = value; }
 
+    double distanceTo(const GeoCoordinate& other) { return getDistance(*this, other); }
+
     bool isNorthOfOrEqualTo(const GeoCoordinate& other);
     bool isNorthOf(const GeoCoordinate& other);
     bool isSouthOfOrEqualTo(const GeoCoordinate& other);
@@ -51,13 +60,15 @@ public:
 
     bool isEmpty() { return *this == GeoCoordinate(); }
 
-    QString toString(int precision = 0);
+    QString toString(Format format = Degrees, int precision = 0);
 
     static bool tryParse(const QString& stringValue, GeoCoordinate &point);
     static GeoCoordinate empty() { return GeoCoordinate(); }
+    static double getDistance(const GeoCoordinate& pt1, const GeoCoordinate& pt2);
 
 private:
     static bool equalAtPrecision(double v1, double v2, int precision);
+    static double radians(double angle) { return M_PI * angle / 180; }
 
     double _latitude;
     double _longitude;

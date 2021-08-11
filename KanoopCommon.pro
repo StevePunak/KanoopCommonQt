@@ -28,7 +28,9 @@ SOURCES += \
     addresshelper.cpp \
     cryptoutil.cpp \
     datetimeutil.cpp \
+    geo/earthgeo.cpp \
     fileutil.cpp \
+    geo/geocircle.cpp \
     geo/geocoordinate.cpp \
     geo/geotypes.cpp \
     jsonhelper.cpp \
@@ -45,7 +47,9 @@ HEADERS += \
     addresshelper.h \
     cryptoutil.h \
     datetimeutil.h \
+    geo/earthgeo.h \
     fileutil.h \
+    geo/geocircle.h \
     geo/geocoordinate.h \
     geo/geotypes.h \
     jsonhelper.h \
