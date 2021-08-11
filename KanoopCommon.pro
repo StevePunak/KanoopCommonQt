@@ -29,6 +29,8 @@ SOURCES += \
     cryptoutil.cpp \
     datetimeutil.cpp \
     fileutil.cpp \
+    geo/geocoordinate.cpp \
+    geo/geotypes.cpp \
     jsonhelper.cpp \
     klog.cpp \
     mutexevent.cpp \
@@ -44,6 +46,8 @@ HEADERS += \
     cryptoutil.h \
     datetimeutil.h \
     fileutil.h \
+    geo/geocoordinate.h \
+    geo/geotypes.h \
     jsonhelper.h \
     kanoopcommon.h \
     klog.h \
