@@ -29,7 +29,7 @@
 
 #define __HoursPerDay                               (uint64_t)24L
 
-#define __DaysPerYear                               365.242;
+#define __DaysPerYear                               365.242
 
 
 #endif //` __TIMECONSTANTS_H
