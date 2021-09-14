@@ -220,7 +220,7 @@ TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString)
     {
         double s = parts.last().toDouble();
         seconds = (int)s;
-        ms = (int)(s - seconds);
+        ms = (int)((s - seconds) * 1000);
         parts.removeLast();
     }
     if(parts.length() > 0)
