@@ -13,6 +13,7 @@ public:
     static bool readAllBytes(const QString& filename, QByteArray& data);
     static bool readAllLines(const QString& filename, QStringList& data);
     static bool writeAllBytes(const QString& filename, const QByteArray& data);
+    static bool writeAllLines(const QString& filename, const QStringList& lines);
     static bool exists(const QString& filename);
     static bool remove(const QString& filename);
     static bool move(const QString& source, const QString& destination);
