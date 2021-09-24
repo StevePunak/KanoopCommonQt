@@ -62,6 +62,21 @@ bool FileUtil::writeAllBytes(const QString &filename, const QByteArray &data)
     return false;
 }
 
+bool FileUtil::writeAllLines(const QString &filename, const QStringList &lines)
+{
+    QFile file(filename);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        foreach(const QString& line, lines)
+        {
+            file.write(line.toLatin1());
+            file.write("\n");
+        }
+        return true;
+    }
+    return false;
+}
+
 bool FileUtil::exists(const QString &filename)
 {
     QFile file(filename);
