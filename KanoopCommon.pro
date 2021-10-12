@@ -6,7 +6,7 @@ TEMPLATE = lib
 CONFIG += c++11
 
 unix {
-    QMAKE_CXXFLAGS += -Wno-format-nonliteral -Wno-format-security
+    QMAKE_CXXFLAGS += -Wno-format-nonliteral -Wno-format-security -O2
     TARGET = KanoopCommon
 }
 
