@@ -87,6 +87,16 @@ double TimeSpan::totalMilliseconds() const
             (_seconds * MillisecondsPerSecond) + _milliseconds;
 }
 
+double TimeSpan::totalMicroseconds() const
+{
+    return totalMilliseconds() * 1000;
+}
+
+double TimeSpan::totalNanoseconds() const
+{
+    return totalMilliseconds() * 1000000;
+}
+
 TimeSpan TimeSpan::operator +(const TimeSpan& other) const
 {
     TimeSpan temp;
