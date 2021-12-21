@@ -30,6 +30,19 @@ public:
     static QString toStandardString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz"); }
     static QString toSquashedString() { return QDateTime::currentDateTimeUtc().toString("yyyyMMddhhmmsszzz"); }
     static QString toSquashedString(QDateTime date) { return date.toString("yyyyMMddhhmmsszzz"); }
+
+private:
+    /**
+     * @brief fromAlternate1String
+     * Parse this format: 2021-12-17 Friday 22:22:51.569
+     * @return
+     */
+    static QDateTime fromAlternate1String(const QString& date)
+    {
+        QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd dddd hh:mm:ss.zzz");
+        result.setTimeSpec(Qt::UTC);
+        return result;
+    }
 };
 
 #endif // DATETIMEUTIL_H

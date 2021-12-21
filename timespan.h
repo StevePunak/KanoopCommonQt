@@ -58,12 +58,16 @@ public:
   int minutes() const { return _minutes; }
   int seconds() const { return _seconds; }
   int milliseconds() const { return _milliseconds; }
+  int microseconds() const { return _milliseconds * 1000; }
+  int nanoseconds() const { return _milliseconds * 1000000; }
 
   double totalSeconds() const;
   double totalMinutes() const;
   double totalHours() const;
   double totalDays() const;
   double totalMilliseconds() const;
+  double totalMicroseconds() const;
+  double totalNanoseconds() const;
 
   void toTimeSpec(struct timespec& timespec) const;
   QString toString() const;
