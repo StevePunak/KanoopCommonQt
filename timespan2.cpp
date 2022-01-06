@@ -43,8 +43,6 @@ TimeSpan2::TimeSpan2(double days, double hours, double minutes, double seconds, 
     _nanoseconds += milliseconds * NanosecondsPerMillisecond;
     _nanoseconds += microseconds * NanosecondsPerMicrosecond;
     _nanoseconds += nanoseconds;
-
-    qDebug() << _nanoseconds << Qt::endl;
 }
 
 TimeSpan2::TimeSpan2(const TimeSpan2& other)
@@ -59,7 +57,7 @@ TimeSpan2::TimeSpan2(const timespec& other)
 
 TimeSpan2& TimeSpan2::operator =(const timespec& other)
 {
-    _nanoseconds = (uint64_t)(other.tv_sec) * 1000L;
+    _nanoseconds = (uint64_t)(other.tv_sec) * 1000000000L;
     _nanoseconds += (uint64_t)other.tv_nsec;
     return *this;
 }
