@@ -3,6 +3,7 @@
 #include <QNetworkInterface>
 #include <QStringList>
 #include <klog.h>
+#include <QRegularExpression>
 
 bool AddressHelper::tryParseAddressPort(const QString &addressString, QString &address, quint16 &port)
 {
@@ -90,9 +91,9 @@ int AddressHelper::indexOfRegEx(const QStringList& regexList, const QString &ifN
 {
     for(int i = 0;i < regexList.count();i++)
     {
-        QRegExp regex(regexList[i]);
-        regex.setPatternSyntax(QRegExp::PatternSyntax::Wildcard);
-        if(regex.indexIn(ifName) == 0)
+        QRegularExpression regex(regexList[i]);
+        QRegularExpressionMatch match = regex.match(ifName);
+        if(match.capturedStart() == 0)
         {
             return i;
         }

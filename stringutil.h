@@ -2,6 +2,7 @@
 #define STRINGUTIL_H
 
 #include <QString>
+#include <QStringList>
 #include "kanoopcommon.h"
 
 class KANOOP_EXPORT StringUtil
