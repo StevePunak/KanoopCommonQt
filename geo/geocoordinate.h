@@ -21,7 +21,10 @@ public:
         _latitude(latitude),
         _longitude(longitude),
         _altitude(altitude),
-        _precision(6)
+        _precision(6),
+        _cardinalLatitude(Geo::InvalidCardinalDirection),
+        _cardinalLongitude(Geo::InvalidCardinalDirection),
+        _valid(false)
     {
         validate();
     }
