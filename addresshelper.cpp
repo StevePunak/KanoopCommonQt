@@ -29,7 +29,7 @@ bool AddressHelper::tryParseAddressPort(const QString &addressString, QHostAddre
             QHostInfo hostInfo = QHostInfo::fromName(addr);
             if(hostInfo.addresses().isEmpty())
                 return false;
-            address = hostInfo.addresses().first();
+            address = hostInfo.addresses().at(0);
         }
         else
         {
