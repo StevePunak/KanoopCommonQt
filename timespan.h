@@ -58,8 +58,8 @@ public:
   int minutes() const { return _minutes; }
   int seconds() const { return _seconds; }
   int milliseconds() const { return _milliseconds; }
-  int microseconds() const { return _milliseconds * 1000; }
-  int nanoseconds() const { return _milliseconds * 1000000; }
+  int microseconds() const { return 0; }
+  int nanoseconds() const { return 0; }
 
   double totalSeconds() const;
   double totalMinutes() const;
