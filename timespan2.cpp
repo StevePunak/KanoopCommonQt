@@ -123,6 +123,34 @@ TimeSpan2 TimeSpan2::operator -(const TimeSpan2& other) const
     return temp;
 }
 
+TimeSpan2 TimeSpan2::operator*(const TimeSpan2 &other) const
+{
+    TimeSpan2 temp;
+    temp._nanoseconds = _nanoseconds * other._nanoseconds;
+    return temp;
+}
+
+TimeSpan2 TimeSpan2::operator*(const int& value) const
+{
+    TimeSpan2 temp;
+    temp._nanoseconds = _nanoseconds * value;
+    return temp;
+}
+
+TimeSpan2 TimeSpan2::operator/(const TimeSpan2 &other) const
+{
+    TimeSpan2 temp;
+    temp._nanoseconds = _nanoseconds / other._nanoseconds;
+    return temp;
+}
+
+TimeSpan2 TimeSpan2::operator/(const int& value) const
+{
+    TimeSpan2 temp;
+    temp._nanoseconds = _nanoseconds / value;
+    return temp;
+}
+
 void TimeSpan2::operator +=(const TimeSpan2& other)
 {
     *this = *this + other;
@@ -131,6 +159,16 @@ void TimeSpan2::operator +=(const TimeSpan2& other)
 void TimeSpan2::operator -=(const TimeSpan2& other)
 {
     *this = *this - other;
+}
+
+void TimeSpan2::operator*=(const TimeSpan2 &other)
+{
+    *this = *this * other;
+}
+
+void TimeSpan2::operator/=(const TimeSpan2 &other)
+{
+    *this = *this / other;
 }
 
 bool TimeSpan2::operator ==(const TimeSpan2& other) const
@@ -422,18 +460,27 @@ void TimeSpan2::toTimeSpec(struct timespec& timespec) const
 
 QString TimeSpan2::toString() const
 {
-    QString result = days() == 0
-            ? QString("%1:%2:%3.%4").
-              arg(hours(), 2, 10, QChar('0')).
-              arg(minutes(), 2, 10, QChar('0')).
-              arg(seconds(), 2, 10, QChar('0')).
-              arg(milliseconds(), 3, 10, QChar('0'))
-            : QString("%1.:%2:%3:%4.%5").
-              arg(days()).
-              arg(hours(), 2, 10, QChar('0')).
-              arg(minutes(), 2, 10, QChar('0')).
-              arg(seconds(), 2, 10, QChar('0')).
-              arg(milliseconds(), 3, 10, QChar('0'));
+    QString result;
+    if(_nanoseconds > 1000000)
+    {
+        result = days() == 0
+                ? QString("%1:%2:%3.%4").
+                  arg(hours(), 2, 10, QChar('0')).
+                  arg(minutes(), 2, 10, QChar('0')).
+                  arg(seconds(), 2, 10, QChar('0')).
+                  arg(milliseconds(), 3, 10, QChar('0'))
+                : QString("%1.:%2:%3:%4.%5").
+                  arg(days()).
+                  arg(hours(), 2, 10, QChar('0')).
+                  arg(minutes(), 2, 10, QChar('0')).
+                  arg(seconds(), 2, 10, QChar('0')).
+                  arg(milliseconds(), 3, 10, QChar('0'));
+    }
+    else
+    {
+        double microseconds = (double)_nanoseconds / (double)1000;
+        result = QString("%1us").arg(microseconds, 0, 'f', 3);
+    }
     return result;
 }
 

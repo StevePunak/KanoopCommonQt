@@ -65,7 +65,6 @@ bool GeoCoordinate::tryParse(const QString &stringValue, GeoCoordinate& point)
     bool result = false;
     QString value = stringValue;
     int		index = value.indexOf(TOSTRING_DELIM);
-    QString	name;
     if(index > 0)
     {
         value = value.mid(index).trimmed();
