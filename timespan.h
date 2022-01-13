@@ -1,6 +1,28 @@
+/**
+ *  TimeSpan
+ *
+ *  This class represents a span of time with nanosecond resolution, and provides
+ *  an interface that is very similar to the .NET TimeSpan class.
+ *
+ *  Operators are supplied for comparison and assignment.
+ *
+ *  Conversions are supplied to convert between timespec and TimeSpan.
+ *
+ *  Use the absDiff() static method to obtain the difference between two
+ *  QDateTime objects.
+ *
+ *  NOTE:
+ *  The underlying representation is a signed 64-bit integer value of nanoseconds.
+ *  Therefore, the largest possible value is 9,223,372,036,854,775,807 giving a
+ *  maximum range of approximately 292 years.
+ *
+ *  This was re-written December 2021 to have nanosecond resolution. The interface
+ *  is compatible with the previous TimeSpan object.
+ *
+ *  Stephen Punak, December 27 2021
+ */
 #ifndef TIMESPAN_H_
 #define TIMESPAN_H_
-
 #include <QString>
 #include <QObject>
 #include <QDateTime>
@@ -8,32 +30,13 @@
 #include <sys/time.h>
 #include "kanoopcommon.h"
 
-using namespace std;
-
 class KANOOP_EXPORT TimeSpan
 {
-  friend class DateTime;
 public:
   TimeSpan() :
-    _days(0),
-    _hours(0),
-    _minutes(0),
-    _seconds(0),
-    _milliseconds(0) {}
+    _nanoseconds(0) {}
 
-  TimeSpan(int days, int hours, int minutes, int seconds) :
-    _days(days),
-    _hours(hours),
-    _minutes(minutes),
-    _seconds(seconds),
-    _milliseconds(0) {}
-
-  TimeSpan(int days, int hours, int minutes, int seconds, int milliseconds) :
-    _days(days),
-    _hours(hours),
-    _minutes(minutes),
-    _seconds(seconds),
-    _milliseconds(milliseconds) {}
+  TimeSpan(double days, double hours, double minutes, double seconds, double milliseconds = 0, double microseconds = 0, double nanoseconds = 0);
 
   TimeSpan(const TimeSpan& other);
   TimeSpan(const timespec& other);
@@ -43,8 +46,14 @@ public:
 
   TimeSpan operator+(const TimeSpan& other) const;
   TimeSpan operator-(const TimeSpan& other) const;
+  TimeSpan operator*(const TimeSpan& other) const;
+  TimeSpan operator*(const int& value) const;
+  TimeSpan operator/(const TimeSpan& other) const;
+  TimeSpan operator/(const int& value) const;
   void operator+=(const TimeSpan& other);
   void operator-=(const TimeSpan& other);
+  void operator*=(const TimeSpan& other);
+  void operator/=(const TimeSpan& other);
 
   bool operator==(const TimeSpan& other) const;
   bool operator!=(const TimeSpan& other) const;
@@ -53,13 +62,13 @@ public:
   bool operator>=(const TimeSpan& other) const;
   bool operator<=(const TimeSpan& other) const;
 
-  int days() const { return _days; }
-  int hours() const { return _hours; }
-  int minutes() const { return _minutes; }
-  int seconds() const { return _seconds; }
-  int milliseconds() const { return _milliseconds; }
-  int microseconds() const { return 0; }
-  int nanoseconds() const { return 0; }
+  qint64 days() const;
+  qint64 hours() const;
+  qint64 minutes() const;
+  qint64 seconds() const;
+  qint64 milliseconds() const;
+  qint64 microseconds() const;
+  qint64 nanoseconds() const;
 
   double totalSeconds() const;
   double totalMinutes() const;
@@ -71,13 +80,24 @@ public:
 
   void toTimeSpec(struct timespec& timespec) const;
   QString toString() const;
-  QString toAbbreviatedFormat(bool milliseconds = false) const;
+  QString toAbbreviatedFormat(bool showMilliseconds = false) const;
+  QString toDumpString() const;
 
-  static TimeSpan fromMilliseconds(int64_t milliseconds);
-  static TimeSpan fromSeconds(int64_t seconds);
-  static TimeSpan fromMinutes(int64_t minutes);
-  static TimeSpan fromHours(int64_t hours);
-  static TimeSpan fromDays(int64_t days);
+  TimeSpan addNanoseconds(double nanoseconds) const;
+  TimeSpan addMicroseconds(double microseconds) const;
+  TimeSpan addMilliseconds(double milliseconds) const;
+  TimeSpan addSeconds(double seconds) const;
+  TimeSpan addMinutes(double minutes) const;
+  TimeSpan addHours(double hours) const;
+  TimeSpan addDays(double days) const;
+
+  static TimeSpan fromNanoseconds(double nanoseconds);
+  static TimeSpan fromMicroseconds(double microseconds);
+  static TimeSpan fromMilliseconds(double milliseconds);
+  static TimeSpan fromSeconds(double seconds);
+  static TimeSpan fromMinutes(double minutes);
+  static TimeSpan fromHours(double hours);
+  static TimeSpan fromDays(double days);
   static TimeSpan fromString(const QString& timeString);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
@@ -86,39 +106,41 @@ public:
   static TimeSpan min(const TimeSpan& t1, const TimeSpan& t2) { return t1 < t2 ? t1 : t2; }
 
 private:
-  void loadFromMilliseconds(int64_t milliseconds);
   static TimeSpan parseAbbreviatedString(const QString& timeString);
   static TimeSpan parseColonDelimitedString(const QString& timeString);
   static int parseIntToToken(QString &remaining, const QString &until);
 
-  int      _days;
-  int      _hours;
-  int      _minutes;
-  int      _seconds;
-  int      _milliseconds;
+  qint64    _nanoseconds;
 
 // Constants
-  static const int64_t MicrosecondsPerMillisecond;
-  static const int64_t MicrosecondsPerSecond;
-  static const int64_t MicrosecondsPerMinute;
-  static const int64_t MicrosecondsPerHour;
-  static const int64_t MicrosecondsPerDay;
+    static const double NanosecondsPerMicrosecond;
+    static const double NanosecondsPerMillisecond;
+    static const double NanosecondsPerSecond;
+    static const double NanosecondsPerMinute;
+    static const double NanosecondsPerHour;
+    static const double NanosecondsPerDay;
 
-  static const int64_t MillisecondsPerSecond;
-  static const int64_t MillisecondsPerMinute;
-  static const int64_t MillisecondsPerHour;
-  static const int64_t MillisecondsPerDay;
+    static const double MicrosecondsPerMillisecond;
+    static const double MicrosecondsPerSecond;
+    static const double MicrosecondsPerMinute;
+    static const double MicrosecondsPerHour;
+    static const double MicrosecondsPerDay;
 
-  static const int64_t SecondsPerMinute;
-  static const int64_t SecondsPerHour;
-  static const int64_t SecondsPerDay;
+    static const double MillisecondsPerSecond;
+    static const double MillisecondsPerMinute;
+    static const double MillisecondsPerHour;
+    static const double MillisecondsPerDay;
 
-  static const int64_t MinutesPerHour;
-  static const int64_t MinutesPerDay;
+    static const double SecondsPerMinute;
+    static const double SecondsPerHour;
+    static const double SecondsPerDay;
 
-  static const int64_t HoursPerDay;
+    static const double MinutesPerHour;
+    static const double MinutesPerDay;
 
-  static const double   DaysPerYear;
+    static const double HoursPerDay;
+
+    static const double   DaysPerYear;
 };
 
 Q_DECLARE_METATYPE(TimeSpan)
