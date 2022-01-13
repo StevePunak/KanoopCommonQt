@@ -1,29 +1,72 @@
+/**
+ *  TimeSpan
+ *
+ *  This class represents a span of time with nanosecond resolution, and provides
+ *  an interface that is very similar to the .NET TimeSpan class.
+ *
+ *  Operators are supplied for comparison and assignment.
+ *
+ *  Conversions are supplied to convert between timespec and TimeSpan.
+ *
+ *  Use the absDiff() static method to obtain the difference between two
+ *  QDateTime objects.
+ *
+ *  NOTE:
+ *  The underlying representation is a signed 64-bit integer value of nanoseconds.
+ *  Therefore, the largest possible value is 9,223,372,036,854,775,807 giving a
+ *  maximum range of approximately 292 years.
+ *
+ *  This was re-written December 2021 to have nanosecond resolution. The interface
+ *  is compatible with the previous TimeSpan object.
+ *
+ *  Stephen Punak, December 27 2021
+ */
 #include "timeconstants.h"
 #include "timespan.h"
 
 #include <QTextStream>
+#include <QDebug>
 
-const int64_t TimeSpan::MicrosecondsPerMillisecond    = __MicrosecondsPerMillisecond;
-const int64_t TimeSpan::MicrosecondsPerSecond         = __MicrosecondsPerSecond;
-const int64_t TimeSpan::MicrosecondsPerMinute         = __MicrosecondsPerMinute;
-const int64_t TimeSpan::MicrosecondsPerHour           = __MicrosecondsPerHour;
-const int64_t TimeSpan::MicrosecondsPerDay            = __MicrosecondsPerDay;
+const double TimeSpan::NanosecondsPerMicrosecond       = (double)__NanosecondsPerMicrosecond;
+const double TimeSpan::NanosecondsPerMillisecond       = (double)__NanosecondsPerMillisecond;
+const double TimeSpan::NanosecondsPerSecond            = (double)__NanosecondsPerSecond;
+const double TimeSpan::NanosecondsPerMinute            = (double)__NanosecondsPerMinute;
+const double TimeSpan::NanosecondsPerHour              = (double)__NanosecondsPerHour;
+const double TimeSpan::NanosecondsPerDay               = (double)__NanosecondsPerDay;
 
-const int64_t TimeSpan::MillisecondsPerSecond         = __MillisecondsPerSecond;
-const int64_t TimeSpan::MillisecondsPerMinute         = __MillisecondsPerMinute;
-const int64_t TimeSpan::MillisecondsPerHour           = __MillisecondsPerHour;
-const int64_t TimeSpan::MillisecondsPerDay            = __MillisecondsPerDay;
+const double TimeSpan::MicrosecondsPerMillisecond    = (double)__MicrosecondsPerMillisecond;
+const double TimeSpan::MicrosecondsPerSecond         = (double)__MicrosecondsPerSecond;
+const double TimeSpan::MicrosecondsPerMinute         = (double)__MicrosecondsPerMinute;
+const double TimeSpan::MicrosecondsPerHour           = (double)__MicrosecondsPerHour;
+const double TimeSpan::MicrosecondsPerDay            = (double)__MicrosecondsPerDay;
 
-const int64_t TimeSpan::SecondsPerMinute              = __SecondsPerMinute;
-const int64_t TimeSpan::SecondsPerHour                = __SecondsPerHour;
-const int64_t TimeSpan::SecondsPerDay                 = __SecondsPerDay;
+const double TimeSpan::MillisecondsPerSecond         = (double)__MillisecondsPerSecond;
+const double TimeSpan::MillisecondsPerMinute         = (double)__MillisecondsPerMinute;
+const double TimeSpan::MillisecondsPerHour           = (double)__MillisecondsPerHour;
+const double TimeSpan::MillisecondsPerDay            = (double)__MillisecondsPerDay;
 
-const int64_t TimeSpan::MinutesPerHour                = __MinutesPerHour;
-const int64_t TimeSpan::MinutesPerDay                 = __MinutesPerDay;
+const double TimeSpan::SecondsPerMinute              = (double)__SecondsPerMinute;
+const double TimeSpan::SecondsPerHour                = (double)__SecondsPerHour;
+const double TimeSpan::SecondsPerDay                 = (double)__SecondsPerDay;
 
-const int64_t TimeSpan::HoursPerDay                   = __HoursPerDay;
+const double TimeSpan::MinutesPerHour                = (double)__MinutesPerHour;
+const double TimeSpan::MinutesPerDay                 = (double)__MinutesPerDay;
 
-const double TimeSpan::DaysPerYear                     = __DaysPerYear;
+const double TimeSpan::HoursPerDay                   = (double)__HoursPerDay;
+
+const double TimeSpan::DaysPerYear                   = (double)__DaysPerYear;
+
+TimeSpan::TimeSpan(double days, double hours, double minutes, double seconds, double milliseconds, double microseconds, double nanoseconds) :
+    _nanoseconds(0)
+{
+    _nanoseconds += days * NanosecondsPerDay;
+    _nanoseconds += hours * NanosecondsPerHour;
+    _nanoseconds += minutes * NanosecondsPerMinute;
+    _nanoseconds += seconds * NanosecondsPerSecond;
+    _nanoseconds += milliseconds * NanosecondsPerMillisecond;
+    _nanoseconds += microseconds * NanosecondsPerMicrosecond;
+    _nanoseconds += nanoseconds;
+}
 
 TimeSpan::TimeSpan(const TimeSpan& other)
 {
@@ -37,77 +80,97 @@ TimeSpan::TimeSpan(const timespec& other)
 
 TimeSpan& TimeSpan::operator =(const timespec& other)
 {
-    uint64_t msecs = (uint64_t)(other.tv_sec) * 1000L;
-    msecs += (uint64_t)other.tv_nsec / 1000000L;
-    loadFromMilliseconds(msecs);
+    _nanoseconds = (uint64_t)(other.tv_sec) * 1000000000L;
+    _nanoseconds += (uint64_t)other.tv_nsec;
     return *this;
 }
 
 TimeSpan& TimeSpan::operator =(const TimeSpan& other)
 {
-    _days = other._days;
-    _hours = other._hours;
-    _minutes = other._minutes;
-    _seconds = other._seconds;
-    _milliseconds = other._milliseconds;
-
+    _nanoseconds = other._nanoseconds;
     return *this;
 }
 
 double TimeSpan::totalSeconds() const
 {
-    double result = totalMilliseconds() / MillisecondsPerSecond;
+    double result = (double)_nanoseconds / NanosecondsPerSecond;
     return result;
 }
 
 double TimeSpan::totalMinutes() const
 {
-    double result = totalMilliseconds() / MillisecondsPerMinute;
+    double result = (double)_nanoseconds / NanosecondsPerMinute;
     return result;
 }
 
 double TimeSpan::totalHours() const
 {
-    double result = totalMilliseconds() / MillisecondsPerHour;
+    double result = (double)_nanoseconds / NanosecondsPerHour;
     return result;
 }
 
 double TimeSpan::totalDays() const
 {
-    double result = totalMilliseconds() / MillisecondsPerDay;
+    double result = (double)_nanoseconds / NanosecondsPerDay;
     return result;
 }
 
 double TimeSpan::totalMilliseconds() const
 {
-    return
-            (_days * MillisecondsPerDay) +
-            (_hours * MillisecondsPerHour) +
-            (_minutes * MillisecondsPerMinute) +
-            (_seconds * MillisecondsPerSecond) + _milliseconds;
+    double result = (double)_nanoseconds / NanosecondsPerMillisecond;
+    return result;
 }
 
 double TimeSpan::totalMicroseconds() const
 {
-    return totalMilliseconds() * 1000;
+    double result = (double)_nanoseconds / NanosecondsPerMicrosecond;
+    return result;
 }
 
 double TimeSpan::totalNanoseconds() const
 {
-    return totalMilliseconds() * 1000000;
+    return (double)_nanoseconds;
 }
 
 TimeSpan TimeSpan::operator +(const TimeSpan& other) const
 {
     TimeSpan temp;
-    temp.loadFromMilliseconds((uint64_t)((uint64_t)totalMilliseconds() + (uint64_t)other.totalMilliseconds()));
+    temp._nanoseconds = _nanoseconds + other._nanoseconds;
     return temp;
 }
 
 TimeSpan TimeSpan::operator -(const TimeSpan& other) const
 {
     TimeSpan temp;
-    temp.loadFromMilliseconds((uint64_t)((uint64_t)totalMilliseconds() - (uint64_t)other.totalMilliseconds()));
+    temp._nanoseconds = _nanoseconds - other._nanoseconds;
+    return temp;
+}
+
+TimeSpan TimeSpan::operator*(const TimeSpan &other) const
+{
+    TimeSpan temp;
+    temp._nanoseconds = _nanoseconds * other._nanoseconds;
+    return temp;
+}
+
+TimeSpan TimeSpan::operator*(const int& value) const
+{
+    TimeSpan temp;
+    temp._nanoseconds = _nanoseconds * value;
+    return temp;
+}
+
+TimeSpan TimeSpan::operator/(const TimeSpan &other) const
+{
+    TimeSpan temp;
+    temp._nanoseconds = _nanoseconds / other._nanoseconds;
+    return temp;
+}
+
+TimeSpan TimeSpan::operator/(const int& value) const
+{
+    TimeSpan temp;
+    temp._nanoseconds = _nanoseconds / value;
     return temp;
 }
 
@@ -121,61 +184,189 @@ void TimeSpan::operator -=(const TimeSpan& other)
     *this = *this - other;
 }
 
+void TimeSpan::operator*=(const TimeSpan &other)
+{
+    *this = *this * other;
+}
+
+void TimeSpan::operator/=(const TimeSpan &other)
+{
+    *this = *this / other;
+}
+
 bool TimeSpan::operator ==(const TimeSpan& other) const
 {
-    return totalMilliseconds() == other.totalMilliseconds();
+    return _nanoseconds == other._nanoseconds;
 }
 
 bool TimeSpan::operator !=(const TimeSpan& other) const
 {
-    return totalMilliseconds() != other.totalMilliseconds();
+    return _nanoseconds != other._nanoseconds;
 }
 
 bool TimeSpan::operator >(const TimeSpan& other) const
 {
-    return totalMilliseconds() > other.totalMilliseconds();
+    return _nanoseconds > other._nanoseconds;
 }
 
 bool TimeSpan::operator <(const TimeSpan& other) const
 {
-    return totalMilliseconds() < other.totalMilliseconds();
+    return _nanoseconds < other._nanoseconds;
 }
 
 bool TimeSpan::operator >=(const TimeSpan& other) const
 {
-    return totalMilliseconds() >= other.totalMilliseconds();
+    return _nanoseconds >= other._nanoseconds;
 }
 
 bool TimeSpan::operator <=(const TimeSpan& other) const
 {
-    return totalMilliseconds() <= other.totalMilliseconds();
+    return _nanoseconds <= other._nanoseconds;
 }
 
-TimeSpan TimeSpan::fromMilliseconds(int64_t milliseconds)
+TimeSpan TimeSpan::addNanoseconds(double nanoseconds) const
 {
-    TimeSpan ts;
-    ts.loadFromMilliseconds(milliseconds);
+    return fromNanoseconds(_nanoseconds + nanoseconds);
+}
+
+TimeSpan TimeSpan::addMicroseconds(double microseconds) const
+{
+    return fromNanoseconds(_nanoseconds + (microseconds * NanosecondsPerMicrosecond));
+}
+
+TimeSpan TimeSpan::addMilliseconds(double milliseconds) const
+{
+    return fromNanoseconds(_nanoseconds + (milliseconds * NanosecondsPerMillisecond));
+}
+
+TimeSpan TimeSpan::addSeconds(double seconds) const
+{
+    return fromNanoseconds(_nanoseconds + (seconds * NanosecondsPerSecond));
+}
+
+TimeSpan TimeSpan::addMinutes(double minutes) const
+{
+    return fromNanoseconds(_nanoseconds + (minutes * NanosecondsPerMinute));
+}
+
+TimeSpan TimeSpan::addHours(double hours) const
+{
+    return fromNanoseconds(_nanoseconds + (hours * NanosecondsPerHour));
+}
+
+TimeSpan TimeSpan::addDays(double days) const
+{
+    return fromNanoseconds(_nanoseconds + (days * NanosecondsPerDay));
+}
+
+qint64 TimeSpan::days() const
+{
+    qint64 d = _nanoseconds / (qint64)NanosecondsPerDay;
+    return d;
+}
+
+qint64 TimeSpan::hours() const
+{
+    qint64 value = _nanoseconds;
+    value -= days() * NanosecondsPerDay;
+    value /= (qint64)NanosecondsPerHour;
+    return value;
+}
+
+qint64 TimeSpan::minutes() const
+{
+    qint64 value = _nanoseconds;
+    value -= days() * NanosecondsPerDay;
+    value -= hours() * NanosecondsPerHour;
+    value /=  (qint64)NanosecondsPerMinute;
+    return value;
+}
+
+qint64 TimeSpan::seconds() const
+{
+    qint64 value = _nanoseconds;
+    value -= days() * NanosecondsPerDay;
+    value -= hours() * NanosecondsPerHour;
+    value -= minutes() * NanosecondsPerMinute;
+    value /=  (qint64)NanosecondsPerSecond;
+    return value;
+}
+
+qint64 TimeSpan::milliseconds() const
+{
+    qint64 value = _nanoseconds;;
+    value -= days() * NanosecondsPerDay;
+    value -= hours() * NanosecondsPerHour;
+    value -= minutes() * NanosecondsPerMinute;
+    value -= seconds() * NanosecondsPerSecond;
+    value /=  (qint64)NanosecondsPerMillisecond;
+    return value;
+}
+
+qint64 TimeSpan::microseconds() const
+{
+    qint64 value = _nanoseconds;
+    value -= days() * NanosecondsPerDay;
+    value -= hours() * NanosecondsPerHour;
+    value -= minutes() * NanosecondsPerMinute;
+    value -= seconds() * NanosecondsPerSecond;
+    value -= milliseconds() * NanosecondsPerMillisecond;
+    value /= (qint64)NanosecondsPerMicrosecond;
+    return value;
+}
+
+qint64 TimeSpan::nanoseconds() const
+{
+    qint64 value = _nanoseconds;
+    value -= days() * NanosecondsPerDay;
+    value -= hours() * NanosecondsPerHour;
+    value -= minutes() * NanosecondsPerMinute;
+    value -= seconds() * NanosecondsPerSecond;
+    value -= milliseconds() * NanosecondsPerMillisecond;
+    value -= microseconds() * NanosecondsPerMicrosecond;
+    return value;
+}
+
+TimeSpan TimeSpan::fromNanoseconds(double nanoseconds)
+{
+    TimeSpan ts(0, 0, 0, 0, 0, 0, nanoseconds);
     return ts;
 }
 
-TimeSpan TimeSpan::fromSeconds(int64_t seconds)
+TimeSpan TimeSpan::fromMicroseconds(double microseconds)
 {
-    return fromMilliseconds(seconds * MillisecondsPerSecond);
+    TimeSpan ts(0, 0, 0, 0, 0, microseconds, 0);
+    return ts;
 }
 
-TimeSpan TimeSpan::fromMinutes(int64_t minutes)
+TimeSpan TimeSpan::fromMilliseconds(double milliseconds)
 {
-    return fromMilliseconds(minutes * MillisecondsPerMinute);
+    TimeSpan ts(0, 0, 0, 0, milliseconds);
+    return ts;
 }
 
-TimeSpan TimeSpan::fromHours(int64_t hours)
+TimeSpan TimeSpan::fromSeconds(double seconds)
 {
-    return fromMilliseconds(hours * MillisecondsPerHour);
+    TimeSpan ts(0, 0, 0, seconds);
+    return ts;
 }
 
-TimeSpan TimeSpan::fromDays(int64_t days)
+TimeSpan TimeSpan::fromMinutes(double minutes)
 {
-    return fromMilliseconds(days * MillisecondsPerDay);
+    TimeSpan ts(0, 0, minutes, 0);
+    return ts;
+}
+
+TimeSpan TimeSpan::fromHours(double hours)
+{
+    TimeSpan ts(0, hours, 0, 0);
+    return ts;
+}
+
+TimeSpan TimeSpan::fromDays(double days)
+{
+    TimeSpan ts(days, 0, 0, 0);
+    return ts;
 }
 
 TimeSpan TimeSpan::fromString(const QString &timeString)
@@ -286,66 +477,46 @@ TimeSpan TimeSpan::absDiff(const QDateTime &t1, const QDateTime &t2)
 
 void TimeSpan::toTimeSpec(struct timespec& timespec) const
 {
-    timespec.tv_sec = totalSeconds();
-    timespec.tv_nsec = _milliseconds * 1000000;
-}
-
-void TimeSpan::loadFromMilliseconds(int64_t milliseconds)
-{
-    _days = milliseconds / MillisecondsPerDay;
-    if(_days > 0)
-    {
-        milliseconds -= _days * MillisecondsPerDay;
-    }
-
-    _hours = (int)(milliseconds / MillisecondsPerHour);
-    if(_hours > 0)
-    {
-        milliseconds -= _hours * MillisecondsPerHour;
-    }
-
-    _minutes = (int)(milliseconds / MillisecondsPerMinute);
-    if(_minutes > 0)
-    {
-        milliseconds -= _minutes * MillisecondsPerMinute;
-    }
-
-    _seconds = (int)(milliseconds / MillisecondsPerSecond);
-    if(_seconds > 0)
-    {
-        milliseconds -= _seconds * MillisecondsPerSecond;
-    }
-
-    _milliseconds = milliseconds;
+    timespec.tv_sec = (long)totalSeconds();
+    timespec.tv_nsec = _nanoseconds % (qint64)NanosecondsPerSecond;
 }
 
 QString TimeSpan::toString() const
 {
-    QString result = _days == 0
-            ? QString("%1:%2:%3.%4").
-              arg(_hours, 2, 10, QChar('0')).
-              arg(_minutes, 2, 10, QChar('0')).
-              arg(_seconds, 2, 10, QChar('0')).
-              arg(_milliseconds, 3, 10, QChar('0'))
-            : QString("%1.:%2:%3:%4.%5").
-              arg(_days).
-              arg(_hours, 2, 10, QChar('0')).
-              arg(_minutes, 2, 10, QChar('0')).
-              arg(_seconds, 2, 10, QChar('0')).
-              arg(_milliseconds, 3, 10, QChar('0'));
+    QString result;
+    if(_nanoseconds > 1000000)
+    {
+        result = days() == 0
+                ? QString("%1:%2:%3.%4").
+                  arg(hours(), 2, 10, QChar('0')).
+                  arg(minutes(), 2, 10, QChar('0')).
+                  arg(seconds(), 2, 10, QChar('0')).
+                  arg(milliseconds(), 3, 10, QChar('0'))
+                : QString("%1.:%2:%3:%4.%5").
+                  arg(days()).
+                  arg(hours(), 2, 10, QChar('0')).
+                  arg(minutes(), 2, 10, QChar('0')).
+                  arg(seconds(), 2, 10, QChar('0')).
+                  arg(milliseconds(), 3, 10, QChar('0'));
+    }
+    else
+    {
+        double microseconds = (double)_nanoseconds / (double)1000;
+        result = QString("%1us").arg(microseconds, 0, 'f', 3);
+    }
     return result;
 }
 
-QString TimeSpan::toAbbreviatedFormat(bool milliseconds) const
+QString TimeSpan::toAbbreviatedFormat(bool showMilliseconds) const
 {
     QString result;
     QTextStream output(&result);
 
-    if (totalMilliseconds() == 0)
+    if (_nanoseconds == 0)
         output << "0m";
     else
     {
-        if(totalMilliseconds() < 0)
+        if(_nanoseconds < 0)
         {
             output << "-";
         }
@@ -366,19 +537,35 @@ QString TimeSpan::toAbbreviatedFormat(bool milliseconds) const
             output << (int)years << "y ";
         if ((int)days != 0)
             output << (int)days << "d ";
-        if (_hours != 0)
-            output << _hours << "h ";
-        if (_minutes != 0)
-            output << _minutes << "m ";
-        if (_seconds != 0)
-            output << _seconds << "s ";
-        if(milliseconds)
+        if (hours() != 0)
+            output << hours() << "h ";
+        if (minutes() != 0)
+            output << minutes() << "m ";
+        if (seconds() != 0)
+            output << seconds() << "s ";
+        if(showMilliseconds)
         {
-            if (_milliseconds != 0)
-                output << _milliseconds << "ms ";
+            if(milliseconds() != 0)
+                output << milliseconds() << "ms ";
         }
     }
     return result.trimmed();
 }
 
+QString TimeSpan::toDumpString() const
+{
+    static const int COL1_WIDTH = 32;
 
+    QString result;
+    QTextStream output(&result);
+
+    output << QString("Days:").leftJustified(COL1_WIDTH) << days() << Qt::endl;
+    output << QString("Hours:").leftJustified(COL1_WIDTH) << hours() << Qt::endl;
+    output << QString("Minutes:").leftJustified(COL1_WIDTH) << minutes() << Qt::endl;
+    output << QString("Seconds:").leftJustified(COL1_WIDTH) << seconds() << Qt::endl;
+    output << QString("Milliseconds:").leftJustified(COL1_WIDTH) << milliseconds() << Qt::endl;
+    output << QString("Microseconds:").leftJustified(COL1_WIDTH) << microseconds() << Qt::endl;
+    output << QString("Nanoseconds:").leftJustified(COL1_WIDTH) << nanoseconds() << Qt::endl;
+
+    return result;
+}

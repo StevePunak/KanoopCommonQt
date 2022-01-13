@@ -41,7 +41,6 @@ SOURCES += \
     stringutil.cpp \
     threadutil.cpp \
     timespan.cpp \
-    timespan2.cpp \
     userutil.cpp
 
 HEADERS += \
@@ -64,7 +63,6 @@ HEADERS += \
     threadutil.h \
     timeconstants.h \
     timespan.h \
-    timespan2.h \
     userutil.h
 
 header_files.files = $$HEADERS
