@@ -43,8 +43,14 @@ public:
 
   TimeSpan2 operator+(const TimeSpan2& other) const;
   TimeSpan2 operator-(const TimeSpan2& other) const;
+  TimeSpan2 operator*(const TimeSpan2& other) const;
+  TimeSpan2 operator*(const int& value) const;
+  TimeSpan2 operator/(const TimeSpan2& other) const;
+  TimeSpan2 operator/(const int& value) const;
   void operator+=(const TimeSpan2& other);
   void operator-=(const TimeSpan2& other);
+  void operator*=(const TimeSpan2& other);
+  void operator/=(const TimeSpan2& other);
 
   bool operator==(const TimeSpan2& other) const;
   bool operator!=(const TimeSpan2& other) const;
