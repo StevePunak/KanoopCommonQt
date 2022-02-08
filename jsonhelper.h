@@ -15,6 +15,7 @@ public:
     static bool tryGetUInt32(const QJsonObject& object, const QString& key, quint32& value);
     static bool tryGetDouble(const QJsonObject& object, const QString& key, qreal& value);
     static bool tryGetBool(const QJsonObject& object, const QString& key, bool& value);
+    static QString toIndented(const QByteArray& json);
 };
 
 #endif // JSONHELPER_H
