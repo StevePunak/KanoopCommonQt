@@ -39,7 +39,7 @@ bool GeoCoordinate::isWestOf(const GeoCoordinate &other)
     return result;
 }
 
-QString GeoCoordinate::toString(CoordinateFormat format, int precision)
+QString GeoCoordinate::toString(CoordinateFormat format, int precision) const
 {
     QString result;
     switch(format)
