@@ -1,5 +1,7 @@
 #include "jsonhelper.h"
 
+#include <QJsonDocument>
+
 
 bool JsonHelper::tryGetString(const QJsonObject &object, const QString &key, QString &value)
 {
@@ -76,4 +78,11 @@ bool JsonHelper::tryGetBool(const QJsonObject &object, const QString &key, bool 
         return true;
     }
     return false;
+}
+
+QString JsonHelper::toIndented(const QByteArray &json)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(json);
+    QString output = doc.toJson(QJsonDocument::Indented);
+    return output;
 }
