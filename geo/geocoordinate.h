@@ -79,7 +79,7 @@ public:
 
     bool isEmpty() { return *this == GeoCoordinate(); }
 
-    QString toString(CoordinateFormat format = Degrees, int precision = 0);
+    QString toString(CoordinateFormat format = Degrees, int precision = 0) const;
 
     static bool tryParse(const QString& stringValue, GeoCoordinate &point);
     static GeoCoordinate empty() { return GeoCoordinate(); }
