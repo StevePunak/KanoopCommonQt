@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QTextStream>
 
+#include <sys/time.h>
+
 QString FileUtil::getMD5String(const QString &filename)
 {
     QByteArray hash = getMD5Bytes(filename);
@@ -110,4 +112,23 @@ bool FileUtil::moveToDirectory(const QString &sourceFilename, const QString &des
         result = currentFile.rename(destFilename);
     }
     return result;
+}
+
+bool FileUtil::setModifyTime(const QString &filename, const QDateTime &value)
+{
+    QFileInfo fileInfo(filename);
+    if(fileInfo.exists() == false)
+        return false;
+
+    timeval times[2];
+
+    // set access time to what is already there
+    times[0].tv_sec = fileInfo.lastRead().toSecsSinceEpoch();
+    times[0].tv_usec = 0;
+
+    // set modify time to new value
+    times[1].tv_sec = value.toSecsSinceEpoch();
+    times[1].tv_usec = value.time().msec() * 1000;
+
+    return utimes(filename.toStdString().c_str(), times) == 0;
 }
