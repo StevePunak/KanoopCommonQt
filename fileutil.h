@@ -2,6 +2,7 @@
 #define FILEUTIL_H
 
 #include <QByteArray>
+#include <QDateTime>
 #include <QString>
 #include "kanoopcommon.h"
 
@@ -18,6 +19,7 @@ public:
     static bool remove(const QString& filename);
     static bool move(const QString& source, const QString& destination);
     static bool moveToDirectory(const QString& sourceFilename, const QString& destinationDirectory);
+    static bool setModifyTime(const QString& filename, const QDateTime& value);
 };
 
 #endif // FILEUTIL_H
