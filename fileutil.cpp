@@ -116,6 +116,11 @@ bool FileUtil::moveToDirectory(const QString &sourceFilename, const QString &des
 
 bool FileUtil::setModifyTime(const QString &filename, const QDateTime &value)
 {
+#ifdef WIN32
+    Q_UNUSED (filename)
+    Q_UNUSED (value)
+    return false;
+#else
     QFileInfo fileInfo(filename);
     if(fileInfo.exists() == false)
         return false;
@@ -131,4 +136,5 @@ bool FileUtil::setModifyTime(const QString &filename, const QDateTime &value)
     times[1].tv_usec = value.time().msec() * 1000;
 
     return utimes(filename.toStdString().c_str(), times) == 0;
+#endif
 }
