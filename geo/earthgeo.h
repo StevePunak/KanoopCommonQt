@@ -1,7 +1,8 @@
 #ifndef EARTHGEO_H
 #define EARTHGEO_H
+#include "kanoopcommon.h"
 
-class EarthGeo
+class KANOOP_EXPORT EarthGeo
 {
 public:
     EarthGeo();
