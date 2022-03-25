@@ -2,8 +2,9 @@
 #define GEOCIRCLE_H
 #include "geocoordinate.h"
 #include <QtMath>
+#include "kanoopcommon.h"
 
-class GeoCircle
+class KANOOP_EXPORT GeoCircle
 {
 public:
     GeoCircle() :
