@@ -4,8 +4,9 @@
 
 #include <QString>
 #include <QtMath>
+#include "kanoopcommon.h"
 
-class GeoCoordinate
+class KANOOP_EXPORT GeoCoordinate
 {
 public:
     GeoCoordinate() :
