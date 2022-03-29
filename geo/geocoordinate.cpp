@@ -146,16 +146,6 @@ GeoCoordinate GeoCoordinate::getPointAtDistanceAndAzimuth(const GeoCoordinate& o
     return GeoCoordinate(qRadiansToDegrees(lat2), qRadiansToDegrees(lon2));
 }
 
-void GeoCoordinate::validate()
-{
-    _valid = _longitude > -180 && _longitude < 180 && _latitude > -45 && _latitude < 45;
-    if(!_valid)
-        return;
-
-    _cardinalLatitude = _latitude >= 0 ? Geo::North : Geo::South;
-    _cardinalLongitude = _longitude >= 0 ? Geo::East : Geo::West;
-}
-
 bool GeoCoordinate::equalAtPrecision(double v1, double v2, int precision)
 {
     QString s1 = QString::number(v1, 'f', precision);

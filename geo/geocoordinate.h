@@ -90,7 +90,15 @@ public:
     static GeoCoordinate getPointAtDistanceAndAzimuth(const GeoCoordinate& origin, double distance, double azimuth);
 
 private:
-    void validate();
+    void validate()
+    {
+        _valid = _longitude > -180 && _longitude < 180 && _latitude > -45 && _latitude < 45;
+        if(!_valid)
+            return;
+
+        _cardinalLatitude = _latitude >= 0 ? Geo::North : Geo::South;
+        _cardinalLongitude = _longitude >= 0 ? Geo::East : Geo::West;
+    }
 
     static bool equalAtPrecision(double v1, double v2, int precision);
 
