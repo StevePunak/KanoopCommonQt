@@ -1,6 +1,7 @@
 #include "pathutil.h"
 #include <QDir>
 #include <QDebug>
+#include <QProcessEnvironment>
 
 QString PathUtil::fileName(const QString &path)
 {
@@ -57,6 +58,31 @@ QString PathUtil::combine(const QStringList &parts)
         output << parts[i];
         if(i < parts.length() - 1)
             output << '/';
+    }
+    return result;
+}
+
+/**
+ * @brief Find first executable in path matching basename
+ * @param executable file basename
+ * @return
+ */
+QFileInfo PathUtil::which(const QString &basename)
+{
+    QFileInfo result;
+    QString fullPath = QProcessEnvironment::systemEnvironment().value("PATH");
+    QStringList paths = fullPath.split(':');
+    foreach(const QString& path, paths)
+    {
+        QDir dir(path);
+        if(dir.exists() == false)
+            continue;
+        QFileInfo testFile(combine(path, basename));
+        if(testFile.exists() && testFile.isExecutable())
+        {
+            result = testFile;
+            break;
+        }
     }
     return result;
 }
