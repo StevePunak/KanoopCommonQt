@@ -46,6 +46,11 @@ public:
      * @return
      */
     static QFileInfo which(const QString& basename);
+
+    /**
+     * @brief Return the given directory with one level popped
+     */
+    static QString popLevel(const QString& path);
 };
 
 #endif // PATHUTIL_H

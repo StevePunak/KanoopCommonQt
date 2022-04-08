@@ -86,3 +86,12 @@ QFileInfo PathUtil::which(const QString &basename)
     }
     return result;
 }
+
+QString PathUtil::popLevel(const QString &path)
+{
+    QString result;
+    int index;
+    if((index = path.lastIndexOf('/')) > 0)
+        result = path.mid(0, index);
+    return result;
+}
