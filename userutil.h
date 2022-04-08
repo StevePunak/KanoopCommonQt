@@ -12,6 +12,8 @@ class UserUtil
 public:
     static gid_t gidFromName(const QString& name);
     static uid_t uidFromName(const QString& name);
+    static uid_t currentUser();
+    static QString currentUserName();
     static bool isUserMemberOfGroup(uid_t uid, gid_t gid);
 };
 

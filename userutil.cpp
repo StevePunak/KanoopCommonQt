@@ -1,6 +1,7 @@
 #include "userutil.h"
 
 #ifndef __WIN32
+#include "unistd.h"
 
 gid_t UserUtil::gidFromName(const QString &name)
 {
@@ -20,6 +21,19 @@ uid_t UserUtil::uidFromName(const QString &name)
     if(passwd != nullptr)
         ret = passwd->pw_uid;
     return ret;
+}
+
+uid_t UserUtil::currentUser()
+{
+    return uidFromName(currentUserName());
+}
+
+QString UserUtil::currentUserName()
+{
+    char buf[1024];
+    if(getlogin_r(buf, sizeof(buf)) != 0)
+        buf[0] = 0;
+    return QString(buf);
 }
 
 bool UserUtil::isUserMemberOfGroup(uid_t uid, gid_t gid)
