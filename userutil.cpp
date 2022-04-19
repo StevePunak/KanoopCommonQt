@@ -23,6 +23,26 @@ uid_t UserUtil::uidFromName(const QString &name)
     return ret;
 }
 
+QString UserUtil::nameFromGid(gid_t gid)
+{
+    QString ret = 0;
+    struct group* group;
+    group = getgrgid(gid);
+    if(group != nullptr)
+        ret = group->gr_name;
+    return ret;
+}
+
+QString UserUtil::nameFromUid(uid_t uid)
+{
+    QString ret;
+    struct passwd* passwd;
+    passwd = getpwuid(uid);
+    if(passwd != nullptr)
+        ret = passwd->pw_name;
+    return ret;
+}
+
 uid_t UserUtil::currentUser()
 {
     return uidFromName(currentUserName());
