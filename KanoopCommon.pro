@@ -11,6 +11,10 @@ unix {
     TARGET = KanoopCommon
 }
 
+win32 {
+    CONFIG += skip_target_version_ext
+}
+
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += KANOOP_LIBRARY
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
