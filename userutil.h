@@ -18,6 +18,7 @@ public:
 
     static uid_t currentUser();
     static QString currentUserName();
+    static QString currentUserFullName();
     static bool isUserMemberOfGroup(uid_t uid, gid_t gid);
 };
 

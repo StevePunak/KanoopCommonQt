@@ -56,6 +56,16 @@ QString UserUtil::currentUserName()
     return QString(buf);
 }
 
+QString UserUtil::currentUserFullName()
+{
+    QString result;
+    struct passwd* passwd;
+    passwd = getpwnam(currentUserName().toLatin1().constData());
+    if(passwd != nullptr)
+        result = passwd->pw_gecos;
+    return result;
+}
+
 bool UserUtil::isUserMemberOfGroup(uid_t uid, gid_t gid)
 {
     struct passwd* pw = getpwuid(uid);
