@@ -90,6 +90,15 @@ bool FileUtil::remove(const QString &filename)
     return QFile(filename).remove();
 }
 
+bool FileUtil::touch(const QString &filename)
+{
+    QFile f(filename);
+    if(f.open(QIODevice::ReadWrite) == false)
+        return false;
+    f.close();
+    return true;
+}
+
 bool FileUtil::move(const QString &source, const QString &destination)
 {
     bool result = false;

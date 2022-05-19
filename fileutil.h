@@ -17,6 +17,7 @@ public:
     static bool writeAllLines(const QString& filename, const QStringList& lines);
     static bool exists(const QString& filename);
     static bool remove(const QString& filename);
+    static bool touch(const QString& filename);
     static bool move(const QString& source, const QString& destination);
     static bool moveToDirectory(const QString& sourceFilename, const QString& destinationDirectory);
     static bool setModifyTime(const QString& filename, const QDateTime& value);
