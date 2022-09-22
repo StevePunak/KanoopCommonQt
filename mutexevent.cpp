@@ -30,7 +30,10 @@ bool MutexEvent::wait(int msecs)
         mutex.lock();
         _checkMutex.unlock();
 
-        result = _condition.wait(&mutex, msecs);
+        if(msecs > 0)
+            result = _condition.wait(&mutex, msecs);
+        else
+            result = _condition.wait(&mutex);
 
         _checkMutex.lock();
         _isset = false;
