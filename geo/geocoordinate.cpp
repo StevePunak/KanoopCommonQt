@@ -9,10 +9,7 @@ bool GeoCoordinate::operator==(const GeoCoordinate &other)
     return
         _latitude == other._latitude &&
         _longitude == other._longitude &&
-        _altitude == other._altitude &&
-        _precision == other._precision &&
-        _cardinalLatitude == other._cardinalLatitude &&
-            _cardinalLongitude == other._cardinalLongitude;
+        _altitude == other._altitude;
 }
 
 bool GeoCoordinate::isNorthOf(const GeoCoordinate &other)
