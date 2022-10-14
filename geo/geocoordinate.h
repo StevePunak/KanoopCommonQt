@@ -32,6 +32,11 @@ public:
 
     GeoCoordinate(const QString& value);
 
+    static GeoCoordinate fromString(const QString& value)
+    {
+        return GeoCoordinate(value);
+    }
+
     enum CoordinateFormat
     {
         Degrees,

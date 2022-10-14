@@ -4,6 +4,14 @@
 
 QString GeoCoordinate::TOSTRING_DELIM       = "Lat/Long: ";
 
+GeoCoordinate::GeoCoordinate(const QString &value)
+{
+    GeoCoordinate c;
+    if(tryParse(value, c)) {
+        *this = c;
+    }
+}
+
 bool GeoCoordinate::operator==(const GeoCoordinate &other)
 {
     return
