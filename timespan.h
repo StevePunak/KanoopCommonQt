@@ -78,6 +78,10 @@ public:
   double totalMicroseconds() const;
   double totalNanoseconds() const;
 
+  bool isZero() const { return _nanoseconds == 0; }
+  bool isNegative() const { return _nanoseconds < 0; }
+  bool isPositive() const { return _nanoseconds > 0; }
+
   void toTimeSpec(struct timespec& timespec) const;
   QString toString() const;
   QString toAbbreviatedFormat(bool showMilliseconds = false) const;
@@ -100,6 +104,7 @@ public:
   static TimeSpan fromDays(double days);
   static TimeSpan fromString(const QString& timeString);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
+  static TimeSpan diff(const QDateTime& now, const QDateTime& then);
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
 
   static TimeSpan max(const TimeSpan& t1, const TimeSpan& t2) { return t1 > t2 ? t1 : t2; }
