@@ -465,6 +465,12 @@ int TimeSpan::parseIntToToken(QString &remaining, const QString& token)
     return result;
 }
 
+TimeSpan TimeSpan::diff(const QDateTime &now, const QDateTime &then)
+{
+    TimeSpan result = fromMilliseconds(then.toMSecsSinceEpoch() - now.toMSecsSinceEpoch());
+    return result;
+}
+
 TimeSpan TimeSpan::absDiff(const QDateTime &t1, const QDateTime &t2)
 {
     TimeSpan result;
@@ -484,7 +490,7 @@ void TimeSpan::toTimeSpec(struct timespec& timespec) const
 QString TimeSpan::toString() const
 {
     QString result;
-    if(_nanoseconds > 1000000)
+    if(qAbs(_nanoseconds) > 1000000)
     {
         result = days() == 0
                 ? QString("%1:%2:%3.%4").
@@ -521,13 +527,17 @@ QString TimeSpan::toAbbreviatedFormat(bool showMilliseconds) const
             output << "-";
         }
 
-        double days = totalDays();
+        // this takes care of negative values
+        TimeSpan ts;
+        ts._nanoseconds = qAbs(_nanoseconds);
+
+        double days = ts.totalDays();
         double years = 0;
 
         if(days > DaysPerYear)
         {
             years = days / DaysPerYear;
-            if(totalDays() > DaysPerYear)
+            if(ts.totalDays() > DaysPerYear)
             {
                 days -= years * DaysPerYear;
             }
@@ -537,16 +547,16 @@ QString TimeSpan::toAbbreviatedFormat(bool showMilliseconds) const
             output << (int)years << "y ";
         if ((int)days != 0)
             output << (int)days << "d ";
-        if (hours() != 0)
-            output << hours() << "h ";
-        if (minutes() != 0)
-            output << minutes() << "m ";
-        if (seconds() != 0)
-            output << seconds() << "s ";
+        if (ts.hours() != 0)
+            output << ts.hours() << "h ";
+        if (ts.minutes() != 0)
+            output << ts.minutes() << "m ";
+        if (ts.seconds() != 0)
+            output << ts.seconds() << "s ";
         if(showMilliseconds)
         {
-            if(milliseconds() != 0)
-                output << milliseconds() << "ms ";
+            if(ts.milliseconds() != 0)
+                output << ts.milliseconds() << "ms ";
         }
     }
     return result.trimmed();
