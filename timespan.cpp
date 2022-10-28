@@ -539,7 +539,7 @@ QString TimeSpan::toAbbreviatedFormat(bool showMilliseconds) const
             years = days / DaysPerYear;
             if(ts.totalDays() > DaysPerYear)
             {
-                days -= years * DaysPerYear;
+                days -= (int)years * DaysPerYear;
             }
         }
 
