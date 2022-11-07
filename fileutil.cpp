@@ -42,6 +42,7 @@ bool FileUtil::readAllLines(const QString &filename, QStringList &lines)
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly))
     {
+        lines.clear();
         QTextStream ts(&file);
         QString line;
         while((line = ts.readLine()).isNull() == false)
