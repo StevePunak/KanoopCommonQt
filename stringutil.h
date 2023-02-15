@@ -1,6 +1,8 @@
 #ifndef STRINGUTIL_H
 #define STRINGUTIL_H
 
+#include <QChar>
+#include <QList>
 #include <QString>
 #include <QStringList>
 #include "kanoopcommon.h"
@@ -23,6 +25,10 @@ public:
      */
     static QString toString(bool value) { return value ? "true" : "false"; }
     /**
+     * Convert a double to string, trimming trailing zeros
+     */
+    static QString toString(double value, int precision = 6);
+    /**
      * Convert a list of strings to a single string delimited by the supplied character
      */
     static QString toDelimitedString(const QStringList& list, char delimiter = ' ');
@@ -30,6 +36,21 @@ public:
      * Format value as abbreviated byte count (K = kilobytes, M = megabytes, G=gigabytes)
      */
     static QString toKMG(qint64 byteCount);
+    /**
+     * @brief trimFront
+     * Trim the given characters from the front of the string
+     */
+    static QString trimFront(const QString& value, const QList<QChar> &chars);
+    /**
+     * @brief trimEnd
+     * Trim the given characters from the end of the string
+     */
+    static QString trimEnd(const QString& value, const QList<QChar> &chars);
+    /**
+     * @brief trimBothEnds
+     * Trim the given characters from both ends of the string
+     */
+    static QString trimBothEnds(const QString& value, const QList<QChar> &chars);
 };
 
 #endif // STRINGUTIL_H
