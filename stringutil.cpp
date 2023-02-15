@@ -1,6 +1,17 @@
 #include "stringutil.h"
 #include <QTextStream>
 
+
+QString StringUtil::toString(double value, int precision)
+{
+    QString result = QString("%1").arg(value, 0, 'f', precision);
+    result = trimEnd(result, QList<QChar>() << '0');
+    if(result.endsWith('.')) {
+        result = trimEnd(result, QList<QChar>() << '.');
+    }
+    return result;
+}
+
 QString StringUtil::toDelimitedString(const QStringList &list, char delimiter)
 {
     QString outputString;
@@ -39,3 +50,41 @@ QString StringUtil::toKMG(qint64 byteCount)
     }
     return result;
 }
+
+QString StringUtil::trimFront(const QString &value, const QList<QChar> &chars)
+{
+    QString result = value;
+    while(result.length() > 0) {
+        QChar first = result.at(0);
+        if(chars.contains(first)) {
+            result = result.mid(1);
+        }
+        else {
+            break;
+        }
+    }
+    return result;
+}
+
+QString StringUtil::trimEnd(const QString& value, const QList<QChar> &chars)
+{
+    QString result = value;
+    while(result.length() > 0) {
+        QChar last = result.at(result.length() - 1);
+        if(chars.contains(last)) {
+            result = result.mid(0, result.length() - 1);
+        }
+        else {
+            break;
+        }
+    }
+    return result;
+}
+
+QString StringUtil::trimBothEnds(const QString &value, const QList<QChar> &chars)
+{
+    QString result = trimFront(value, chars);
+    result = trimEnd(result, chars);
+    return result;
+}
+
