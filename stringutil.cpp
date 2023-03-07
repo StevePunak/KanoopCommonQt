@@ -2,6 +2,25 @@
 #include <QTextStream>
 
 
+QByteArray StringUtil::toByteArray(const QString &value)
+{
+    QByteArray result;
+    if(value.contains(' ')) {
+        QStringList parts = value.split(' ', Qt::SkipEmptyParts);
+        for(const QString& part : parts) {
+            bool ok;
+            uint32_t val = part.toUInt(&ok, 16);
+            if(ok) {
+                result.append(val);
+            }
+        }
+    }
+    else {
+        result = QByteArray::fromHex(value.toUtf8());
+    }
+    return result;
+}
+
 QString StringUtil::toString(double value, int precision)
 {
     QString result = QString("%1").arg(value, 0, 'f', precision);
@@ -10,6 +29,20 @@ QString StringUtil::toString(double value, int precision)
         result = trimEnd(result, QList<QChar>() << '.');
     }
     return result;
+}
+
+QString StringUtil::toString(const QByteArray &value, const QString &delimiter)
+{
+    QString result;
+    QTextStream output(&result);
+    for(int i = 0;i < value.length();i++) {
+        quint8 b = value.at(i);
+        output << QString::number(b, 16).toUpper();
+        if(delimiter.length() > 0) {
+            output << delimiter;
+        }
+    }
+    return result.trimmed();
 }
 
 QString StringUtil::toDelimitedString(const QStringList &list, char delimiter)
