@@ -21,6 +21,10 @@ public:
      */
     static bool toBool(int value) { return value != 0; }
     /**
+     * Convert the string to a byte array
+     */
+    static QByteArray toByteArray(const QString& value);
+    /**
      * Convert a boolean to a string (true or false)
      */
     static QString toString(bool value) { return value ? "true" : "false"; }
@@ -28,6 +32,10 @@ public:
      * Convert a double to string, trimming trailing zeros
      */
     static QString toString(double value, int precision = 6);
+    /**
+     * Convert a byte array to a hex string
+     */
+    static QString toString(const QByteArray& value, const QString& delimiter = QString(" "));
     /**
      * Convert a list of strings to a single string delimited by the supplied character
      */
