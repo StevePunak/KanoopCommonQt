@@ -449,7 +449,7 @@ int TimeSpan::parseIntToToken(QString &remaining, const QString& token)
     int index = remaining.indexOf(token);
 
     // make sure the token has no adjoining alpha characters
-    if(index > 0)
+    if(index > 0 && remaining.at(index -1).isLetter() == false)
     {
         int tokenSizeAtLocation = 0;
         for(;index + tokenSizeAtLocation < remaining.length() && remaining[index + tokenSizeAtLocation].isLetter();tokenSizeAtLocation++);
