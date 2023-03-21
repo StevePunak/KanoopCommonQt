@@ -371,13 +371,20 @@ TimeSpan TimeSpan::fromDays(double days)
 
 TimeSpan TimeSpan::fromString(const QString &timeString)
 {
-    if(timeString.contains('d') || timeString.contains('h') || timeString.contains('m') || timeString.contains('s'))
+    QStringList tokens = getTokens(timeString);
+
+    if(tokens.contains("d") || tokens.contains("h") || tokens.contains("m") || tokens.contains("s"))
         return parseAbbreviatedString(timeString);
     else if(timeString.contains(':'))
         return parseColonDelimitedString(timeString);
     else if(timeString.length() > 0 && timeString[0].isDigit())
     {
-        return TimeSpan::fromMilliseconds(timeString.toInt());
+        if(tokens.contains("us")) {
+            return parseMicrosecondString(timeString);
+        }
+        else {
+            return TimeSpan::fromMilliseconds(timeString.toInt());
+        }
     }
     return TimeSpan::zero();
 }
@@ -421,7 +428,10 @@ TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString)
     {
         double s = parts.last().toDouble();
         seconds = (int)s;
-        ms = (int)((s - seconds) * 1000);
+        // This rigamorole help with double lack of precision (e.g.: 1.003 will normally parse to 1.0029999999)
+        s -= seconds;
+        s =  qRound(s * 1000);
+        ms = s;
         parts.removeLast();
     }
     if(parts.length() > 0)
@@ -440,6 +450,38 @@ TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString)
     }
 
     TimeSpan result = TimeSpan(days, hours, minutes, seconds, ms);
+    return result;
+}
+
+TimeSpan TimeSpan::parseMicrosecondString(const QString &timeString)
+{
+    TimeSpan result;
+    int index = timeString.indexOf("us");
+    if(index > 0) {
+        QString trimmed = timeString.left(index).trimmed();
+        double us = trimmed.toDouble();
+        result = TimeSpan::fromMicroseconds(us);
+    }
+    return result;
+}
+
+QStringList TimeSpan::getTokens(const QString& timeString)
+{
+    QStringList result;
+    QString token;
+    for(int i = 0;i < timeString.length();i++) {
+        QChar c = timeString.at(i);
+        if(c.isLetter()) {
+            token.append(c);
+        }
+        else if(token.length() > 0) {
+            result.append(token);
+            token.clear();
+        }
+    }
+    if(token.length() > 0) {
+        result.append(token);
+    }
     return result;
 }
 
