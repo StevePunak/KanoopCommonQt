@@ -12,7 +12,7 @@ GeoCoordinate::GeoCoordinate(const QString &value)
     }
 }
 
-bool GeoCoordinate::operator==(const GeoCoordinate &other)
+bool GeoCoordinate::operator==(const GeoCoordinate &other) const
 {
     return
         _latitude == other._latitude &&
@@ -20,7 +20,7 @@ bool GeoCoordinate::operator==(const GeoCoordinate &other)
         _altitude == other._altitude;
 }
 
-bool GeoCoordinate::isNorthOf(const GeoCoordinate &other)
+bool GeoCoordinate::isNorthOf(const GeoCoordinate &other) const
 {
     bool result = false;
     if(_cardinalLatitude == Geo::North && other._cardinalLatitude == Geo::North)
@@ -32,7 +32,7 @@ bool GeoCoordinate::isNorthOf(const GeoCoordinate &other)
     return result;
 }
 
-bool GeoCoordinate::isWestOf(const GeoCoordinate &other)
+bool GeoCoordinate::isWestOf(const GeoCoordinate &other) const
 {
     bool result = false;
     if(_cardinalLongitude == Geo::West && other._cardinalLongitude == Geo::West)

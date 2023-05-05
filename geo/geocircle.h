@@ -23,7 +23,9 @@ public:
     double diameter() const { return _radius * 2; }
     double area() const { return M_PI * (_radius * _radius); }
 
-    bool contains(const GeoCoordinate& point);
+    bool contains(const GeoCoordinate& point) const;
+
+    bool isValid() const { return _center.isValid() && _radius != 0; }
 
 private:
     GeoCoordinate _center;
