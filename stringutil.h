@@ -59,6 +59,74 @@ public:
      * Trim the given characters from both ends of the string
      */
     static QString trimBothEnds(const QString& value, const QList<QChar> &chars);
+
+    /**
+     * @brief fuzzyIndexOf
+     * Calculate the index of a fuzzy match of 'needle' into 'haystack' using BITAP algorithm.
+     * Distance is the max Levenshtein distance to obtain a match.
+     * @param needle
+     * @param haystack
+     * @param maxDistance
+     * @return
+     */
+    static int fuzzyIndexOf(const QString& needle, const QString& haystack, int maxDistance = 1);
+
+    /**
+     * @brief levenshteinDistance
+     * Calculate the Levenshtein distance between two strings
+     * @param s1
+     * @param s2
+     * @return
+     */
+    static int levenshteinDistance(const QString& s1, const QString& s2);
+
+    /**
+     * @brief Implements BITAP algorithm for fuzzy search
+     */
+    class Bitap
+    {
+    public:
+        Bitap(const QString& haystack, const QString& needle, int maxDistance = 1);
+
+        int index() const { return _index; }
+
+    private:
+        int calculate(int maxDistance);
+
+        QString _haystack;
+        QString _needle;
+
+        int _index;
+    };
+
+    /**
+     * @brief Implements the Levenshtein algorithm to determine the distance
+     * between two strings
+     */
+    class Levenshtein
+    {
+    public:
+        Levenshtein(const QString& s1, const QString& s2);
+
+        int distance() const { return _distance; }
+
+    private:
+        int min(int a, int b, int c)
+        {
+            int result = -1;
+            if(a <= b && a <= c) {
+                result = a;
+            }
+            else if(b <= a && b <= c) {
+                result = b;
+            }
+            else if(c <= a && c <= b) {
+                result = c;
+            }
+            return result;
+        }
+        int _distance;
+    };
 };
 
 #endif // STRINGUTIL_H

@@ -43,8 +43,8 @@ public:
         Parsable,
     };
 
-    bool operator==(const GeoCoordinate& other);
-    bool operator!=(const GeoCoordinate& other) { return !(*this == other); }
+    bool operator==(const GeoCoordinate& other) const;
+    bool operator!=(const GeoCoordinate& other) const { return !(*this == other); }
 
     double latitude() const { return _latitude; }
     void setLatitude(double value) { _latitude = value; validate(); }
@@ -58,32 +58,33 @@ public:
     int precision() const { return _precision; }
     void setPrecision(int value) { _precision = value; }
 
-    double distanceTo(const GeoCoordinate& other) { return getDistance(*this, other); }
-    double azimuthTo(const GeoCoordinate& other) { return getAzimuth(*this, other); }
+    double distanceTo(const GeoCoordinate& other)  const { return getDistance(*this, other); }
+    double azimuthTo(const GeoCoordinate& other)  const { return getAzimuth(*this, other); }
     GeoCoordinate atDistanceAndAzimuth(double distance, double azimuth) { return getPointAtDistanceAndAzimuth(*this, distance, azimuth); }
 
-    bool isNorthOfOrEqualTo(const GeoCoordinate& other)
+    bool isNorthOfOrEqualTo(const GeoCoordinate& other) const
     {
         return isNorthOf(other) || (equalAtPrecision(_latitude, other._latitude, _precision) && _cardinalLatitude == other._cardinalLatitude);
     }
-    bool isNorthOf(const GeoCoordinate& other);
-    bool isSouthOfOrEqualTo(const GeoCoordinate& other)
+    bool isNorthOf(const GeoCoordinate& other) const;
+    bool isSouthOfOrEqualTo(const GeoCoordinate& other) const
     {
         return isSouthOf(other) || (equalAtPrecision(_latitude, other._cardinalLatitude, _precision) && _cardinalLatitude == other._cardinalLatitude);
     }
-    bool isSouthOf(const GeoCoordinate& other) { return !isNorthOf(other); }
-    bool isWestOfOrEqualTo(const GeoCoordinate& other)
+    bool isSouthOf(const GeoCoordinate& other)  const{ return !isNorthOf(other); }
+    bool isWestOfOrEqualTo(const GeoCoordinate& other) const
     {
         return isWestOf(other) || equalAtPrecision(_longitude, other._longitude, _precision);
     }
-    bool isWestOf(const GeoCoordinate& other);
-    bool isEastOfOrEqualTo(const GeoCoordinate& other)
+    bool isWestOf(const GeoCoordinate& other) const;
+    bool isEastOfOrEqualTo(const GeoCoordinate& other) const
     {
         return isEastOf(other) || equalAtPrecision(_longitude, other._longitude, _precision);
     }
-    bool isEastOf(const GeoCoordinate& other) { return !isWestOf(other); }
+    bool isEastOf(const GeoCoordinate& other) const { return !isWestOf(other); }
 
-    bool isEmpty() { return *this == GeoCoordinate(); }
+    bool isEmpty() const { return *this == GeoCoordinate(); }
+    bool isValid() const { return !isEmpty(); }
 
     QString toString(CoordinateFormat format = Degrees, int precision = 0) const;
 
