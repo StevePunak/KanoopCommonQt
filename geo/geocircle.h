@@ -14,6 +14,9 @@ public:
         _center(center),
         _radius(radius) {}
 
+    bool operator==(const GeoCircle& other) const;
+    bool operator!=(const GeoCircle& other) const { return !(*this == other); }
+
     GeoCoordinate center() const { return _center; }
     void setCenter(GeoCoordinate value) { _center = value; }
 
@@ -26,6 +29,13 @@ public:
     bool contains(const GeoCoordinate& point) const;
 
     bool isValid() const { return _center.isValid() && _radius != 0; }
+
+    QString toString() const
+    {
+        return QString("%1, %2").arg(_center.toString()).arg(radius());
+    }
+
+    static GeoCircle fromString(const QString& value);
 
 private:
     GeoCoordinate _center;
