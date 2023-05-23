@@ -4,7 +4,8 @@
 
 QString GeoCoordinate::TOSTRING_DELIM       = "Lat/Long: ";
 
-GeoCoordinate::GeoCoordinate(const QString &value)
+GeoCoordinate::GeoCoordinate(const QString &value) :
+    _latitude(0), _longitude(0), _altitude(0)
 {
     GeoCoordinate c;
     if(tryParse(value, c)) {
