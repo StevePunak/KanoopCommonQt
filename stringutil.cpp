@@ -38,7 +38,7 @@ QString StringUtil::toString(const QByteArray &value, const QString &delimiter)
     QTextStream output(&result);
     for(int i = 0;i < value.length();i++) {
         quint8 b = value.at(i);
-        output << QString::number(b, 16).toUpper();
+        output << QString("%1").arg(b, 2, 16, QChar('0')).toUpper();
         if(delimiter.length() > 0) {
             output << delimiter;
         }
