@@ -37,6 +37,10 @@ public:
         return GeoCoordinate(value);
     }
 
+    static GeoCoordinate fromDMS(Geo::CardinalDirection latitudeCardinalDirection, double latitudeDegrees, double latitudeMinutes, double latitudeSeconds,
+                                 Geo::CardinalDirection longitudeCardinalDirection, double longitudeDegrees, double longitudeMinutes, double longitudeSeconds);
+
+
     enum CoordinateFormat
     {
         Degrees,
