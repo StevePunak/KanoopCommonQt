@@ -13,6 +13,19 @@ GeoCoordinate::GeoCoordinate(const QString &value) :
     }
 }
 
+GeoCoordinate GeoCoordinate::fromDMS(Geo::CardinalDirection latitudeCardinalDirection, double latitudeDegrees, double latitudeMinutes, double latitudeSeconds, Geo::CardinalDirection longitudeCardinalDirection, double longitudeDegrees, double longitudeMinutes, double longitudeSeconds)
+{
+    double latitude = latitudeDegrees + (latitudeMinutes / 60) + (latitudeSeconds / 3600);
+    double longitude = longitudeDegrees + (longitudeMinutes / 60) + (longitudeSeconds / 3600);
+    if(latitudeCardinalDirection == Geo::South) {
+        latitude = -latitude;
+    }
+    if(longitudeCardinalDirection == Geo::West) {
+        longitude = -longitude;
+    }
+    return GeoCoordinate(latitude, longitude);
+}
+
 bool GeoCoordinate::operator==(const GeoCoordinate &other) const
 {
     return
@@ -154,7 +167,7 @@ GeoCoordinate GeoCoordinate::getPointAtDistanceAndAzimuth(const GeoCoordinate& o
 
 void GeoCoordinate::validate()
 {
-    _valid = _longitude > -180 && _longitude < 180 && _latitude > -45 && _latitude < 45;
+    _valid = _longitude > -180 && _longitude < 180 && _latitude > -90 && _latitude < 90;
     if(!_valid)
         return;
 
