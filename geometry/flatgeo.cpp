@@ -4,6 +4,7 @@
 #include "line.h"
 #include <QtMath>
 
+using namespace Geo;
 double FlatGeo::vectorAngle(const Line &l1, const Line &l2)
 {
     double		a = l1.p1().x() - l1.p1().x();
@@ -131,6 +132,48 @@ bool FlatGeo::arePointsEqual(const QPointF &p1, const QPointF &p2, int precision
         result = x1 == x2 && y1 == y2;
     }
     return result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QPointF &origin, const QPointF &other)
+{
+    int result = NoRelationship;
+    if(isPointAbove(origin, other)) {
+        result |= Above;
+    }
+    if(isPointBelow(origin, other)) {
+        result |= Below;
+    }
+    if(isPointLeftOf(origin, other)) {
+        result |= Left;
+    }
+    if(isPointRightOf(origin, other)) {
+        result |= Right;
+    }
+    if(origin == other) {
+        result = ContainedBy | Contains;
+    }
+    return (SpatialRelationship)result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QRectF &origin, const QPointF &other)
+{
+    int result = NoRelationship;
+    if(isRectAbove(origin, other)) {
+        result |= Above;
+    }
+    if(isRectBelow(origin, other)) {
+        result |= Below;
+    }
+    if(isRectLeftOf(origin, other)) {
+        result |= Left;
+    }
+    if(isRectRightOf(origin, other)) {
+        result |= Right;
+    }
+    if(origin.contains(other.toPoint())) {
+        result = Contains;
+    }
+    return (SpatialRelationship)result;
 }
 
 QString FlatGeo::makePointString(const QPoint &p)
