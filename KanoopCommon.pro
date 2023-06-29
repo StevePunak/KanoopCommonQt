@@ -33,11 +33,18 @@ SOURCES += \
     addresshelper.cpp \
     cryptoutil.cpp \
     datetimeutil.cpp \
-    geo/earthgeo.cpp \
     fileutil.cpp \
+    geo/earthgeo.cpp \
     geo/geocircle.cpp \
     geo/geocoordinate.cpp \
     geo/geotypes.cpp \
+    geometry/angle.cpp \
+    geometry/circle.cpp \
+    geometry/flatgeo.cpp \
+    geometry/line.cpp \
+    geometry/spanningtree.cpp \
+    geometry/treepathvertice.cpp \
+    geometry/triangle.cpp \
     jsonhelper.cpp \
     klog.cpp \
     mutexevent.cpp \
@@ -50,13 +57,21 @@ SOURCES += \
 
 HEADERS += \
     addresshelper.h \
+    commonexception.h \
     cryptoutil.h \
     datetimeutil.h \
-    geo/earthgeo.h \
     fileutil.h \
+    geo/earthgeo.h \
     geo/geocircle.h \
     geo/geocoordinate.h \
     geo/geotypes.h \
+    geometry/angle.h \
+    geometry/circle.h \
+    geometry/flatgeo.h \
+    geometry/line.h \
+    geometry/spanningtree.h \
+    geometry/treepathvertice.h \
+    geometry/triangle.h \
     jsonhelper.h \
     kanoopcommon.h \
     klog.h \
