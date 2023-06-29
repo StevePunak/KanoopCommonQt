@@ -144,10 +144,10 @@ SpatialRelationship FlatGeo::relationTo(const QPointF &origin, const QPointF &ot
         result |= Below;
     }
     if(isPointLeftOf(origin, other)) {
-        result |= Left;
+        result |= ToLeftOf;
     }
     if(isPointRightOf(origin, other)) {
-        result |= Right;
+        result |= ToRightOf;
     }
     if(origin == other) {
         result = ContainedBy | Contains;
@@ -165,13 +165,61 @@ SpatialRelationship FlatGeo::relationTo(const QRectF &origin, const QPointF &oth
         result |= Below;
     }
     if(isRectLeftOf(origin, other)) {
-        result |= Left;
+        result |= ToLeftOf;
     }
     if(isRectRightOf(origin, other)) {
-        result |= Right;
+        result |= ToRightOf;
     }
     if(origin.contains(other.toPoint())) {
         result = Contains;
+    }
+    return (SpatialRelationship)result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QPointF &origin, const QRectF &other)
+{
+    int result = NoRelationship;
+    if(isRectAbove(other, origin)) {
+        result |= Below;
+    }
+    if(isRectBelow(other, origin)) {
+        result |= Above;
+    }
+    if(isRectLeftOf(other, origin)) {
+        result |= ToRightOf;
+    }
+    if(isRectRightOf(other, origin)) {
+        result |= ToLeftOf;
+    }
+    if(other.contains(origin)) {
+        result = ContainedBy;
+    }
+    return (SpatialRelationship)result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QRectF &origin, const QRectF &other)
+{
+    int result = NoRelationship;
+    if(isRectAbove(other, origin) || isRectBelow(origin, other)) {
+        result |= Below;
+    }
+    if(isRectBelow(other, origin) || isRectAbove(origin, other)) {
+        result |= Above;
+    }
+    if(isRectLeftOf(other, origin) || isRectRightOf(origin, other)) {
+        result |= ToRightOf;
+    }
+    if(isRectRightOf(other, origin) || isRectLeftOf(origin, other)) {
+        result |= ToLeftOf;
+    }
+    if(other.contains(origin)) {
+        result |= ContainedBy;
+    }
+    if(origin.contains(other)) {
+        result |= Contains;
+    }
+    if(origin.intersects(other)) {
+        result |= IntersectsWith;
     }
     return (SpatialRelationship)result;
 }

@@ -82,48 +82,42 @@ public:
     {
         return point.y() > other.y();
     }
-    static inline bool isRectLeftOf(const QRect& rect, const QPoint& other)
-    {
-        return isRectLeftOf(QRectF(rect), QPointF(other));
-    }
     static inline bool isRectLeftOf(const QRectF& rect, const QPointF& other)
     {
         return rect.x() + rect.width() < other.x();
-    }
-    static inline bool isRectRightOf(const QRect& rect, const QPoint& other)
-    {
-        return isRectRightOf(QRectF(rect), QPointF(other));
     }
     static inline bool isRectRightOf(const QRectF& rect, const QPointF& other)
     {
         return rect.x() > other.x();
     }
-    static inline bool isRectAbove(const QRect& rect, const QPoint& other)
-    {
-        return isRectAbove(QRectF(rect), QPointF(other));
-    }
     static inline bool isRectAbove(const QRectF& rect, const QPointF& other)
     {
         return rect.y() + rect.height() < other.y();
-    }
-    static inline bool isRectBelow(const QRect& rect, const QPoint& other)
-    {
-        return isRectBelow(QRectF(rect), QPointF(other));
     }
     static inline bool isRectBelow(const QRectF& rect, const QPointF& other)
     {
         return rect.y() > other.y();
     }
-    Geo::SpatialRelationship relationTo(const QPoint& origin, const QPoint& other)
+    static inline bool isRectLeftOf(const QRectF& rect, const QRectF& other)
     {
-        return relationTo(QPointF(origin), QPointF(other));
+        return other.x() < rect.x();
     }
-    Geo::SpatialRelationship relationTo(const QPointF& origin, const QPointF& other);
-    Geo::SpatialRelationship relationTo(const QRect& origin, const QPoint& other)
+    static inline bool isRectRightOf(const QRectF& rect, const QRectF& other)
     {
-        return relationTo(QRectF(origin), QPointF(other));
+        return other.x() > rect.x() + rect.width();
     }
-    Geo::SpatialRelationship relationTo(const QRectF& origin, const QPointF& other);
+    static inline bool isRectAbove(const QRectF& rect, const QRectF& other)
+    {
+        return other.y() < rect.y();
+    }
+    static inline bool isRectBelow(const QRectF& rect, const QRectF& other)
+    {
+        return other.y() > rect.y() + rect.height();
+    }
+    static Geo::SpatialRelationship relationTo(const QPointF& origin, const QPointF& other);
+    static Geo::SpatialRelationship relationTo(const QRectF& origin, const QPointF& other);
+    static Geo::SpatialRelationship relationTo(const QPointF& origin, const QRectF& other);
+    static Geo::SpatialRelationship relationTo(const QRectF& origin, const QRectF& other);
 
     static QString makePointString(const QPoint& p);
     static QString makePointString(const QPointF& p);
