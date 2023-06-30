@@ -25,7 +25,10 @@ public:
     bool operator !=(const Line& other) const { return (*this == other) == false; }
 
     Point p1() const { return _p1; }
+    void setP1(const Point& value) { _p1 = value; }
+
     Point p2() const { return _p2; }
+    void setP2(const Point& value) { _p2 = value; }
 
     class List : public QList<Line>
     {
@@ -73,6 +76,9 @@ public:
     bool sharesSameEndpoints(const Line& other) const;
     bool isEndpoint(const QPointF& point, int precision = 0) const;
     bool containsPoint(const QPointF& point) const;
+    void shorten(double howMuch);
+
+    Line& round();
 
     static List verticalLines(const QRectF& rect);
     static List horizontalLines(const QRectF& rect);

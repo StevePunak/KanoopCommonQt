@@ -291,6 +291,21 @@ bool Line::containsPoint(const QPointF &point) const
     return d1 + d2 == length();
 }
 
+void Line::shorten(double howMuch)
+{
+    if(length() >= howMuch) {
+        Point newP2 = FlatGeo::getPoint(_p1, bearing(), length() - howMuch);
+        _p2 = newP2;
+    }
+}
+
+Line &Line::round()
+{
+    _p1.round();
+    _p2.round();
+    return *this;
+}
+
 Line::List Line::verticalLines(const QRectF &rect)
 {
     List result;
