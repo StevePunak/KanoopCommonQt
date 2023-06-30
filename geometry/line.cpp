@@ -286,6 +286,22 @@ bool Line::containsPoint(const QPointF &point) const
     return d1 + d2 == length();
 }
 
+Line::List Line::verticalLines(const QRectF &rect)
+{
+    List result;
+    result.append(Line(rect.topLeft(), rect.bottomLeft()));
+    result.append(Line(rect.topRight(), rect.bottomRight()));
+    return result;
+}
+
+Line::List Line::horizontalLines(const QRectF &rect)
+{
+    List result;
+    result.append(Line(rect.topLeft(), rect.topRight()));
+    result.append(Line(rect.bottomLeft(), rect.bottomRight()));
+    return result;
+}
+
 void Line::move(double bearing, double distance)
 {
     _p1 = FlatGeo::move(_p1, bearing, distance);
@@ -312,3 +328,104 @@ QString Line::toString() const
 {
     return QString("%1 <==> %2").arg(FlatGeo::makePointString(_p1)).arg(FlatGeo::makePointString(_p2));
 }
+
+
+// ======================== Line::List =============================
+
+Line::List Line::List::fromPoints(const QList<QPoint>& points)
+{
+    List result;
+    for(int i = 0;i < points.count() - 1;i++) {
+        result.append(Line(points.at(i), points.at(i+1)));
+    }
+    return result;
+}
+
+Line::List Line::List::fromPoints(const QList<QPointF>& points)
+{
+    List result;
+    for(int i = 0;i < points.count() - 1;i++) {
+        result.append(Line(points.at(i), points.at(i+1)));
+    }
+    return result;
+}
+
+Line Line::List::longestHorizontalLine()
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(line.isHorizontal() && line.length() > result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+Line Line::List::longestVerticalLine()
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(line.isVertical() && line.length() > result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+bool Line::List::containsLineWithSameEndpoints(const Line& line) const
+{
+    bool result = false;
+    const_iterator it = std::find_if(constBegin(), constEnd(), [line](const Line& other) {
+        return other.sharesSameEndpoints(line);
+    });
+    if(it != constEnd()) {
+        result = true;
+    }
+    return result;
+}
+
+Line Line::List::highest() const
+{
+    Line result;
+    if(count() > 0) {
+        result = this->at(0);
+        for(const Line& line : *this) {
+            if(line.isAbove(result)) {
+                result = line;
+            }
+        }
+    }
+    return result;
+}
+
+Line Line::List::lowest() const
+{
+    Line result;
+    if(count() > 0) {
+        result = this->at(0);
+        for(const Line& line : *this) {
+            if(line.isBelow(result)) {
+                result = line;
+            }
+        }
+    }
+    return result;
+}
+
+QPointF Line::List::closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance)
+{
+    closestDistance = INFINITY;
+    QPointF closestPoint;
+
+    for(const Line& line : *this) {
+        double	distance;
+        QPointF	p = line.closestPointTo(other, distance);
+        if(distance < closestDistance) {
+            closestDistance = distance;
+            closestPoint = p;
+            closestLine = line;
+        }
+    }
+    return closestPoint;
+}
+

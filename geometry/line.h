@@ -6,6 +6,7 @@
 #include <QRect>
 
 #include "flatgeo.h"
+#include "point.h"
 
 class QLineF;
 class QLine;
@@ -25,6 +26,19 @@ public:
 
     QPointF p1() const { return _p1; }
     QPointF p2() const { return _p2; }
+
+    class List : public QList<Line>
+    {
+    public:
+        static List fromPoints(const QList<QPoint>& points);
+        static List fromPoints(const QList<QPointF>& points);
+        Line longestHorizontalLine();
+        Line longestVerticalLine();
+        bool containsLineWithSameEndpoints(const Line& line) const;
+        Line highest() const;
+        Line lowest() const;
+        QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
+    };
 
     QPointF midpoint() const;
     double length() const;
@@ -59,6 +73,9 @@ public:
     bool isEndpoint(const QPointF& point, int precision = 0) const;
     bool containsPoint(const QPointF& point) const;
 
+    static List verticalLines(const QRectF& rect);
+    static List horizontalLines(const QRectF& rect);
+
     void move(double bearing, double distance);
     void rotate(const QPointF& centroid, double angle);
 
@@ -68,107 +85,6 @@ public:
     QString toString() const;
 
     bool isValid() const { return _p1.isNull() == false && _p2.isNull() == false; }
-
-    class List : public QList<Line>
-    {
-    public:
-        static List fromPoints(const QList<QPoint>& points)
-        {
-            List result;
-            for(int i = 0;i < points.count() - 1;i++) {
-                result.append(Line(points.at(i), points.at(i+1)));
-            }
-            return result;
-        }
-
-        static List fromPoints(const QList<QPointF>& points)
-        {
-            List result;
-            for(int i = 0;i < points.count() - 1;i++) {
-                result.append(Line(points.at(i), points.at(i+1)));
-            }
-            return result;
-        }
-
-        Line longestHorizontalLine()
-        {
-            Line result;
-            for(const Line& line : *this) {
-                if(line.isHorizontal() && line.length() > result.length()) {
-                    result = line;
-                }
-            }
-            return result;
-        }
-
-        Line longestVerticalLine()
-        {
-            Line result;
-            for(const Line& line : *this) {
-                if(line.isVertical() && line.length() > result.length()) {
-                    result = line;
-                }
-            }
-            return result;
-        }
-
-        bool containsLineWithSameEndpoints(const Line& line) const
-        {
-            bool result = false;
-            const_iterator it = std::find_if(constBegin(), constEnd(), [line](const Line& other) {
-                return other.sharesSameEndpoints(line);
-            });
-            if(it != constEnd()) {
-                result = true;
-            }
-            return result;
-        }
-
-        Line highest() const
-        {
-            Line result;
-            if(count() > 0) {
-                result = this->at(0);
-                for(const Line& line : *this) {
-                    if(line.isAbove(result)) {
-                        result = line;
-                    }
-                }
-            }
-            return result;
-        }
-
-        Line lowest() const
-        {
-            Line result;
-            if(count() > 0) {
-                result = this->at(0);
-                for(const Line& line : *this) {
-                    if(line.isBelow(result)) {
-                        result = line;
-                    }
-                }
-            }
-            return result;
-        }
-
-        QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance)
-        {
-            closestDistance = INFINITY;
-            QPointF closestPoint;
-
-            for(const Line& line : *this) {
-                double	distance;
-                QPointF	p = line.closestPointTo(other, distance);
-                if(distance < closestDistance) {
-                    closestDistance = distance;
-                    closestPoint = p;
-                    closestLine = line;
-                }
-            }
-            return closestPoint;
-        }
-    };
 
 private:
     QPointF _p1;

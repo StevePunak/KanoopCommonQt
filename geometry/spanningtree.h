@@ -16,9 +16,6 @@ public:
     void setOrigin(const QPointF& origin, Geo::Direction preferredDirection = Geo::NoDirection);
     void setDestination(const QPointF& destination);
 
-    void appendObstacle(const QRect& value) { _obstacles.append(value); }
-    void setObstacles(const QList<QRect>& value) { _obstacles = value; }
-
     TreePathVertice::List vertices() const
     {
         return TreePathVertice::List(_vertices.values());
@@ -46,8 +43,6 @@ private:
     TreePathVertice::List _unvisited;
     TreePathVertice* _origin;
     TreePathVertice* _destination;
-
-    QList<QRect> _obstacles;
 
     int _debugLevel;
 };

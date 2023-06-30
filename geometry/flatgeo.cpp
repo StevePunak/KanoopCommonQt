@@ -200,16 +200,16 @@ SpatialRelationship FlatGeo::relationTo(const QPointF &origin, const QRectF &oth
 SpatialRelationship FlatGeo::relationTo(const QRectF &origin, const QRectF &other)
 {
     int result = NoRelationship;
-    if(isRectAbove(other, origin) || isRectBelow(origin, other)) {
+    if(isRectBelow(origin, other)) {
         result |= Below;
     }
-    if(isRectBelow(other, origin) || isRectAbove(origin, other)) {
+    if(isRectAbove(origin, other)) {
         result |= Above;
     }
-    if(isRectLeftOf(other, origin) || isRectRightOf(origin, other)) {
+    if(isRectRightOf(origin, other)) {
         result |= ToRightOf;
     }
-    if(isRectRightOf(other, origin) || isRectLeftOf(origin, other)) {
+    if(isRectLeftOf(origin, other)) {
         result |= ToLeftOf;
     }
     if(other.contains(origin)) {
