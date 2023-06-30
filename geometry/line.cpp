@@ -11,7 +11,7 @@
 Line::Line(const QPointF &origin, double bearing, double distance) :
     _p1(origin), _p2(FlatGeo::getPoint(origin, bearing, distance)) {}
 
-QPointF Line::midpoint() const
+Point Line::midpoint() const
 {
     double x = _p2.x() - ((_p2.x() - _p1.x()) / 2);
     double y = _p2.y() - ((_p2.y() - _p1.y()) / 2);
@@ -108,13 +108,13 @@ double Line::distanceTo(const QPointF &to) const
     return result;
 }
 
-QPointF Line::closestPointTo(const QPointF &point) const
+Point Line::closestPointTo(const QPointF &point) const
 {
     double distance;
     return closestPointTo(point, distance);
 }
 
-QPointF Line::closestPointTo(const QPointF &point, double &distance) const
+Point Line::closestPointTo(const QPointF &point, double &distance) const
 {
     QPointF	closest;
     double dx = _p2.x() - _p1.x();
@@ -147,7 +147,7 @@ QPointF Line::closestPointTo(const QPointF &point, double &distance) const
     return closest;
 }
 
-QPointF Line::furthestPointFrom(const QPointF &point) const
+Point Line::furthestPointFrom(const QPointF &point) const
 {
     double distance;
     QPointF closest = closestPointTo(point, distance);
@@ -155,22 +155,22 @@ QPointF Line::furthestPointFrom(const QPointF &point) const
     return furthest;
 }
 
-QPointF Line::topMostPoint() const
+Point Line::topMostPoint() const
 {
     return FlatGeo::isPointAbove(_p1, _p2) ? _p1 : _p2;
 }
 
-QPointF Line::bottomMostPoint() const
+Point Line::bottomMostPoint() const
 {
     return FlatGeo::isPointBelow(_p1, _p2) ? _p1 : _p2;
 }
 
-QPointF Line::leftMostPoint() const
+Point Line::leftMostPoint() const
 {
     return FlatGeo::isPointLeftOf(_p1, _p2) ? _p1 : _p2;
 }
 
-QPointF Line::rightMostPoint() const
+Point Line::rightMostPoint() const
 {
     return FlatGeo::isPointRightOf(_p1, _p2) ? _p1 : _p2;
 }
@@ -201,7 +201,7 @@ bool Line::intersects(const Line &other) const
     return point.isNull() == false;
 }
 
-bool Line::intersects(const Line &other, QPointF &intersection) const
+bool Line::intersects(const Line &other, Point &intersection) const
 {
     intersection = FlatGeo::intersection(*this, other);
     return intersection.isNull() == false;
@@ -220,7 +220,7 @@ bool Line::intersects(const QRectF &other) const
            intersects(Line(other.bottomLeft(), other.topLeft()));
 }
 
-QPointF Line::intersection(const Line &other) const
+Point Line::intersection(const Line &other) const
 {
     return FlatGeo::intersection(*this, other);
 }
@@ -256,6 +256,11 @@ bool Line::isBelow(const Line &other) const
     double maxL2 = qMax(other._p1.y(), other._p2.y());
 
     return maxL1 > maxL2;
+}
+
+bool Line::isPerpendicular() const
+{
+    return isVertical() || isHorizontal();
 }
 
 bool Line::sharesEndpointWith(const Line &other, double maxDistance) const
@@ -308,7 +313,7 @@ void Line::move(double bearing, double distance)
     _p2 = FlatGeo::move(_p2, bearing, distance);
 }
 
-void Line::rotate(const QPointF &centroid, double angle)
+void Line::rotate(const Point &centroid, double angle)
 {
     _p1 = FlatGeo::rotate(_p1, centroid, angle);
     _p2 = FlatGeo::rotate(_p2, centroid, angle);

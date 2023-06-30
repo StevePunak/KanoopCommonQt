@@ -24,8 +24,8 @@ public:
     bool operator ==(const Line& other) const { return _p1 == other._p1 && _p2 == other._p2; }
     bool operator !=(const Line& other) const { return (*this == other) == false; }
 
-    QPointF p1() const { return _p1; }
-    QPointF p2() const { return _p2; }
+    Point p1() const { return _p1; }
+    Point p2() const { return _p2; }
 
     class List : public QList<Line>
     {
@@ -40,7 +40,7 @@ public:
         QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
     };
 
-    QPointF midpoint() const;
+    Point midpoint() const;
     double length() const;
     double slope() const;
     double intercept() const;
@@ -48,26 +48,27 @@ public:
     bool isHorizontal() const;
     double bearing() const;
     double distanceTo(const QPointF& to) const;
-    QPointF closestPointTo(const QPointF& point) const;
-    QPointF closestPointTo(const QPointF& point, double& distance) const;
-    QPointF furthestPointFrom(const QPointF& point) const;
-    QPointF topMostPoint() const;
-    QPointF bottomMostPoint() const;
-    QPointF leftMostPoint() const;
-    QPointF rightMostPoint() const;
+    Point closestPointTo(const QPointF& point) const;
+    Point closestPointTo(const QPointF& point, double& distance) const;
+    Point furthestPointFrom(const QPointF& point) const;
+    Point topMostPoint() const;
+    Point bottomMostPoint() const;
+    Point leftMostPoint() const;
+    Point rightMostPoint() const;
     bool hasXBetween(double x1, double x2) const;
     bool crossesX(double x) const;
     bool hasYBetween(double y1, double y2) const;
     bool crossesY(double y) const;
     bool intersects(const Line& other) const;
-    bool intersects(const Line& other, QPointF& intersection) const;
+    bool intersects(const Line& other, Point &intersection) const;
     bool intersects(const Circle& other) const;
     bool intersects(const QRectF &other) const;
-    QPointF intersection(const Line& other) const;
+    Point intersection(const Line& other) const;
     bool isLeftOf(const Line& other) const;
     bool isRightOf(const Line& other) const;
     bool isAbove(const Line& other) const;
     bool isBelow(const Line& other) const;
+    bool isPerpendicular() const;
     bool sharesEndpointWith(const Line& other, double maxDistance = 0) const;
     bool sharesSameEndpoints(const Line& other) const;
     bool isEndpoint(const QPointF& point, int precision = 0) const;
@@ -77,7 +78,7 @@ public:
     static List horizontalLines(const QRectF& rect);
 
     void move(double bearing, double distance);
-    void rotate(const QPointF& centroid, double angle);
+    void rotate(const Point& centroid, double angle);
 
     QLine toQLine() const;
     QLineF toQLineF() const;
@@ -87,8 +88,8 @@ public:
     bool isValid() const { return _p1.isNull() == false && _p2.isNull() == false; }
 
 private:
-    QPointF _p1;
-    QPointF _p2;
+    Point _p1;
+    Point _p2;
 
     static inline bool isBetween(double value, double v1, double v2)
     {

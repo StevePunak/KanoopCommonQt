@@ -10,10 +10,10 @@ public:
     Point(const QPoint& other) : QPointF(other) {}
     Point(double x, double y) : QPointF(x, y) {}
 
-    bool isLeftOf(const QPointF& other) { return x() < other.x(); }
-    bool isRightOf(const QPointF& other) { return x() > other.x(); }
-    bool isAbove(const QPointF& other) { return y() < other.y(); }
-    bool isBelow(const QPointF& other) { return y() > other.y(); }
+    bool isLeftOf(const QPointF& other) const { return x() < other.x(); }
+    bool isRightOf(const QPointF& other) const { return x() > other.x(); }
+    bool isAbove(const QPointF& other) const { return y() < other.y(); }
+    bool isBelow(const QPointF& other) const { return y() > other.y(); }
 };
 
 #endif // POINT_H
