@@ -1,3 +1,28 @@
+/**
+ * pathrouter.cpp
+ *
+ * Works in multiple passes:
+ *
+ * Pass 1 - Find a direct shot from current 'a' to 'b'.
+ *   This pass will find a home run if it exists.
+ *   It is the pass which will finally yield a result;
+ *
+ * Pass 2 -
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 #include "pathrouter.h"
 #include "klog.h"
 
@@ -5,11 +30,13 @@
 
 using namespace Geo;
 
-PathRouter::PathRouter(const QPoint &origin, const QPoint &destination, const QRectF &canvas, const QList<QRect> &obstacles) :
+PathRouter::PathRouter(const Point &origin, const Point &destination, const QRectF &canvas, const QList<Rectangle> &obstacles) :
     _originPoint(origin), _destinationPoint(destination),
     _canvas(canvas),
     _obstacles(obstacles),
     _direction(Geo::NoDirection),
+    _forceDirection(Geo::NoDirection),
+    _complete(false),
     _routingMargin(DefaultRoutingMargin),
     _debugLevel(KLog::Debug)
 {
@@ -22,13 +49,36 @@ Line::List PathRouter::calcluatePath()
 
     logText(KLOG_DEBUG, QString("Calculate path from %1 to %2 with %3 obstacles").arg(a.toString()).arg(b.toString()).arg(_obstacles.count()));
 
-    pointLiesWithinObstacle(_originPoint, _originObstacle);
-    pointLiesWithinObstacle(_destinationPoint, _destinationObstacle);
+    try
+    {
+        pointLiesWithinObstacle(_originPoint, _originObstacle);
+        pointLiesWithinObstacle(_destinationPoint, _destinationObstacle);
 
-    // cycle on calculation
-    while(cycle(a, b) == false) {
-        a = _pathLines.last().p2();
+        int MAX_CYCLES = 500;
+        // cycle on calculation
+        int cycles = 0;
+        do {
+            cycle(a, b);
+
+            // if the last two are the same, we have failed
+            if(_pathLines.count() >= 2 && (_pathLines[_pathLines.count() - 2] == _pathLines[_pathLines.count() - 1])) {
+                logText(KLOG_ERROR, "Failed to resolve");
+                break;
+            }
+            a = _pathLines.last().p2();
+
+            // prevent infinite looping
+            if(cycles++ > MAX_CYCLES) {
+                logText(KLOG_ERROR, "Abandoning after too many cycles");
+                break;
+            }
+        }while(!_complete);
     }
+    catch(const CommonException& e)
+    {
+        logText(KLOG_ERROR, QString(e.message()));
+    }
+
     return _pathLines;
 }
 
@@ -36,80 +86,209 @@ bool PathRouter::cycle(const Point &a, const Point &b)
 {
     bool result = false;
 
-    QList<QRect> obstaclesToIgnore = { _originObstacle, _destinationObstacle };
+    if( (result = pass1(a, b)) == false &&
+        (result = pass2(a, b)) == false &&
+        (result = pass3(a, b)) == false) {
 
-    Line direct(a, b);
-    QRect obstacle;
+    }
+    return result;
+}
+
+/**
+ * @brief PathRouter::pass1
+ * This pass looks for a direct shot
+ * @param a
+ * @param b
+ * @return
+ */
+bool PathRouter::pass1(const Point &a, const Point &b)
+{
+    bool result = false;
+
+    QList<Rectangle> obstaclesToIgnore = { _originObstacle, _destinationObstacle };
+
+    Rectangle obstacle;
     Point intersection;
+    Line direct(a, b);
+
     if(direct.isPerpendicular() && lineCrossesObstacle(direct, obstaclesToIgnore, obstacle, intersection) == false) {
         appendPathLine(direct);
-        result = true;      // done!
+        _complete = true;      // done!
+        result = true;
     }
-    else {
-        // choose an direction
-        _direction = chooseDirection(a, b, _direction);
+    return result;
+}
 
-        Line ray = rayInDirection(a, _direction);
-        if(lineCrossesObstacle(ray, obstaclesToIgnore, obstacle, intersection)) {
-            // insert a line to midpoint of 'a' and intersection
-            Line nextLine(ray.p1(), intersection);
-            nextLine = Line(nextLine.p1(), nextLine.midpoint());
-            appendPathLine(nextLine);
+/**
+ * @brief PathRouter::pass2
+ * This pass chooses a direction, and if blocked, will try and get off the obstacle
+ * @param a
+ * @param b
+ * @return
+ */
+bool PathRouter::pass2(const Point &a, const Point &b)
+{
+    bool result = false;
+
+    // choose a direction
+
+    if(_forceDirection == NoDirection) {
+        Direction newDirection = chooseDirection(a, b, QList<Direction>() << _direction << oppositeDirection(_direction));
+        if(newDirection != NoDirection) {
+            _direction = newDirection;
         }
         else {
-            // We have a clear path in this axis.
-            // Move along the current direction finding the best path
-            Direction desiredDirection = chooseDirection(a, b);     // general direction of target
-            if(desiredDirection != _direction) {
-                // we have changed directions... seek for a clear path on the new axis
-                Line nextLine = seekClearLine(a, _direction, desiredDirection);
-                if(nextLine.isValid()) {
-                    appendPathLine(nextLine);
+            // we have nowhere to go. We have probably landed on an obstacle
+            Rectangle obstacle;
+            if(pointLiesWithinObstacle(a, obstacle)) {
+                Line pathOff = findPathOffObstacle(a, obstacle, newDirection);
+                if(newDirection != NoDirection) {
+                    appendPathLine(pathOff);
+                    _direction = newDirection;
+                    result = true;
                 }
                 else {
+                    logText(KLOG_WARNING, "Failed to find path off obstacle");
+                }
+            }
+        }
+    }
+    else {
+        _direction = _forceDirection;
+        _forceDirection = NoDirection;
+    }
+    return result;
+}
+
+bool PathRouter::pass3(const Point &a, const Point &b)
+{
+    bool result = false;
+
+    // Detect obstacle in the way
+    Line ray = rayInDirection(a, _direction);
+    Rectangle obstacle;
+    Point intersection;
+    if(lineCrossesObstacle(ray, _originObstacle, obstacle, intersection)) {
+        double distanceToB = distanceInDirection(a, _direction, b);
+        double distanceToObstacle = FlatGeo::distance(a, intersection);
+
+        // if the destination 'b' lies between our current point and the obstacle,
+        // travel the distance to destination line
+        if(distanceToB < distanceToObstacle) {
+            Line newLine(a, _direction, distanceToB);
+            appendPathLine(newLine);
+            result = true;
+        }
+        else if(distanceToObstacle == 0) {
+            // we are on an obstacle... get off of it
+            Direction newDirection;
+            Line pathOff = findPathOffObstacle(a, obstacle, newDirection);
+            if(newDirection != NoDirection) {
+                appendPathLine(pathOff);
+                _direction = newDirection;
+                result = true;
+            }
+            else {
+                logText(KLOG_WARNING, "Failed to find path off obstacle (2)");
+            }
+        }
+        else {
+            Line lineToTarget(a, intersection);
+            lineToTarget = reduceLineToTarget(lineToTarget, _direction, b, _routingMargin);
+
+            // make another line to 'a' and intersection
+            Line lineToIntersection(a, intersection);
+
+            if(lineToTarget.length() <= lineToIntersection.length()) {
+                // the line will rouch the obstacle.. try and shorten it
+                if(lineToTarget.length() > _routingMargin) {
+                    lineToTarget.shorten(_routingMargin).round();
+                }
+                _forceDirection = chooseDirection(a, b, directionOfLine(lineToTarget));
+                appendPathLine(lineToTarget);
+                result = true;
+            }
+            else {
+                // go to the midpoint
+                lineToIntersection = Line(lineToIntersection.p1(), lineToIntersection.midpoint());
+                appendPathLine(lineToIntersection);
+                result = true;
+            }
+        }
+    }
+    else {
+        // We have a clear path in this axis.
+        // Move along the current direction finding the best path
+        Direction desiredDirection = chooseDirection(a, b);     // general direction of target
+        if(desiredDirection != _direction) {
+            // we have changed directions... seek for a clear path on the new axis
+            Line nextLine = seekClearLine(a, _direction, desiredDirection);
+            if(nextLine.isValid()) {
+                appendPathLine(nextLine);
+                result = true;
+            }
+            else {
+                /**
+                 * No completely clear path found. try again limiting the search distance to the
+                 * distance to 'b' along the two best axes
+                 */
+
+                // get the two directions towards target and try to find a clear line along both
+                QList<Direction> targetDirections = chooseDirections(a, b);
+
+                for(Direction targetDirection : targetDirections) {
+                    double distanceToB = distanceInDirection(a, targetDirection, b);
+
+                    nextLine = seekClearLine(a, _direction, targetDirection, distanceToB);
+                    if(nextLine.isValid()) {
+                        appendPathLine(nextLine);
+                        result = true;
+                    }
+                }
+                if(result == false) {
                     logText(KLOG_DEBUG, "No clear line. WHAT NOW?");
                 }
             }
+        }
+        else {
+            // we are going the same direction as previous pass... go as far as possible
+            // towards our target
+            Line checkLine = rayInDirection(a, desiredDirection);
+            if(lineCrossesObstacle(checkLine, _originObstacle, obstacle, intersection) == false) {
+                // nothing in the way. go as far as possible towards target
+                checkLine = reduceLineToTarget(checkLine, desiredDirection, b, 0);
+                appendPathLine(checkLine);
+            }
+            else if(obstacle == _destinationObstacle) {
+                if(intersection != b) {
+                    // we
+                }
+            }
             else {
-                // we are going the same direction as previous pass... go as far as possible
-                // towards our target
-                Line checkLine = rayInDirection(a, desiredDirection);
-                if(lineCrossesObstacle(checkLine, _originObstacle, obstacle, intersection) == false) {
-                    // nothing in the way. go as far as possible towards target
-                    checkLine = reduceLineToTarget(checkLine, desiredDirection, b, _routingMargin);
-                    appendPathLine(checkLine);
-                }
-                else if(obstacle == _destinationObstacle) {
-                    if(intersection != b) {
-                        // we
-                    }
-                }
-                else {
-                    logText(KLOG_DEBUG, "Going in same directions WHAT NOW?");
-                }
+                logText(KLOG_DEBUG, "Going in same directions WHAT NOW?");
             }
         }
     }
     return result;
 }
 
-bool PathRouter::lineCrossesObstacle(const Line &line, QRect &firstObstacle, Point &intersection) const
+bool PathRouter::lineCrossesObstacle(const Line &line, Rectangle &firstObstacle, Point &intersection) const
 {
-    return lineCrossesObstacle(line, QList<QRect>(), firstObstacle, intersection);
+    return lineCrossesObstacle(line, QList<Rectangle>(), firstObstacle, intersection);
 }
 
-bool PathRouter::lineCrossesObstacle(const Line &line, const QRect &ignoreObstacle, QRect &firstObstacle, Point &intersection) const
+bool PathRouter::lineCrossesObstacle(const Line &line, const Rectangle &ignoreObstacle, Rectangle &firstObstacle, Point &intersection) const
 {
-    return lineCrossesObstacle(line, QList<QRect>() << ignoreObstacle, firstObstacle, intersection);
+    return lineCrossesObstacle(line, QList<Rectangle>() << ignoreObstacle, firstObstacle, intersection);
 }
 
-bool PathRouter::lineCrossesObstacle(const Line& line, const QList<QRect> &ignoreObstacles, QRect &firstObstacle, Point& intersection) const
+bool PathRouter::lineCrossesObstacle(const Line& line, const QList<Rectangle> &ignoreObstacles, Rectangle &firstObstacle, Point& intersection) const
 {
     bool result = false;
     double minDistance = INFINITY;
     try
     {
-        for(const QRect& obstacle : _obstacles) {
+        for(const Rectangle& obstacle : _obstacles) {
             if(ignoreObstacles.contains(obstacle)) {
                 continue;
             }
@@ -148,11 +327,11 @@ bool PathRouter::lineCrossesObstacle(const Line& line, const QList<QRect> &ignor
     return result;
 }
 
-bool PathRouter::pointLiesWithinObstacle(const Point& point, QRect &result)
+bool PathRouter::pointLiesWithinObstacle(const Point& point, Rectangle &result)
 {
-    result = QRect();
-    for(const QRect& obstacle : _obstacles) {
-        QRect inflated = obstacle.adjusted(-1, -1, 1, 1);
+    result = Rectangle();
+    for(const Rectangle& obstacle : _obstacles) {
+        Rectangle inflated = obstacle.adjusted(-1, -1, 1, 1);
         if(inflated.contains(point.toPoint())) {
             result = obstacle;
             break;
@@ -161,7 +340,20 @@ bool PathRouter::pointLiesWithinObstacle(const Point& point, QRect &result)
     return result.isNull() == false;
 }
 
-Geo::Direction PathRouter::chooseDirection(const Point &a, const Point &b, Direction exclude) const
+QList<Direction> PathRouter::chooseDirections(const Point &a, const Point &b)
+{
+    QList<Direction> result;
+    result.append(chooseDirection(a, b));
+    result.append(chooseDirection(a, b, result.at(0)));
+    return result;
+}
+
+Geo::Direction PathRouter::chooseDirection(const Point &a, const Point &b, Direction exclude)
+{
+    return chooseDirection(a, b, QList<Direction>() << exclude);
+}
+
+Direction PathRouter::chooseDirection(const Point &a, const Point &b, const QList<Geo::Direction> exclude)
 {
     Geo::Direction result = Geo::NoDirection;
 
@@ -170,13 +362,13 @@ Geo::Direction PathRouter::chooseDirection(const Point &a, const Point &b, Direc
     if(b.isRightOf(a)) {
         if(b.isAbove(a)) {
             result = dx < dy ? Up : ToRight;
-            if(result == exclude) {
+            if(exclude.contains(result)) {
                 result = (result == Up) ? ToRight : Up;
             }
         }
         else {
             result = dx < dy ? Down : ToRight;
-            if(result == exclude) {
+            if(exclude.contains(result)) {
                 result = (result == Down) ? ToRight : Down;
             }
         }
@@ -184,13 +376,13 @@ Geo::Direction PathRouter::chooseDirection(const Point &a, const Point &b, Direc
     else if(b.isLeftOf(a)) {
         if(b.isAbove(a)) {
             result = dx < dy ? Up : ToLeft;
-            if(result == exclude) {
+            if(exclude.contains(result)) {
                 result = (result == Up) ? ToLeft : Down;
             }
         }
         else {
             result = dx < dy ? Down : ToLeft;
-            if(result == exclude) {
+            if(exclude.contains(result)) {
                 result = (result == Down) ? ToLeft : Down;
             }
         }
@@ -198,10 +390,40 @@ Geo::Direction PathRouter::chooseDirection(const Point &a, const Point &b, Direc
     else {
         if(b.isAbove(a)) {
             result = Up;
+            if(exclude.contains(result)) {
+                result = NoDirection;
+            }
         }
         else {
             result = Down;
+            if(exclude.contains(result)) {
+                result = NoDirection;
+            }
         }
+    }
+    return result;
+}
+
+Direction PathRouter::nonExcludedDirection(QList<Geo::Direction> choices, QList<Geo::Direction> exclude)
+{
+    Direction result = NoDirection;
+    for(Direction d : choices) {
+        if(exclude.contains(d) == false) {
+            result = d;
+            break;
+        }
+    }
+    return result;
+}
+
+Direction PathRouter::directionOfLine(const Line &line)
+{
+    Direction result = NoDirection;
+    if(line.p1().x() == line.p2().x()) {
+        result = line.p1().y() > line.p2().y() ? Up : Down;
+    }
+    else if(line.p1().y() == line.p2().y()) {
+        result = line.p1().x() > line.p2().x() ? ToLeft : ToRight;
     }
     return result;
 }
@@ -227,25 +449,34 @@ Line PathRouter::rayInDirection(const Point &origin, Geo::Direction direction)
         logText(KLOG_ERROR, "Invalid direction");
         break;
     }
-    result = Line(origin, other);
+    result = Line(origin, other).round();
     return result;
 }
 
-Line PathRouter::seekClearLine(const Point &origin, Geo::Direction moveAxis, Direction seekAxis)
+Line PathRouter::seekClearLine(const Point &origin, Geo::Direction moveAxis, Direction seekAxis, double distanceLimit)
 {
     Line result;
     Point nextOrigin = origin;
 
-    QList<QRect> obstaclesToIgnore = { _destinationObstacle };
+    QList<Rectangle> obstaclesToIgnore = { _destinationObstacle };
 
     while(_canvas.contains(nextOrigin)) {
         nextOrigin.move(moveAxis, _routingMargin);
         Line ray = rayInDirection(nextOrigin, seekAxis);
-        QRect obstacle;
+        if(distanceLimit != 0) {
+            ray.shorten(ray.length() - distanceLimit);
+            ray.round();
+        }
+        Rectangle obstacle;
         Point intersection;
 
         if(lineCrossesObstacle(ray, obstaclesToIgnore, obstacle, intersection) == false) {
-            result = Line(origin, nextOrigin);
+            if(distanceLimit == 0) {
+                result = Line(origin, nextOrigin);
+            }
+            else {
+                result = Line(origin, ray.p2());
+            }
             break;
         }
     }
@@ -285,6 +516,48 @@ Line PathRouter::reduceLineToTarget(const Line &line, Geo::Direction direction, 
         result.round();
     }
 
+    return result;
+}
+
+double PathRouter::distanceInDirection(const Point &origin, Geo::Direction direction, const Point &target)
+{
+    Line line;
+    line.setP1(origin);
+    switch(direction) {
+    case Up:
+        if(target.y() < origin.y()) {
+            line.setP2(Point(origin.x(), target.y()));
+        }
+        break;
+    case Down:
+        if(target.y() > origin.y()) {
+            line.setP2(Point(origin.x(), target.y()));
+        }
+        break;
+    case ToLeft:
+        if(target.x() < origin.x()) {
+            line.setP2(Point(target.x(), origin.y()));
+        }
+        break;
+    case ToRight:
+        if(target.x() > origin.x()) {
+            line.setP2(Point(target.x(), origin.y()));
+        }
+        break;
+    default:
+        break;
+    }
+    return line.p2().isNull() ? INFINITY : line.length();
+}
+
+Line PathRouter::findPathOffObstacle(const Point &origin, const Rectangle &obstacle, Geo::Direction &direction)
+{
+    Line result;
+
+    Point closest = obstacle.closestCorner(origin);
+    direction = chooseDirection(origin, closest);
+    result = Line(origin, closest);
+    result.extend(_routingMargin);
     return result;
 }
 

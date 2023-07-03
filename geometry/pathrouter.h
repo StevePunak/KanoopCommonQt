@@ -8,20 +8,23 @@
 #include <QString>
 
 #include "point.h"
+#include "rectangle.h"
 
 class PathRouter
 {
 public:
     PathRouter() :
         _direction(Geo::NoDirection),
+        _forceDirection(Geo::NoDirection),
+        _complete(false),
         _routingMargin(DefaultRoutingMargin),
         _debugLevel(0) {}
-    PathRouter(const QPoint& origin, const QPoint& destination, const QRectF &canvas, const QList<QRect>& obstacles = QList<QRect>());
+    PathRouter(const Point& origin, const Point& destination, const QRectF &canvas, const QList<Rectangle> &obstacles = QList<Rectangle>());
 
     Line::List calcluatePath();
 
-    void appendObstacle(const QRect& value) { _obstacles.append(value); }
-    void setObstacles(const QList<QRect>& value) { _obstacles = value; }
+    void appendObstacle(const Rectangle& value) { _obstacles.append(value); }
+    void setObstacles(const QList<Rectangle>& value) { _obstacles = value; }
 
     Point originPoint() const { return _originPoint; }
     void setOriginPoint(const Point& value) { _originPoint = value ; }
@@ -34,15 +37,26 @@ public:
 
 private:
     bool cycle(const Point& a, const Point& b);
+    bool pass1(const Point& a, const Point& b);
+    bool pass2(const Point& a, const Point& b);
+    bool pass3(const Point& a, const Point& b);
 
-    bool lineCrossesObstacle(const Line &line, QRect& firstObstacle, Point &intersection) const;
-    bool lineCrossesObstacle(const Line &line, const QRect &ignoreObstacle, QRect& firstObstacle, Point &intersection) const;
-    bool lineCrossesObstacle(const Line &line, const QList<QRect> &ignoreObstacles, QRect& firstObstacle, Point &intersection) const;
-    bool pointLiesWithinObstacle(const Point &point, QRect& result);
-    Geo::Direction chooseDirection(const Point& a, const Point& b, Geo::Direction exclude = Geo::NoDirection) const;
+    bool lineCrossesObstacle(const Line &line, Rectangle &firstObstacle, Point &intersection) const;
+    bool lineCrossesObstacle(const Line &line, const Rectangle &ignoreObstacle, Rectangle &firstObstacle, Point &intersection) const;
+    bool lineCrossesObstacle(const Line &line, const QList<Rectangle> &ignoreObstacles, Rectangle &firstObstacle, Point &intersection) const;
+    bool pointLiesWithinObstacle(const Point &point, Rectangle &result);
+
+    static QList<Geo::Direction> chooseDirections(const Point& a, const Point& b);
+    static Geo::Direction chooseDirection(const Point& a, const Point& b, Geo::Direction exclude = Geo::NoDirection);
+    static Geo::Direction chooseDirection(const Point& a, const Point& b, const QList<Geo::Direction> exclude);
+    static Geo::Direction nonExcludedDirection(QList<Geo::Direction> choices, QList<Geo::Direction> exclude);
+    static Geo::Direction directionOfLine(const Line& line);
+
     Line rayInDirection(const Point& origin, Geo::Direction direction);
-    Line seekClearLine(const Point& origin, Geo::Direction moveAxis, Geo::Direction seekAxis);
+    Line seekClearLine(const Point& origin, Geo::Direction moveAxis, Geo::Direction seekAxis, double distanceLimit = 0);
     Line reduceLineToTarget(const Line& line, Geo::Direction direction, const Point& target, double margin);
+    double distanceInDirection(const Point& origin, Geo::Direction direction, const Point& target);
+    Line findPathOffObstacle(const Point& origin, const Rectangle &obstacle, Geo::Direction& direction);
 
     void appendPathLine(const Line& line);
 
@@ -50,15 +64,19 @@ private:
 
     Point _originPoint;
     Point _destinationPoint;
-    QRectF _canvas;
-    QList<QRect> _obstacles;
+    Rectangle _canvas;
+    QList<Rectangle> _obstacles;
     Geo::Direction _direction;
+    Geo::Direction _forceDirection;
+    bool _complete;
     int _routingMargin;
     int _debugLevel;
 
     Line::List _pathLines;
-    QRect _originObstacle;
-    QRect _destinationObstacle;
+    Rectangle _originObstacle;
+    Rectangle _destinationObstacle;
+    Rectangle _currentObstacle;
+
 
     static const int DefaultRoutingMargin = 10;
 };

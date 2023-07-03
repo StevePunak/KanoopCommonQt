@@ -11,6 +11,9 @@
 Line::Line(const QPointF &origin, double bearing, double distance) :
     _p1(origin), _p2(FlatGeo::getPoint(origin, bearing, distance)) {}
 
+Line::Line(const QPointF &origin, Geo::Direction direction, double distance) :
+    _p1(origin), _p2(FlatGeo::getPoint(origin, Geo::directionToBearing(direction), distance)) {}
+
 Point Line::midpoint() const
 {
     double x = _p2.x() - ((_p2.x() - _p1.x()) / 2);
@@ -291,12 +294,20 @@ bool Line::containsPoint(const QPointF &point) const
     return d1 + d2 == length();
 }
 
-void Line::shorten(double howMuch)
+Line &Line::shorten(double howMuch)
 {
     if(length() >= howMuch) {
         Point newP2 = FlatGeo::getPoint(_p1, bearing(), length() - howMuch);
         _p2 = newP2;
     }
+    return *this;
+}
+
+Line &Line::extend(double howMuch)
+{
+    Point newP2 = FlatGeo::getPoint(_p1, bearing(), length() + howMuch);
+    _p2 = newP2;
+    return *this;
 }
 
 Line &Line::round()
@@ -427,6 +438,28 @@ Line Line::List::lowest() const
             if(line.isBelow(result)) {
                 result = line;
             }
+        }
+    }
+    return result;
+}
+
+Line Line::List::shortest() const
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(result.isValid() == false || line.length() < result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+Line Line::List::longest() const
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(result.isValid() == false || line.length() > result.length()) {
+            result = line;
         }
     }
     return result;

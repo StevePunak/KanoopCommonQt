@@ -267,3 +267,47 @@ Geo::Direction Geo::sideToDirection(Side side)
 {
     return (Direction)side;
 }
+
+double Geo::directionToBearing(Direction direction)
+{
+    double result = 0;
+    switch(direction) {
+    case Up:
+        result = 0;
+        break;
+    case Down:
+        result = 180;
+        break;
+    case ToLeft:
+        result = 270;
+        break;
+    case ToRight:
+        result = 90;
+        break;
+    default:
+        break;
+    }
+    return result;
+}
+
+Direction Geo::oppositeDirection(Direction direction)
+{
+    Direction result = NoDirection;
+    switch(direction) {
+    case Up:
+        result = Down;
+        break;
+    case Down:
+        result = Up;
+        break;
+    case ToLeft:
+        result = ToRight;
+        break;
+    case ToRight:
+        result = ToLeft;
+        break;
+    default:
+        break;
+    }
+    return result;
+}

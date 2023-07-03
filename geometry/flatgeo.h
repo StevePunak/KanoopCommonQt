@@ -45,6 +45,8 @@ enum SpatialRelationship {
 QList<Direction> allDirections();
 Side directionToSide(Direction direction);
 Direction sideToDirection(Side side);
+double directionToBearing(Direction direction);
+Direction oppositeDirection(Direction direction);
 
 }   // namespace Geo
 

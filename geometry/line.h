@@ -20,6 +20,7 @@ public:
     Line(const QPointF& p1, const QPointF& p2) :
         _p1(p1), _p2(p2) {}
     Line(const QPointF& origin, double bearing, double distance);
+    Line(const QPointF& origin, Geo::Direction direction, double distance);
 
     bool operator ==(const Line& other) const { return _p1 == other._p1 && _p2 == other._p2; }
     bool operator !=(const Line& other) const { return (*this == other) == false; }
@@ -40,6 +41,8 @@ public:
         bool containsLineWithSameEndpoints(const Line& line) const;
         Line highest() const;
         Line lowest() const;
+        Line shortest() const;
+        Line longest() const;
         QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
     };
 
@@ -76,7 +79,8 @@ public:
     bool sharesSameEndpoints(const Line& other) const;
     bool isEndpoint(const QPointF& point, int precision = 0) const;
     bool containsPoint(const QPointF& point) const;
-    void shorten(double howMuch);
+    Line& shorten(double howMuch);
+    Line& extend(double howMuch);
 
     Line& round();
 
@@ -91,7 +95,7 @@ public:
 
     QString toString() const;
 
-    bool isValid() const { return _p1.isNull() == false && _p2.isNull() == false; }
+    bool isValid() const { return length() != 0; }
 
 private:
     Point _p1;

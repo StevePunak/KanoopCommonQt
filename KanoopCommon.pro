@@ -44,6 +44,7 @@ SOURCES += \
     geometry/line.cpp \
     geometry/pathrouter.cpp \
     geometry/point.cpp \
+    geometry/rectangle.cpp \
     geometry/spanningtree.cpp \
     geometry/treepathvertice.cpp \
     geometry/triangle.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     geometry/line.h \
     geometry/pathrouter.h \
     geometry/point.h \
+    geometry/rectangle.h \
     geometry/spanningtree.h \
     geometry/treepathvertice.h \
     geometry/triangle.h \
