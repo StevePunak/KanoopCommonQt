@@ -311,3 +311,21 @@ Direction Geo::oppositeDirection(Direction direction)
     }
     return result;
 }
+
+Direction Geo::bearingToDirection(double bearing)
+{
+    Direction result = NoDirection;
+    if(bearing == 0) {
+        result = Up;
+    }
+    else if(bearing == 180) {
+        result = Down;
+    }
+    else if(bearing == 90) {
+        result = ToRight;
+    }
+    else if(bearing == 270) {
+        result = ToLeft;
+    }
+    return result;
+}

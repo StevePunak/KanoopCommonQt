@@ -46,6 +46,7 @@ QList<Direction> allDirections();
 Side directionToSide(Direction direction);
 Direction sideToDirection(Side side);
 double directionToBearing(Direction direction);
+Direction bearingToDirection(double bearing);
 Direction oppositeDirection(Direction direction);
 
 }   // namespace Geo

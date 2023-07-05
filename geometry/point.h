@@ -1,5 +1,6 @@
 #ifndef POINT_H
 #define POINT_H
+#include <QList>
 #include <QPointF>
 
 #include "flatgeo.h"
@@ -17,10 +18,19 @@ public:
     bool isAbove(const QPointF& other) const { return y() < other.y(); }
     bool isBelow(const QPointF& other) const { return y() > other.y(); }
 
-    void move(Geo::Direction direction, double amount);
+    Point& move(Geo::Direction direction, double amount);
     Point& round();
 
     QString toString() const { return QString("%1, %2").arg(x()).arg(y()); }
+
+    class List : public QList<Point>
+    {
+    public:
+        Point topLeft() const;
+        Point topRight() const;
+        Point bottomLeft() const;
+        Point bottomRight() const;
+    };
 };
 
 #endif // POINT_H

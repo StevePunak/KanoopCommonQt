@@ -34,6 +34,13 @@ public:
     class List : public QList<Line>
     {
     public:
+        List() : QList<Line>() {}
+        List(const QList<Line>& other) {
+            for(const Line& line : other) {
+                append(line);
+            }
+        }
+
         static List fromPoints(const QList<QPoint>& points);
         static List fromPoints(const QList<QPointF>& points);
         Line longestHorizontalLine();
@@ -44,6 +51,10 @@ public:
         Line shortest() const;
         Line longest() const;
         QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
+        double minX() const;
+        double maxX() const;
+        double minY() const;
+        double maxY() const;
     };
 
     Point midpoint() const;
@@ -75,20 +86,27 @@ public:
     bool isAbove(const Line& other) const;
     bool isBelow(const Line& other) const;
     bool isPerpendicular() const;
+    bool sharesAxisWith(const Line& other) const;
     bool sharesEndpointWith(const Line& other, double maxDistance = 0) const;
     bool sharesSameEndpoints(const Line& other) const;
     bool isEndpoint(const QPointF& point, int precision = 0) const;
     bool containsPoint(const QPointF& point) const;
     Line& shorten(double howMuch);
     Line& extend(double howMuch);
+    Geo::Direction direction() const;
+    double minX() const;
+    double maxX() const;
+    double minY() const;
+    double maxY() const;
 
     Line& round();
 
     static List verticalLines(const QRectF& rect);
     static List horizontalLines(const QRectF& rect);
 
-    void move(double bearing, double distance);
-    void rotate(const Point& centroid, double angle);
+    Line& move(double bearing, double distance);
+    Line& move(Geo::Direction direction, double distance);
+    Line &rotate(const Point& centroid, double angle);
 
     QLine toQLine() const;
     QLineF toQLineF() const;

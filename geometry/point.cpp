@@ -2,7 +2,7 @@
 
 using namespace Geo;
 
-void Point::move(Direction direction, double amount)
+Point &Point::move(Direction direction, double amount)
 {
     switch(direction) {
     case Up:
@@ -20,6 +20,7 @@ void Point::move(Direction direction, double amount)
     default:
         break;
     }
+    return *this;
 }
 
 Point &Point::round()
@@ -27,4 +28,52 @@ Point &Point::round()
     setX(qRound(x()));
     setY(qRound(y()));
     return *this;
+}
+
+Point Point::List::topLeft() const
+{
+    Point result;
+    for(int i = 0;i < count();i++) {
+        Point p = this->at(i);
+        if(i == 0 || (p.x() <= result.x() && p.y() <= result.y())) {
+            result = p;
+        }
+    }
+    return result;
+}
+
+Point Point::List::topRight() const
+{
+    Point result;
+    for(int i = 0;i < count();i++) {
+        Point p = this->at(i);
+        if(i == 0 || (p.x() >= result.x() && p.y() <= result.y())) {
+            result = p;
+        }
+    }
+    return result;
+}
+
+Point Point::List::bottomLeft() const
+{
+    Point result;
+    for(int i = 0;i < count();i++) {
+        Point p = this->at(i);
+        if(i == 0 || (p.x() <= result.x() && p.y() >= result.y())) {
+            result = p;
+        }
+    }
+    return result;
+}
+
+Point Point::List::bottomRight() const
+{
+    Point result;
+    for(int i = 0;i < count();i++) {
+        Point p = this->at(i);
+        if(i == 0 || (p.x() >= result.x() && p.y() >= result.y())) {
+            result = p;
+        }
+    }
+    return result;
 }
