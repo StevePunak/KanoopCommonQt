@@ -11,7 +11,7 @@ using namespace Geo;
 SpanningTree::SpanningTree(const Line::List &lines) :
     _lines(lines),
     _origin(nullptr), _destination(nullptr),
-    _debugLevel(10)
+    _debugLevel(KLog::Informational)
 {
     initializeFromLines();
 }
@@ -45,6 +45,7 @@ void SpanningTree::initializeFromLines()
 
 Line::List SpanningTree::computePath()
 {
+    debugLog(KLOG_INFO, "Begin compute path");
     Line::List result;
     try
     {
@@ -64,6 +65,7 @@ Line::List SpanningTree::computePath()
     {
         debugLog(KLOG_WARNING, e.message());
     }
+    debugLog(KLOG_INFO, "End compute path");
     return result;
 }
 
@@ -309,14 +311,14 @@ Line::List SpanningTree::getPath()
     }while(vertice != nullptr && lastInserted != _origin);
 
     if(lastInserted != _origin) {
-        qCritical() << "Never resolved the origin";
+        debugLog(KLOG_ERROR, "Never resolved the origin");
     }
     return Line::List::fromPoints(path);
 }
 
 void SpanningTree::debugLog(const char *file, int line, int level, const QString &text)
 {
-    if(level >= _debugLevel) {
+    if(level <= _debugLevel) {
         KLog::sysLogText(file, line, (KLog::LogLevel)level, text);
     }
 }

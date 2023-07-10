@@ -6,10 +6,12 @@
 #include <QRect>
 
 #include "flatgeo.h"
+#include "point.h"
 
 class QLineF;
 class QLine;
 class Circle;
+class Rectangle;
 class Line
 {
 public:
@@ -19,14 +21,45 @@ public:
     Line(const QPointF& p1, const QPointF& p2) :
         _p1(p1), _p2(p2) {}
     Line(const QPointF& origin, double bearing, double distance);
+    Line(const QPointF& origin, Geo::Direction direction, double distance);
 
     bool operator ==(const Line& other) const { return _p1 == other._p1 && _p2 == other._p2; }
     bool operator !=(const Line& other) const { return (*this == other) == false; }
 
-    QPointF p1() const { return _p1; }
-    QPointF p2() const { return _p2; }
+    Point p1() const { return _p1; }
+    void setP1(const Point& value) { _p1 = value; }
 
-    QPointF midpoint() const;
+    Point p2() const { return _p2; }
+    void setP2(const Point& value) { _p2 = value; }
+
+    class List : public QList<Line>
+    {
+    public:
+        List() : QList<Line>() {}
+        List(const QList<Line>& other) {
+            for(const Line& line : other) {
+                append(line);
+            }
+        }
+
+        static List fromPoints(const QList<QPoint>& points);
+        static List fromPoints(const QList<QPointF>& points);
+        Line longestHorizontalLine();
+        Line longestVerticalLine();
+        bool containsLineWithSameEndpoints(const Line& line) const;
+        Line highest() const;
+        Line lowest() const;
+        Line shortest() const;
+        Line longest() const;
+        QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
+        double minX() const;
+        double maxX() const;
+        double minY() const;
+        double maxY() const;
+        Rectangle rectangle() const;
+    };
+
+    Point midpoint() const;
     double length() const;
     double slope() const;
     double intercept() const;
@@ -34,145 +67,59 @@ public:
     bool isHorizontal() const;
     double bearing() const;
     double distanceTo(const QPointF& to) const;
-    QPointF closestPointTo(const QPointF& point) const;
-    QPointF closestPointTo(const QPointF& point, double& distance) const;
-    QPointF furthestPointFrom(const QPointF& point) const;
-    QPointF topMostPoint() const;
-    QPointF bottomMostPoint() const;
-    QPointF leftMostPoint() const;
-    QPointF rightMostPoint() const;
+    Point closestPointTo(const QPointF& point) const;
+    Point closestPointTo(const QPointF& point, double& distance) const;
+    Point furthestPointFrom(const QPointF& point) const;
+    Point topMostPoint() const;
+    Point bottomMostPoint() const;
+    Point leftMostPoint() const;
+    Point rightMostPoint() const;
     bool hasXBetween(double x1, double x2) const;
     bool crossesX(double x) const;
     bool hasYBetween(double y1, double y2) const;
     bool crossesY(double y) const;
     bool intersects(const Line& other) const;
-    bool intersects(const Line& other, QPointF& intersection) const;
+    bool intersects(const Line& other, Point &intersection) const;
     bool intersects(const Circle& other) const;
     bool intersects(const QRectF &other) const;
-    QPointF intersection(const Line& other) const;
+    Point intersection(const Line& other) const;
     bool isLeftOf(const Line& other) const;
     bool isRightOf(const Line& other) const;
     bool isAbove(const Line& other) const;
     bool isBelow(const Line& other) const;
+    bool isPerpendicular() const;
+    bool sharesAxisWith(const Line& other) const;
     bool sharesEndpointWith(const Line& other, double maxDistance = 0) const;
     bool sharesSameEndpoints(const Line& other) const;
     bool isEndpoint(const QPointF& point, int precision = 0) const;
     bool containsPoint(const QPointF& point) const;
+    Line& shorten(double howMuch);
+    Line& extend(double howMuch);
+    Geo::Direction direction() const;
+    double minX() const;
+    double maxX() const;
+    double minY() const;
+    double maxY() const;
 
-    void move(double bearing, double distance);
-    void rotate(const QPointF& centroid, double angle);
+    Line& round();
+
+    static List verticalLines(const QRectF& rect);
+    static List horizontalLines(const QRectF& rect);
+
+    Line& move(double bearing, double distance);
+    Line& move(Geo::Direction direction, double distance);
+    Line &rotate(const Point& centroid, double angle);
 
     QLine toQLine() const;
     QLineF toQLineF() const;
 
     QString toString() const;
 
-    bool isValid() const { return _p1.isNull() == false && _p2.isNull() == false; }
-
-    class List : public QList<Line>
-    {
-    public:
-        static List fromPoints(const QList<QPoint>& points)
-        {
-            List result;
-            for(int i = 0;i < points.count() - 1;i++) {
-                result.append(Line(points.at(i), points.at(i+1)));
-            }
-            return result;
-        }
-
-        static List fromPoints(const QList<QPointF>& points)
-        {
-            List result;
-            for(int i = 0;i < points.count() - 1;i++) {
-                result.append(Line(points.at(i), points.at(i+1)));
-            }
-            return result;
-        }
-
-        Line longestHorizontalLine()
-        {
-            Line result;
-            for(const Line& line : *this) {
-                if(line.isHorizontal() && line.length() > result.length()) {
-                    result = line;
-                }
-            }
-            return result;
-        }
-
-        Line longestVerticalLine()
-        {
-            Line result;
-            for(const Line& line : *this) {
-                if(line.isVertical() && line.length() > result.length()) {
-                    result = line;
-                }
-            }
-            return result;
-        }
-
-        bool containsLineWithSameEndpoints(const Line& line) const
-        {
-            bool result = false;
-            const_iterator it = std::find_if(constBegin(), constEnd(), [line](const Line& other) {
-                return other.sharesSameEndpoints(line);
-            });
-            if(it != constEnd()) {
-                result = true;
-            }
-            return result;
-        }
-
-        Line highest() const
-        {
-            Line result;
-            if(count() > 0) {
-                result = this->at(0);
-                for(const Line& line : *this) {
-                    if(line.isAbove(result)) {
-                        result = line;
-                    }
-                }
-            }
-            return result;
-        }
-
-        Line lowest() const
-        {
-            Line result;
-            if(count() > 0) {
-                result = this->at(0);
-                for(const Line& line : *this) {
-                    if(line.isBelow(result)) {
-                        result = line;
-                    }
-                }
-            }
-            return result;
-        }
-
-        QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance)
-        {
-            closestDistance = INFINITY;
-            QPointF closestPoint;
-
-            for(const Line& line : *this) {
-                double	distance;
-                QPointF	p = line.closestPointTo(other, distance);
-                if(distance < closestDistance) {
-                    closestDistance = distance;
-                    closestPoint = p;
-                    closestLine = line;
-                }
-            }
-            return closestPoint;
-        }
-    };
+    bool isValid() const { return length() != 0; }
 
 private:
-    QPointF _p1;
-    QPointF _p2;
+    Point _p1;
+    Point _p2;
 
     static inline bool isBetween(double value, double v1, double v2)
     {

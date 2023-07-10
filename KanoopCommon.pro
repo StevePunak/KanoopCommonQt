@@ -2,7 +2,7 @@ QT       += network
 QT       -= gui
 
 TEMPLATE = lib
-VERSION=1.0.19
+VERSION=1.0.20
 
 CONFIG += c++11
 
@@ -42,6 +42,9 @@ SOURCES += \
     geometry/circle.cpp \
     geometry/flatgeo.cpp \
     geometry/line.cpp \
+    geometry/pathrouter.cpp \
+    geometry/point.cpp \
+    geometry/rectangle.cpp \
     geometry/spanningtree.cpp \
     geometry/treepathvertice.cpp \
     geometry/triangle.cpp \
@@ -69,6 +72,9 @@ HEADERS += \
     geometry/circle.h \
     geometry/flatgeo.h \
     geometry/line.h \
+    geometry/pathrouter.h \
+    geometry/point.h \
+    geometry/rectangle.h \
     geometry/spanningtree.h \
     geometry/treepathvertice.h \
     geometry/triangle.h \

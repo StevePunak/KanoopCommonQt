@@ -4,6 +4,7 @@
 #include "line.h"
 #include <QtMath>
 
+using namespace Geo;
 double FlatGeo::vectorAngle(const Line &l1, const Line &l2)
 {
     double		a = l1.p1().x() - l1.p1().x();
@@ -133,6 +134,96 @@ bool FlatGeo::arePointsEqual(const QPointF &p1, const QPointF &p2, int precision
     return result;
 }
 
+SpatialRelationship FlatGeo::relationTo(const QPointF &origin, const QPointF &other)
+{
+    int result = NoRelationship;
+    if(isPointAbove(origin, other)) {
+        result |= Above;
+    }
+    if(isPointBelow(origin, other)) {
+        result |= Below;
+    }
+    if(isPointLeftOf(origin, other)) {
+        result |= ToLeftOf;
+    }
+    if(isPointRightOf(origin, other)) {
+        result |= ToRightOf;
+    }
+    if(origin == other) {
+        result = ContainedBy | Contains;
+    }
+    return (SpatialRelationship)result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QRectF &origin, const QPointF &other)
+{
+    int result = NoRelationship;
+    if(isRectAbove(origin, other)) {
+        result |= Above;
+    }
+    if(isRectBelow(origin, other)) {
+        result |= Below;
+    }
+    if(isRectLeftOf(origin, other)) {
+        result |= ToLeftOf;
+    }
+    if(isRectRightOf(origin, other)) {
+        result |= ToRightOf;
+    }
+    if(origin.contains(other.toPoint())) {
+        result = Contains;
+    }
+    return (SpatialRelationship)result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QPointF &origin, const QRectF &other)
+{
+    int result = NoRelationship;
+    if(isRectAbove(other, origin)) {
+        result |= Below;
+    }
+    if(isRectBelow(other, origin)) {
+        result |= Above;
+    }
+    if(isRectLeftOf(other, origin)) {
+        result |= ToRightOf;
+    }
+    if(isRectRightOf(other, origin)) {
+        result |= ToLeftOf;
+    }
+    if(other.contains(origin)) {
+        result = ContainedBy;
+    }
+    return (SpatialRelationship)result;
+}
+
+SpatialRelationship FlatGeo::relationTo(const QRectF &origin, const QRectF &other)
+{
+    int result = NoRelationship;
+    if(isRectBelow(origin, other)) {
+        result |= Below;
+    }
+    if(isRectAbove(origin, other)) {
+        result |= Above;
+    }
+    if(isRectRightOf(origin, other)) {
+        result |= ToRightOf;
+    }
+    if(isRectLeftOf(origin, other)) {
+        result |= ToLeftOf;
+    }
+    if(other.contains(origin)) {
+        result |= ContainedBy;
+    }
+    if(origin.contains(other)) {
+        result |= Contains;
+    }
+    if(origin.intersects(other)) {
+        result |= IntersectsWith;
+    }
+    return (SpatialRelationship)result;
+}
+
 QString FlatGeo::makePointString(const QPoint &p)
 {
     return QString("%1, %2").arg(p.x()).arg(p.y());
@@ -175,4 +266,66 @@ Geo::Side Geo::directionToSide(Direction direction)
 Geo::Direction Geo::sideToDirection(Side side)
 {
     return (Direction)side;
+}
+
+double Geo::directionToBearing(Direction direction)
+{
+    double result = 0;
+    switch(direction) {
+    case Up:
+        result = 0;
+        break;
+    case Down:
+        result = 180;
+        break;
+    case ToLeft:
+        result = 270;
+        break;
+    case ToRight:
+        result = 90;
+        break;
+    default:
+        break;
+    }
+    return result;
+}
+
+Direction Geo::oppositeDirection(Direction direction)
+{
+    Direction result = NoDirection;
+    switch(direction) {
+    case Up:
+        result = Down;
+        break;
+    case Down:
+        result = Up;
+        break;
+    case ToLeft:
+        result = ToRight;
+        break;
+    case ToRight:
+        result = ToLeft;
+        break;
+    default:
+        break;
+    }
+    return result;
+}
+
+Direction Geo::bearingToDirection(double bearing)
+{
+    Direction result = NoDirection;
+    if(bearing == 0) {
+        result = Up;
+    }
+    else if(bearing == 180) {
+        result = Down;
+    }
+    else if(bearing == 90) {
+        result = ToRight;
+    }
+    else if(bearing == 270) {
+        result = ToLeft;
+    }
+    return result;
 }

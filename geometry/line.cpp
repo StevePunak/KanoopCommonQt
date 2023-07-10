@@ -2,6 +2,7 @@
 #include "circle.h"
 #include "flatgeo.h"
 #include "line.h"
+#include "rectangle.h"
 
 #include <QLine>
 #include <QLineF>
@@ -11,7 +12,10 @@
 Line::Line(const QPointF &origin, double bearing, double distance) :
     _p1(origin), _p2(FlatGeo::getPoint(origin, bearing, distance)) {}
 
-QPointF Line::midpoint() const
+Line::Line(const QPointF &origin, Geo::Direction direction, double distance) :
+    _p1(origin), _p2(FlatGeo::getPoint(origin, Geo::directionToBearing(direction), distance)) {}
+
+Point Line::midpoint() const
 {
     double x = _p2.x() - ((_p2.x() - _p1.x()) / 2);
     double y = _p2.y() - ((_p2.y() - _p1.y()) / 2);
@@ -108,13 +112,13 @@ double Line::distanceTo(const QPointF &to) const
     return result;
 }
 
-QPointF Line::closestPointTo(const QPointF &point) const
+Point Line::closestPointTo(const QPointF &point) const
 {
     double distance;
     return closestPointTo(point, distance);
 }
 
-QPointF Line::closestPointTo(const QPointF &point, double &distance) const
+Point Line::closestPointTo(const QPointF &point, double &distance) const
 {
     QPointF	closest;
     double dx = _p2.x() - _p1.x();
@@ -147,7 +151,7 @@ QPointF Line::closestPointTo(const QPointF &point, double &distance) const
     return closest;
 }
 
-QPointF Line::furthestPointFrom(const QPointF &point) const
+Point Line::furthestPointFrom(const QPointF &point) const
 {
     double distance;
     QPointF closest = closestPointTo(point, distance);
@@ -155,22 +159,22 @@ QPointF Line::furthestPointFrom(const QPointF &point) const
     return furthest;
 }
 
-QPointF Line::topMostPoint() const
+Point Line::topMostPoint() const
 {
     return FlatGeo::isPointAbove(_p1, _p2) ? _p1 : _p2;
 }
 
-QPointF Line::bottomMostPoint() const
+Point Line::bottomMostPoint() const
 {
     return FlatGeo::isPointBelow(_p1, _p2) ? _p1 : _p2;
 }
 
-QPointF Line::leftMostPoint() const
+Point Line::leftMostPoint() const
 {
     return FlatGeo::isPointLeftOf(_p1, _p2) ? _p1 : _p2;
 }
 
-QPointF Line::rightMostPoint() const
+Point Line::rightMostPoint() const
 {
     return FlatGeo::isPointRightOf(_p1, _p2) ? _p1 : _p2;
 }
@@ -201,7 +205,7 @@ bool Line::intersects(const Line &other) const
     return point.isNull() == false;
 }
 
-bool Line::intersects(const Line &other, QPointF &intersection) const
+bool Line::intersects(const Line &other, Point &intersection) const
 {
     intersection = FlatGeo::intersection(*this, other);
     return intersection.isNull() == false;
@@ -220,7 +224,7 @@ bool Line::intersects(const QRectF &other) const
            intersects(Line(other.bottomLeft(), other.topLeft()));
 }
 
-QPointF Line::intersection(const Line &other) const
+Point Line::intersection(const Line &other) const
 {
     return FlatGeo::intersection(*this, other);
 }
@@ -258,6 +262,28 @@ bool Line::isBelow(const Line &other) const
     return maxL1 > maxL2;
 }
 
+bool Line::isPerpendicular() const
+{
+    return isVertical() || isHorizontal();
+}
+
+/**
+ * @brief Line::sharesAxisWith
+ * @param other
+ * @return true if y or x is the same depending on the line direction
+ */
+bool Line::sharesAxisWith(const Line &other) const
+{
+    bool result = false;
+    if(isVertical() && other.isVertical()) {
+        result = _p1.x() == other._p1.x();
+    }
+    else if(isHorizontal() && other.isHorizontal()) {
+        result = _p1.y() == other._p1.y();
+    }
+    return result;
+}
+
 bool Line::sharesEndpointWith(const Line &other, double maxDistance) const
 {
     bool result =
@@ -286,16 +312,87 @@ bool Line::containsPoint(const QPointF &point) const
     return d1 + d2 == length();
 }
 
-void Line::move(double bearing, double distance)
+Line &Line::shorten(double howMuch)
+{
+    if(length() >= howMuch) {
+        Point newP2 = FlatGeo::getPoint(_p1, bearing(), length() - howMuch);
+        _p2 = newP2;
+    }
+    return *this;
+}
+
+Line &Line::extend(double howMuch)
+{
+    Point newP2 = FlatGeo::getPoint(_p1, bearing(), length() + howMuch);
+    _p2 = newP2;
+    return *this;
+}
+
+Geo::Direction Line::direction() const
+{
+    return Geo::bearingToDirection(qRound(bearing()));
+}
+
+double Line::minX() const
+{
+    return qMin(_p1.x(), _p2.x());
+}
+
+double Line::maxX() const
+{
+    return qMax(_p1.x(), _p2.x());
+}
+
+double Line::minY() const
+{
+    return qMin(_p1.y(), _p2.y());
+}
+
+double Line::maxY() const
+{
+    return qMax(_p1.y(), _p2.y());
+}
+
+Line &Line::round()
+{
+    _p1.round();
+    _p2.round();
+    return *this;
+}
+
+Line::List Line::verticalLines(const QRectF &rect)
+{
+    List result;
+    result.append(Line(rect.topLeft(), rect.bottomLeft()));
+    result.append(Line(rect.topRight(), rect.bottomRight()));
+    return result;
+}
+
+Line::List Line::horizontalLines(const QRectF &rect)
+{
+    List result;
+    result.append(Line(rect.topLeft(), rect.topRight()));
+    result.append(Line(rect.bottomLeft(), rect.bottomRight()));
+    return result;
+}
+
+Line &Line::move(double bearing, double distance)
 {
     _p1 = FlatGeo::move(_p1, bearing, distance);
     _p2 = FlatGeo::move(_p2, bearing, distance);
+    return *this;
 }
 
-void Line::rotate(const QPointF &centroid, double angle)
+Line &Line::move(Geo::Direction direction, double distance)
+{
+    return move(Geo::directionToBearing(direction), distance);
+}
+
+Line&  Line::rotate(const Point &centroid, double angle)
 {
     _p1 = FlatGeo::rotate(_p1, centroid, angle);
     _p2 = FlatGeo::rotate(_p2, centroid, angle);
+    return *this;
 }
 
 QLine Line::toQLine() const
@@ -310,5 +407,200 @@ QLineF Line::toQLineF() const
 
 QString Line::toString() const
 {
-    return QString("%1 <==> %2").arg(FlatGeo::makePointString(_p1)).arg(FlatGeo::makePointString(_p2));
+    return QString("p1: %1  p2: %2").arg(FlatGeo::makePointString(_p1)).arg(FlatGeo::makePointString(_p2));
 }
+
+
+// ======================== Line::List =============================
+
+Line::List Line::List::fromPoints(const QList<QPoint>& points)
+{
+    List result;
+    for(int i = 0;i < points.count() - 1;i++) {
+        result.append(Line(points.at(i), points.at(i+1)));
+    }
+    return result;
+}
+
+Line::List Line::List::fromPoints(const QList<QPointF>& points)
+{
+    List result;
+    for(int i = 0;i < points.count() - 1;i++) {
+        result.append(Line(points.at(i), points.at(i+1)));
+    }
+    return result;
+}
+
+Line Line::List::longestHorizontalLine()
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(line.isHorizontal() && line.length() > result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+Line Line::List::longestVerticalLine()
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(line.isVertical() && line.length() > result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+bool Line::List::containsLineWithSameEndpoints(const Line& line) const
+{
+    bool result = false;
+    const_iterator it = std::find_if(constBegin(), constEnd(), [line](const Line& other) {
+        return other.sharesSameEndpoints(line);
+    });
+    if(it != constEnd()) {
+        result = true;
+    }
+    return result;
+}
+
+Line Line::List::highest() const
+{
+    Line result;
+    if(count() > 0) {
+        result = this->at(0);
+        for(const Line& line : *this) {
+            if(line.isAbove(result)) {
+                result = line;
+            }
+        }
+    }
+    return result;
+}
+
+Line Line::List::lowest() const
+{
+    Line result;
+    if(count() > 0) {
+        result = this->at(0);
+        for(const Line& line : *this) {
+            if(line.isBelow(result)) {
+                result = line;
+            }
+        }
+    }
+    return result;
+}
+
+Line Line::List::shortest() const
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(result.isValid() == false || line.length() < result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+Line Line::List::longest() const
+{
+    Line result;
+    for(const Line& line : *this) {
+        if(result.isValid() == false || line.length() > result.length()) {
+            result = line;
+        }
+    }
+    return result;
+}
+
+QPointF Line::List::closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance)
+{
+    closestDistance = INFINITY;
+    QPointF closestPoint;
+
+    for(const Line& line : *this) {
+        double	distance;
+        QPointF	p = line.closestPointTo(other, distance);
+        if(distance < closestDistance) {
+            closestDistance = distance;
+            closestPoint = p;
+            closestLine = line;
+        }
+    }
+    return closestPoint;
+}
+
+double Line::List::minX() const
+{
+    double result = INFINITY;
+    const_iterator it = std::min_element(constBegin(), constEnd(), [](const Line& a, const Line& b)
+    {
+        return a.minX() < b.minX();
+    });
+    if(it != constEnd()) {
+        Line l = *it;
+        result = l.minX();
+    }
+    return result;
+}
+
+double Line::List::maxX() const
+{
+    double result = 0;
+    const_iterator it = std::max_element(constBegin(), constEnd(), [](const Line& a, const Line& b)
+                                         {
+        return a.maxX() < b.maxX();
+    });
+    if(it != constEnd()) {
+        Line l = *it;
+        result = l.maxX();
+    }
+    return result;
+}
+
+double Line::List::minY() const
+{
+    double result = INFINITY;
+    const_iterator it = std::min_element(constBegin(), constEnd(), [](const Line& a, const Line& b)
+    {
+        return a.minY() < b.minY();
+    });
+    if(it != constEnd()) {
+        Line l = *it;
+        result = l.minY();
+    }
+    return result;
+}
+
+double Line::List::maxY() const
+{
+    double result = 0;
+    const_iterator it = std::max_element(constBegin(), constEnd(), [](const Line& a, const Line& b)
+    {
+        return a.maxY() < b.maxY();
+    });
+
+    if(it != constEnd()) {
+        Line l = *it;
+        result = l.maxY();
+    }
+    return result;
+}
+
+/**
+ * @brief Line::List::rectangle
+ * @return a rectangle containing all our lines
+ */
+Rectangle Line::List::rectangle() const
+{
+    Point::List points;
+    points.append(Point(minX(), minY()));
+    points.append(Point(minX(), maxY()));
+    points.append(Point(maxX(), minY()));
+    points.append(Point(maxX(), maxY()));
+    Rectangle result = Rectangle::fromPoints(points);
+    return result;
+}
+
