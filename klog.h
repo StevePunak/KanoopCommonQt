@@ -93,7 +93,7 @@ private:
 };
 
 #define KLOG_DEBUG      __FILE__,__LINE__,KLog::LogLevel::Debug
-#define KLOG_INFO       __FILE__,__LINE__,KLog::LogLevel::Info
+#define KLOG_INFO       __FILE__,__LINE__,KLog::LogLevel::Informational
 #define KLOG_WARNING    __FILE__,__LINE__,KLog::LogLevel::Warning
 #define KLOG_ERROR      __FILE__,__LINE__,KLog::LogLevel::Error
 #define KLOG_FATAL      __FILE__,__LINE__,KLog::LogLevel::Fatal
