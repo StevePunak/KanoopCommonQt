@@ -38,6 +38,12 @@ QString CryptoUtil::md5String(const QString &of)
     return toHashString(hash);
 }
 
+QString CryptoUtil::md5String(const QByteArray &of)
+{
+    QByteArray hash = md5(of);
+    return toHashString(hash);
+}
+
 QString CryptoUtil::md5String(const QStringList &of)
 {
     return toHashString(md5(of));
