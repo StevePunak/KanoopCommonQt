@@ -62,6 +62,26 @@ Line::List Rectangle::horizontalLines() const
     return result;
 }
 
+Line Rectangle::upperEdge() const
+{
+    return Line(topLeft(), topRight());
+}
+
+Line Rectangle::lowerEdge() const
+{
+    return Line(bottomLeft(), bottomRight());
+}
+
+Line Rectangle::leftEdge() const
+{
+    return Line(topLeft(), bottomLeft());
+}
+
+Line Rectangle::rightEdge() const
+{
+    return Line(topRight(), bottomRight());
+}
+
 bool Rectangle::isPointOnEdge(const Point &point) const
 {
     bool result = false;
