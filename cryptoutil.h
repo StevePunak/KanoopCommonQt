@@ -13,6 +13,7 @@ public:
     static QString fileMd5String(const QString& filename);
     static QByteArray md5(const QByteArray& of);
     static QString md5String(const QString& of);
+    static QString md5String(const QByteArray& of);
     static QString md5String(const QStringList& of);
     static QByteArray md5(const QStringList& of);
 
