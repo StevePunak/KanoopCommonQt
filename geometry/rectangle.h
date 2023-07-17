@@ -20,6 +20,10 @@ public:
     Line::List edges() const;
     Line::List verticalLines() const;
     Line::List horizontalLines() const;
+    Line upperEdge() const;
+    Line lowerEdge() const;
+    Line leftEdge() const;
+    Line rightEdge() const;
     bool isPointOnEdge(const Point& point) const;
     bool containsAnyPoint(const Line& line) const;
     Point centerPoint() const;

@@ -45,7 +45,7 @@ PathRouter::PathRouter(const Point &origin, const Point &destination, const QRec
     _consolidateEmptyRectangles(true),
     _routeAroundMargins(true),
     _verticalConstraint(-1),
-    _debugLevel(KLog::Debug)
+    _debugLevel(KLog::Informational)
 {
 }
 
