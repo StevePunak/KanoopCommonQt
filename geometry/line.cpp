@@ -353,11 +353,41 @@ double Line::maxY() const
     return qMax(_p1.y(), _p2.y());
 }
 
+Point::List Line::points() const
+{
+    Point::List result;
+    result.append(_p1);
+    result.append(_p2);
+    return result;
+}
+
 Line &Line::round()
 {
     _p1.round();
     _p2.round();
     return *this;
+}
+
+Rectangle Line::makeRectangle(int expandedWidth) const
+{
+    Rectangle result;
+    if(isVertical()) {
+        int tx = topMostPoint().x() - expandedWidth;
+        int ty = topMostPoint().y() - expandedWidth;
+        int w = expandedWidth * 2;
+        int h = length() + expandedWidth * 2;
+
+        result = Rectangle(tx, ty, w, h);
+    }
+    else {
+        int tx = leftMostPoint().x() - expandedWidth;
+        int ty = leftMostPoint().y() - expandedWidth;
+        int w = length() + expandedWidth * 2;
+        int h = expandedWidth * 2;
+
+        result = Rectangle(tx, ty, w, h);
+    }
+    return result;
 }
 
 Line::List Line::verticalLines(const QRectF &rect)
@@ -593,7 +623,7 @@ double Line::List::maxY() const
  * @brief Line::List::rectangle
  * @return a rectangle containing all our lines
  */
-Rectangle Line::List::rectangle() const
+Rectangle Line::List::boundingRectangle() const
 {
     Point::List points;
     points.append(Point(minX(), minY()));
@@ -601,6 +631,45 @@ Rectangle Line::List::rectangle() const
     points.append(Point(maxX(), minY()));
     points.append(Point(maxX(), maxY()));
     Rectangle result = Rectangle::fromPoints(points);
+    return result;
+}
+
+Line Line::List::lineContainingPoint(const Point &point) const
+{
+    for(const Line& line : *this) {
+        if(line.containsPoint(point)) {
+            return line;
+        }
+    }
+    return Line();
+}
+
+Line Line::List::lineNearPoint(const Point &point, int margin) const
+{
+    for(const Line& line : *this) {
+        Rectangle rect = line.makeRectangle(margin / 2);
+        if(rect.contains(point)) {
+            return line;
+        }
+    }
+    return Line();
+}
+
+QList<QLineF> Line::List::toQLineFList() const
+{
+    QList<QLineF> result;
+    for(const Line& line : *this) {
+        result.append(line.toQLineF());
+    }
+    return result;
+}
+
+QList<QLine> Line::List::toQLineList() const
+{
+    QList<QLine> result;
+    for(const Line& line : *this) {
+        result.append(line.toQLine());
+    }
     return result;
 }
 

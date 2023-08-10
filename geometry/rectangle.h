@@ -1,5 +1,6 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
+#include <QMap>
 #include <QRectF>
 #include "point.h"
 #include "line.h"
@@ -14,19 +15,24 @@ public:
     Rectangle(double x, double y, int w, int h) : QRectF(x, y, w, h) {}
 
     static Rectangle fromPoints(const Point::List& points);
+    static Rectangle fromCenterLine(const Line& centerLine, double expand);
 
     Point closestCorner(const Point& origin) const;
     Point::List corners() const;
     Line::List edges() const;
+    QMap<Geo::Side, Line> edgeMap() const;
     Line::List verticalLines() const;
     Line::List horizontalLines() const;
-    Line upperEdge() const;
-    Line lowerEdge() const;
+    Line topEdge() const;
+    Line bottomEdge() const;
     Line leftEdge() const;
     Line rightEdge() const;
+    Line closestEdge(const Point& point);
+    bool isPointOnEdge(const Point& point, Line &foundEdge) const;
     bool isPointOnEdge(const Point& point) const;
     bool containsAnyPoint(const Line& line) const;
     Point centerPoint() const;
+    Geo::Side closestSideToPoint(const Point &point) const;
 
     QString toString() const { return QString("x,y %1, %2  w,h %3, %4").arg(x()).arg(y()).arg(width()).arg(height()); }
 
