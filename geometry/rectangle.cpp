@@ -1,5 +1,6 @@
 #include "rectangle.h"
 
+using namespace Geo;
 
 Rectangle Rectangle::fromPoints(const Point::List &points)
 {
@@ -14,6 +15,30 @@ Rectangle Rectangle::fromPoints(const Point::List &points)
         bottomLeft.y() == bottomRight.y()) {
         result = Rectangle(topLeft.x(), topLeft.y(), topRight.x() - topLeft.x(), bottomLeft.y() - topLeft.y());
     }
+    return result;
+}
+
+Rectangle Rectangle::fromCenterLine(const Line &centerLine, double expand)
+{
+    Rectangle result;
+    Line l1 = centerLine;
+    Line l2 = centerLine;
+    double d = expand / 2;
+    if(centerLine.isHorizontal()) {
+        l1.move(Up, d);
+        l2.move(Down, d);
+    }
+    else {
+        l1.move(ToLeft, d);
+        l2.move(ToRight, d);
+    }
+    double minX = qMin(l1.minX(), l2.minX());
+    double maxX = qMax(l1.maxX(), l2.maxX());
+    double minY = qMin(l1.minY(), l2.minY());
+    double maxY = qMax(l1.maxY(), l2.maxY());
+    double w = maxX - minX;
+    double h = maxY - minY;
+    result = Rectangle(minX, minY, w, h);
     return result;
 }
 
@@ -46,6 +71,16 @@ Line::List Rectangle::edges() const
     return result;
 }
 
+QMap<Geo::Side, Line> Rectangle::edgeMap() const
+{
+    QMap<Geo::Side, Line> result;
+    result.insert(Top, topEdge());
+    result.insert(Bottom, bottomEdge());
+    result.insert(Left, leftEdge());
+    result.insert(Right, rightEdge());
+    return result;
+}
+
 Line::List Rectangle::verticalLines() const
 {
     Line::List result;
@@ -62,12 +97,12 @@ Line::List Rectangle::horizontalLines() const
     return result;
 }
 
-Line Rectangle::upperEdge() const
+Line Rectangle::topEdge() const
 {
     return Line(topLeft(), topRight());
 }
 
-Line Rectangle::lowerEdge() const
+Line Rectangle::bottomEdge() const
 {
     return Line(bottomLeft(), bottomRight());
 }
@@ -82,17 +117,39 @@ Line Rectangle::rightEdge() const
     return Line(topRight(), bottomRight());
 }
 
-bool Rectangle::isPointOnEdge(const Point &point) const
+Line Rectangle::closestEdge(const Point &point)
+{
+    Line result;
+    double closestDistance = INFINITY;
+    for(const Line& edge : edges()) {
+        double distance;
+        edge.closestPointTo(point, distance);
+        if(distance < closestDistance) {
+            closestDistance = distance;
+            result = edge;
+        }
+    }
+    return result;
+}
+
+bool Rectangle::isPointOnEdge(const Point &point, Line &foundEdge) const
 {
     bool result = false;
     Line::List allLines = edges();
     for(const Line& line : allLines) {
         if(line.containsPoint(point)) {
             result = true;
+            foundEdge = line;
             break;
         }
     }
     return result;
+}
+
+bool Rectangle::isPointOnEdge(const Point &point) const
+{
+    Line edge;
+    return isPointOnEdge(point, edge);
 }
 
 bool Rectangle::containsAnyPoint(const Line &line) const
@@ -103,4 +160,23 @@ bool Rectangle::containsAnyPoint(const Line &line) const
 Point Rectangle::centerPoint() const
 {
     return Line(topLeft(), bottomRight()).midpoint();
+}
+
+Geo::Side Rectangle::closestSideToPoint(const Point& point) const
+{
+    Side result = NoSide;
+    double closestDistance = INFINITY;
+    QMap<Geo::Side, Line> edges = edgeMap();
+    Point closestPoint;
+    for(QMap<Geo::Side, Line>::const_iterator it = edges.constBegin();it != edges.constEnd();it++) {
+        Line edge = it.value();
+        double distance;
+        Point p = edge.closestPointTo(point, distance);
+        if(distance < closestDistance) {
+            closestPoint = p;
+            closestDistance = distance;
+            result = it.key();
+        }
+    }
+    return result;
 }

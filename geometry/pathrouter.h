@@ -55,6 +55,8 @@ public:
     int debugLevel() const { return _debugLevel; }
     void setDebugLevel(int value) { _debugLevel = value; }
 
+    static void mergeAdjacentLines(Line::List& lines);
+
 private:
     bool pass1();
     bool pass2();
@@ -62,17 +64,21 @@ private:
     bool cycleOnPass1(const Point& a, const Point& b);
     bool cycleFindDirectShot(const Point& a, const Point& b);
     bool cycleChooseDirection(const Point& a, const Point& b);
+    bool cycleSimpleLShot(const Point &a, const Point &b);
     bool cycleFindWayOffObstacle(const Point& a, const Point& b);
     bool cycleFindNextPoint(const Point& a, const Point& b);
 
     bool rectangleCrossesObstacle(const Rectangle &rectangle, const QList<Rectangle> &ignoreObstacles = QList<Rectangle>()) const;
+    bool linesCrossObstacle(const Line::List &lines) const;
     bool lineCrossesObstacle(const Line &line) const;
     bool lineCrossesObstacle(const Line &line, Rectangle &firstObstacle, Point &intersection) const;
     bool lineCrossesObstacle(const Line &line, const Rectangle &ignoreObstacle, Rectangle &firstObstacle, Point &intersection) const;
     bool lineCrossesObstacle(const Line &line, const QList<Rectangle> &ignoreObstacles, Rectangle &firstObstacle, Point &intersection) const;
     bool pointLiesWithinObstacle(const Point &point, Rectangle &result);
     bool pointLiesOnObstacleEdge(const Point &point, Rectangle &result);
+    bool pointLiesOnObstacleEdge(const Point &point, Rectangle &result, Line& foundEdge);
     bool lineLiesOnObstacleEdge(const Line &line, Rectangle &foundObstacle, Line& foundEdge);
+    bool lineLiesNearObstacleEdge(const Line &line, double margin, Rectangle &foundObstacle, Line& foundEdge);
     void replaceLines(int index, int count, const Line::List &newLines);
     Geo::Direction directionOffObstacle(const Line& line, const Rectangle& obstacle);
 
@@ -93,7 +99,6 @@ private:
     bool pointLiesOnAppropriateObtstacleCorner(const Point& origin, const Rectangle &obstacle, const QList<Geo::Direction>& directions) const;
     Geo::Direction lastLineDirection() const;
     void removeZeroLengthLines(Line::List& lines) const;
-    void mergeAdjacentLines(Line::List& lines) const;
     void mergeTinySegments(Line::List& lines) const;
     bool lineCrossesVerticalConstraint(const Line& line);
     static int countAdjacentLines(const Line::List& lines);

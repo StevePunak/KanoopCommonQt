@@ -41,9 +41,11 @@ SOURCES += \
     geometry/angle.cpp \
     geometry/circle.cpp \
     geometry/flatgeo.cpp \
+    geometry/geo.cpp \
     geometry/line.cpp \
     geometry/pathrouter.cpp \
     geometry/point.cpp \
+    geometry/polygon.cpp \
     geometry/rectangle.cpp \
     geometry/spanningtree.cpp \
     geometry/treepathvertice.cpp \
@@ -71,9 +73,11 @@ HEADERS += \
     geometry/angle.h \
     geometry/circle.h \
     geometry/flatgeo.h \
+    geometry/geo.h \
     geometry/line.h \
     geometry/pathrouter.h \
     geometry/point.h \
+    geometry/polygon.h \
     geometry/rectangle.h \
     geometry/spanningtree.h \
     geometry/treepathvertice.h \
