@@ -8,6 +8,8 @@ class Polygon
 public:
     Polygon() {}
 
+    static Polygon fromLine(const Line& line, int expandBy);
+
     void appendPoint(const Point& point) { _points.append(point); }
 
     double area() const;

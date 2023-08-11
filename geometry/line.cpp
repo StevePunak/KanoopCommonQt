@@ -2,10 +2,12 @@
 #include "circle.h"
 #include "flatgeo.h"
 #include "line.h"
+#include "polygon.h"
 #include "rectangle.h"
 
 #include <QLine>
 #include <QLineF>
+#include <QTextStream>
 #include <QtMath>
 #include <float.h>
 
@@ -85,6 +87,11 @@ double Line::bearing() const
     }
 
     return angle.degrees();
+}
+
+Angle Line::angle() const
+{
+    return Angle(bearing());
 }
 
 double Line::distanceTo(const QPointF &to) const
@@ -647,9 +654,17 @@ Line Line::List::lineContainingPoint(const Point &point) const
 Line Line::List::lineNearPoint(const Point &point, int margin) const
 {
     for(const Line& line : *this) {
-        Rectangle rect = line.makeRectangle(margin / 2);
-        if(rect.contains(point)) {
-            return line;
+        if(line.isPerpendicular()) {
+            Rectangle rect = line.makeRectangle(margin / 2);
+            if(rect.contains(point)) {
+                return line;
+            }
+        }
+        else {
+            Polygon polygon = Polygon::fromLine(line, margin);
+            if(polygon.contains(point)) {
+                return line;
+            }
         }
     }
     return Line();
@@ -669,6 +684,20 @@ QList<QLine> Line::List::toQLineList() const
     QList<QLine> result;
     for(const Line& line : *this) {
         result.append(line.toQLine());
+    }
+    return result;
+}
+
+QString Line::List::toString() const
+{
+    QString result;
+    QTextStream output(&result);
+    for(int i = 0;i < count();i++) {
+        const Line& line = this->at(i);
+        output << QString("(%1)").arg(line.toString());
+        if(i < count() - 1) {
+            output << ',';
+        }
     }
     return result;
 }

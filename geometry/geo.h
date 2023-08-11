@@ -3,16 +3,19 @@
 
 #include <QList>
 
-
-
 namespace Geo {
 
 enum Side
 {
-    NoSide,
-    Top, Left, Bottom, Right,
-    TopLeftCorner, TopRightCorner,
-    BottomLeftCorner, BottomRightCorner,
+    NoSide                  = 0x0000,
+    Top                     = 0x0001,
+    Left                    = 0x0002,
+    Bottom                  = 0x0004,
+    Right                   = 0x0008,
+    TopLeftCorner           = 0x0010,
+    TopRightCorner          = 0x0020,
+    BottomLeftCorner        = 0x0040,
+    BottomRightCorner       = 0x0080,
 };
 
 enum Direction

@@ -62,6 +62,8 @@ public:
 
         QList<QLineF> toQLineFList() const;
         QList<QLine> toQLineList() const;
+
+        QString toString() const;
     };
 
     Point midpoint() const;
@@ -71,6 +73,7 @@ public:
     bool isVertical() const;
     bool isHorizontal() const;
     double bearing() const;
+    Angle angle() const;
     double distanceTo(const QPointF& to) const;
     Point closestPointTo(const QPointF& point) const;
     Point closestPointTo(const QPointF& point, double& distance) const;

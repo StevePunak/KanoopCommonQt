@@ -1,6 +1,26 @@
 #include "polygon.h"
 #include <limits>
+#include "angle.h"
 #include "rectangle.h"
+
+Polygon Polygon::fromLine(const Line &line, int expandBy)
+{
+    Angle angle = line.angle();
+    angle += 90;
+    Line l1 = line;
+    l1.move(angle.degrees(), expandBy);
+
+    angle += 180;
+    Line l2 = line;
+    l2.move(angle.degrees(), expandBy);
+
+    Polygon result;
+    result._points.append(l1.p1());
+    result._points.append(l2.p1());
+    result._points.append(l2.p2());
+    result._points.append(l1.p2());
+    return result;
+}
 
 double Polygon::area() const
 {
