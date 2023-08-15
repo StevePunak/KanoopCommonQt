@@ -65,7 +65,12 @@ bool PathRouter::pass1()
     Point a = _originPoint;
     Point b = _destinationPoint;
 
-    logText(KLOG_DEBUG, QString("Pass 1 - Calculate path from %1 to %2 with %3 obstacles").arg(a.toString()).arg(b.toString()).arg(_obstacles.count()));
+    logText(KLOG_INFO, QString("Pass 1 - Calculate path from %1 to %2 with %3 obstacles. Initial direction: %4. Routing margin: %5")
+                           .arg(a.toString())
+                           .arg(b.toString())
+                           .arg(_obstacles.count())
+                           .arg(_forceDirection)
+                           .arg(_routingMargin));
 
     try
     {
@@ -174,11 +179,18 @@ bool PathRouter::pass3()
         return result;
     }
 
+    static const int MAX_TRIES = 3;
+    QMap<int, int> triesAtIndex;
     for(int i = 0;i < _pathLines.count();i++) {
+        if(triesAtIndex[i] >= MAX_TRIES) {
+            logText(KLOG_INFO, "Giving up after retries");
+            continue;
+        }
+
         Line line = _pathLines.at(i);
         Rectangle obstacle;
         Line obstacleEdge;
-        if(lineLiesOnObstacleEdge(line, obstacle, obstacleEdge)) {
+        if(lineLiesNearObstacleEdge(line, _routingMargin, obstacle, obstacleEdge)) {
             logText(KLOG_DEBUG, QString("Line [%1] lies on edge [%2] of obstacle [%3]. There are %4 adjacent lines")
                                     .arg(line.toString()).arg(obstacleEdge.toString()).arg(obstacle.toString()).arg(countAdjacentLines(_pathLines)));
 
@@ -207,11 +219,16 @@ bool PathRouter::pass3()
                             }
                             newLines.append(newNextLine);
                         }
+                        else {
+                            Line last(proposedNewLine.p2(), line.p2());
+                            newLines.append(last);
+                        }
                         removeZeroLengthLines(newLines);
                         mergeAdjacentLines(newLines);
 
                         replaceLines(i - 1, newLines.count(), newLines);
 
+                        triesAtIndex[i] = triesAtIndex[i] + 1;
                         i--;    // back up
                     }
                     else {
@@ -233,9 +250,14 @@ bool PathRouter::pass3()
                             // turn the old two lines into the new four lines
                             replaceLines(i - 1, 2, newLines);
 
+                            triesAtIndex[i] = triesAtIndex[i] + 1;
                             i--;    // back up
                         }
                     }
+                }
+                else {
+                    // It's the first line we need to move
+                    logText(KLOG_WARNING, "Need to move first line TODO");
                 }
 
                 // if we introduced adjacent lines, remove them and pop back for another pass
@@ -257,6 +279,7 @@ bool PathRouter::cycleOnPass1(const Point &a, const Point &b)
 
     if( (result = cycleFindDirectShot(a, b)) == false &&
         (result = cycleChooseDirection(a, b)) == false &&
+        (result = cycleSimpleLShot(a, b)) == false &&
         (result = cycleFindWayOffObstacle(a, b)) == false &&
         (result = cycleFindNextPoint(a, b)) == false) {
     }
@@ -330,6 +353,43 @@ bool PathRouter::cycleChooseDirection(const Point &a, const Point &b)
 }
 
 /**
+ * @brief PathRouter::simpleLShot
+ * Make a simple 'L' and see if it works
+ * @param a
+ * @param b
+ * @return
+ */
+bool PathRouter::cycleSimpleLShot(const Point &a, const Point &b)
+{
+    bool result = false;
+    QList<Direction> directions = chooseDirections(a, b);
+    if(directions.count() >= 2) {
+        Line::List lines;
+
+        Direction bestDirection = directions.at(0);
+        Direction jogDirection = directions.at(1);
+
+        double distance = qRound(distanceInDirection(a, bestDirection, b) / 2);
+        Line l1(a, bestDirection, distance);        l1.round();
+        lines.append(l1);
+
+        double jogSize = qRound(distanceInDirection(l1.p2(), jogDirection, b));
+        Line l2(l1.p2(), jogDirection, jogSize);    l2.round();
+        lines.append(l2);
+
+        lines.append(Line(l2.p2(), b));
+
+        if(linesCrossObstacle(lines) == false) {
+            for(const Line& line : lines) {
+                appendPathLine(line);
+            }
+            result = true;
+        }
+    }
+    return result;
+}
+
+/**
  * @brief PathRouter::cycleFindWayOffObstacle
  * Find our way off any obstacle we are on
  * @param a
@@ -350,10 +410,19 @@ bool PathRouter::cycleFindWayOffObstacle(const Point &a, const Point &b)
         targetDirections.removeOne(reverse);
     }
 
-    if(pointLiesOnObstacleEdge(a, obstacle)) {
+    Line edge;
+    if(pointLiesOnObstacleEdge(a, obstacle, edge)) {
         if(obstacle == _destinationObstacle) {
-            // If we are on the target obstacle, the remaining passes will get us to the interior (if necessary)
             logText(KLOG_DEBUG, QString("Point %1 lies on the destination obstacle").arg(a.toString()));
+            Line closestEdge = _destinationObstacle.closestEdge(b);
+            if(edge == closestEdge) {
+                // we are on the correct edge... just map to the closest point
+                Point closestPoint = edge.closestPointTo(b);
+                appendPathLine(Line(a, closestPoint));
+                appendPathLine(Line(closestPoint, b));      // we should be done
+                result = true;
+            }
+            // Otherwise, the remaining passes will get us to the interior (if necessary)
         }
         else {
             // if this point lies on a corner of the obstacle, and the corner is appropriate given
@@ -470,8 +539,13 @@ bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
 
                 for(Direction targetDirection : targetDirections) {
                     double distanceToB = distanceInDirection(a, targetDirection, b);
-
-                    nextLine = seekClearLine(a, _direction, targetDirection, distanceToB);
+                    if(distanceToB == INFINITY) {
+                        continue;
+                    }
+                    nextLine = seekClearLine(a, _direction, targetDirection, distanceToB);      // START HERE!
+                    if(nextLine.isPerpendicular() == false) {
+                        logText(KLOG_ERROR, "Line is not perpendiclar");
+                    }
                     if(nextLine.isValid()) {
                         appendPathLine(nextLine);
                         result = true;
@@ -513,6 +587,18 @@ bool PathRouter::rectangleCrossesObstacle(const Rectangle &rectangle, const QLis
         }
 
         if(rectangle.intersects(obstacle)) {
+            result = true;
+            break;
+        }
+    }
+    return result;
+}
+
+bool PathRouter::linesCrossObstacle(const Line::List &lines) const
+{
+    bool result = false;
+    for(const Line& line : lines) {
+        if(lineCrossesObstacle(line)) {
             result = true;
             break;
         }
@@ -597,9 +683,15 @@ bool PathRouter::pointLiesWithinObstacle(const Point& point, Rectangle &result)
 
 bool PathRouter::pointLiesOnObstacleEdge(const Point &point, Rectangle &result)
 {
+    Line edge;
+    return pointLiesOnObstacleEdge(point, result, edge);
+}
+
+bool PathRouter::pointLiesOnObstacleEdge(const Point &point, Rectangle &result, Line &foundEdge)
+{
     result = Rectangle();
     for(const Rectangle& obstacle : _obstacles) {
-        if(obstacle.isPointOnEdge(point)) {
+        if(obstacle.isPointOnEdge(point, foundEdge)) {
             result = obstacle;
             break;
         }
@@ -613,7 +705,35 @@ bool PathRouter::lineLiesOnObstacleEdge(const Line &line, Rectangle &foundObstac
     for(const Rectangle& obstacle : _obstacles) {
         Line::List edges = line.isVertical() ? obstacle.verticalLines() : obstacle.horizontalLines();
         for(const Line& edge : edges) {
-            if(line.containsPoint(edge.p1()) || line.containsPoint(edge.p2())) {
+            if(line.containsPoint(edge.p1()) ||
+                line.containsPoint(edge.p2()) ||
+                edge.containsPoint(line.p2()) ||
+                edge.containsPoint(line.p2())) {
+                foundObstacle = obstacle;
+                foundEdge = edge;
+                break;
+            }
+        }
+        if(foundObstacle.isEmpty() == false) {
+            break;
+        }
+    }
+    return foundObstacle.isNull() == false;
+}
+
+bool PathRouter::lineLiesNearObstacleEdge(const Line &line, double margin, Rectangle &foundObstacle, Line &foundEdge)
+{
+    foundObstacle = Rectangle();
+    for(const Rectangle& obstacle : _obstacles) {
+        Line::List edges = line.isVertical() ? obstacle.verticalLines() : obstacle.horizontalLines();
+        for(const Line& edge : edges) {
+            // make a rectangle with the margin
+            Rectangle lineRect = Rectangle::fromCenterLine(line, margin);
+            Rectangle edgeRect = Rectangle::fromCenterLine(edge, margin);
+            if(lineRect.contains(edge.p1()) ||
+                lineRect.contains(edge.p2()) ||
+                edgeRect.contains(line.p2()) ||
+                edgeRect.contains(line.p2())) {
                 foundObstacle = obstacle;
                 foundEdge = edge;
                 break;
@@ -634,7 +754,8 @@ bool PathRouter::lineLiesOnObstacleEdge(const Line &line, Rectangle &foundObstac
  */
 void PathRouter::replaceLines(int index, int count, const Line::List& newLines)
 {
-    _pathLines.remove(index, count);
+    int toRemove = qMin(count, _pathLines.count() - index);
+    _pathLines.remove(index, toRemove);
     for(const Line& line : newLines) {
         _pathLines.insert(index++, line);
     }
@@ -704,7 +825,7 @@ Direction PathRouter::chooseDirection(const Point &a, const Point &b, const QLis
         if(b.isAbove(a)) {
             result = dx < dy ? Up : ToLeft;
             if(exclude.contains(result)) {
-                result = (result == Up) ? ToLeft : Down;
+                result = (result == Up) ? ToLeft : Up;
             }
         }
         else {
@@ -852,6 +973,9 @@ Line PathRouter::seekClearLine(const Point &origin, Geo::Direction moveAxis, Dir
         if(distanceLimit != 0) {
             ray.shorten(ray.length() - distanceLimit);
             ray.round();
+        }
+        if(ray.isPerpendicular() == false) {
+            logText(KLOG_ERROR, "Ray is not perpendicular");
         }
         Rectangle obstacle;
         Point intersection;
@@ -1010,7 +1134,7 @@ void PathRouter::removeZeroLengthLines(Line::List &lines) const
     }
 }
 
-void PathRouter::mergeAdjacentLines(Line::List &lines) const
+void PathRouter::mergeAdjacentLines(Line::List &lines)
 {
     for(int i = 0;i < lines.count() - 1;i++) {
         Line thisLine = lines.at(i);
@@ -1069,7 +1193,7 @@ void PathRouter::mergeAdjacentLines(Line::List &lines) const
             if(j < lines.count()) {
                 Line nextLine = lines.at(j);
                 if(newLine.p2() != nextLine.p1()) {
-                    logText(KLOG_DEBUG, QString("Shortening new line [%1] to meet up with next endpoint at [%2]").arg(newLine.toString()).arg(nextLine.p1().toString()));
+//                    logText(KLOG_DEBUG, QString("Shortening new line [%1] to meet up with next endpoint at [%2]").arg(newLine.toString()).arg(nextLine.p1().toString()));
                     newLine.setP2(nextLine.p1());
                 }
             }

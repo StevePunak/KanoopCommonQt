@@ -1,4 +1,5 @@
 #include "point.h"
+#include "flatgeo.h"
 
 using namespace Geo;
 
@@ -23,11 +24,38 @@ Point &Point::move(Direction direction, double amount)
     return *this;
 }
 
+Point &Point::move(double bearing, double distance)
+{
+    Point np = FlatGeo::getPoint(*this, bearing, distance);
+    this->rx() = np.x();
+    this->ry() = np.y();
+    return *this;
+}
+
 Point &Point::round()
 {
     setX(qRound(x()));
     setY(qRound(y()));
     return *this;
+}
+
+Point &Point::offset(double x, double y)
+{
+    rx() += x;
+    ry() += y;
+    return *this;
+}
+
+Point Point::fromString(const QString &value)
+{
+    Point result;
+    QStringList parts = value.split(',', Qt::SkipEmptyParts);
+    if(parts.count() == 2) {
+        double x = parts.at(0).trimmed().toDouble();
+        double y = parts.at(1).trimmed().toDouble();
+        result = Point(x, y);
+    }
+    return result;
 }
 
 Point Point::List::topLeft() const

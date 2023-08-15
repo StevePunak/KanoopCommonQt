@@ -14,6 +14,11 @@ public:
     Angle operator-(const Angle& other) const { return *this - other._degrees; }
     Angle operator-(double degrees) const;
 
+    void operator+=(const Angle& other) { *this = *this + other; }
+    void operator+=(double degrees) { *this = *this + degrees; }
+    void operator-=(const Angle& other) { *this = *this - other; }
+    void operator-=(double degrees) { *this = *this - degrees; }
+
     double degrees() const { return _degrees; }
     void setDegrees(double value) { _degrees = value; }
 

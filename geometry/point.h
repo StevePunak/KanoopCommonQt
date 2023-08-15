@@ -3,7 +3,7 @@
 #include <QList>
 #include <QPointF>
 
-#include "flatgeo.h"
+#include "geo.h"
 
 class Point : public QPointF
 {
@@ -19,9 +19,12 @@ public:
     bool isBelow(const QPointF& other) const { return y() > other.y(); }
 
     Point& move(Geo::Direction direction, double amount);
+    Point& move(double bearing, double distance);
     Point& round();
+    Point& offset(double x, double y);
 
     QString toString() const { return QString("%1, %2").arg(x()).arg(y()); }
+    static Point fromString(const QString& value);
 
     class List : public QList<Point>
     {

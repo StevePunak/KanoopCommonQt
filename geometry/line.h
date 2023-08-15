@@ -56,7 +56,14 @@ public:
         double maxX() const;
         double minY() const;
         double maxY() const;
-        Rectangle rectangle() const;
+        Rectangle boundingRectangle() const;
+        Line lineContainingPoint(const Point& point) const;
+        Line lineNearPoint(const Point& point, int margin) const;
+
+        QList<QLineF> toQLineFList() const;
+        QList<QLine> toQLineList() const;
+
+        QString toString() const;
     };
 
     Point midpoint() const;
@@ -66,6 +73,7 @@ public:
     bool isVertical() const;
     bool isHorizontal() const;
     double bearing() const;
+    Angle angle() const;
     double distanceTo(const QPointF& to) const;
     Point closestPointTo(const QPointF& point) const;
     Point closestPointTo(const QPointF& point, double& distance) const;
@@ -100,8 +108,11 @@ public:
     double maxX() const;
     double minY() const;
     double maxY() const;
+    Point::List points() const;
 
     Line& round();
+
+    Rectangle makeRectangle(int expandedWidth) const;
 
     static List verticalLines(const QRectF& rect);
     static List horizontalLines(const QRectF& rect);

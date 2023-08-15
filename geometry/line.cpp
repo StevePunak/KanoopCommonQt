@@ -2,10 +2,12 @@
 #include "circle.h"
 #include "flatgeo.h"
 #include "line.h"
+#include "polygon.h"
 #include "rectangle.h"
 
 #include <QLine>
 #include <QLineF>
+#include <QTextStream>
 #include <QtMath>
 #include <float.h>
 
@@ -85,6 +87,11 @@ double Line::bearing() const
     }
 
     return angle.degrees();
+}
+
+Angle Line::angle() const
+{
+    return Angle(bearing());
 }
 
 double Line::distanceTo(const QPointF &to) const
@@ -353,11 +360,41 @@ double Line::maxY() const
     return qMax(_p1.y(), _p2.y());
 }
 
+Point::List Line::points() const
+{
+    Point::List result;
+    result.append(_p1);
+    result.append(_p2);
+    return result;
+}
+
 Line &Line::round()
 {
     _p1.round();
     _p2.round();
     return *this;
+}
+
+Rectangle Line::makeRectangle(int expandedWidth) const
+{
+    Rectangle result;
+    if(isVertical()) {
+        int tx = topMostPoint().x() - expandedWidth;
+        int ty = topMostPoint().y() - expandedWidth;
+        int w = expandedWidth * 2;
+        int h = length() + expandedWidth * 2;
+
+        result = Rectangle(tx, ty, w, h);
+    }
+    else {
+        int tx = leftMostPoint().x() - expandedWidth;
+        int ty = leftMostPoint().y() - expandedWidth;
+        int w = length() + expandedWidth * 2;
+        int h = expandedWidth * 2;
+
+        result = Rectangle(tx, ty, w, h);
+    }
+    return result;
 }
 
 Line::List Line::verticalLines(const QRectF &rect)
@@ -593,7 +630,7 @@ double Line::List::maxY() const
  * @brief Line::List::rectangle
  * @return a rectangle containing all our lines
  */
-Rectangle Line::List::rectangle() const
+Rectangle Line::List::boundingRectangle() const
 {
     Point::List points;
     points.append(Point(minX(), minY()));
@@ -601,6 +638,67 @@ Rectangle Line::List::rectangle() const
     points.append(Point(maxX(), minY()));
     points.append(Point(maxX(), maxY()));
     Rectangle result = Rectangle::fromPoints(points);
+    return result;
+}
+
+Line Line::List::lineContainingPoint(const Point &point) const
+{
+    for(const Line& line : *this) {
+        if(line.containsPoint(point)) {
+            return line;
+        }
+    }
+    return Line();
+}
+
+Line Line::List::lineNearPoint(const Point &point, int margin) const
+{
+    for(const Line& line : *this) {
+        if(line.isPerpendicular()) {
+            Rectangle rect = line.makeRectangle(margin / 2);
+            if(rect.contains(point)) {
+                return line;
+            }
+        }
+        else {
+            Polygon polygon = Polygon::fromLine(line, margin);
+            if(polygon.contains(point)) {
+                return line;
+            }
+        }
+    }
+    return Line();
+}
+
+QList<QLineF> Line::List::toQLineFList() const
+{
+    QList<QLineF> result;
+    for(const Line& line : *this) {
+        result.append(line.toQLineF());
+    }
+    return result;
+}
+
+QList<QLine> Line::List::toQLineList() const
+{
+    QList<QLine> result;
+    for(const Line& line : *this) {
+        result.append(line.toQLine());
+    }
+    return result;
+}
+
+QString Line::List::toString() const
+{
+    QString result;
+    QTextStream output(&result);
+    for(int i = 0;i < count();i++) {
+        const Line& line = this->at(i);
+        output << QString("(%1)").arg(line.toString());
+        if(i < count() - 1) {
+            output << ',';
+        }
+    }
     return result;
 }
 
