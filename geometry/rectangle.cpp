@@ -42,6 +42,14 @@ Rectangle Rectangle::fromCenterLine(const Line &centerLine, double expand)
     return result;
 }
 
+Rectangle Rectangle::fromCenterPoint(const Point &centerPoint, double expand)
+{
+    double x = centerPoint.x() - expand;
+    double y = centerPoint.y() - expand;
+    Rectangle result(x, y, expand * 2, expand * 2);
+    return result;
+}
+
 Point Rectangle::closestCorner(const Point &origin) const
 {
     Line::List lines;

@@ -16,6 +16,7 @@ public:
 
     static Rectangle fromPoints(const Point::List& points);
     static Rectangle fromCenterLine(const Line& centerLine, double expand);
+    static Rectangle fromCenterPoint(const Point& centerPoint, double expand);
 
     Point closestCorner(const Point& origin) const;
     Point::List corners() const;
