@@ -382,6 +382,9 @@ TimeSpan TimeSpan::fromString(const QString &timeString)
         if(tokens.contains("us")) {
             return parseMicrosecondString(timeString);
         }
+        else if(tokens.contains("ms")) {
+            return parseMillisecondString(timeString);
+        }
         else {
             return TimeSpan::fromMilliseconds(timeString.toInt());
         }
@@ -463,6 +466,19 @@ TimeSpan TimeSpan::parseMicrosecondString(const QString &timeString)
         result = TimeSpan::fromMicroseconds(us);
     }
     return result;
+}
+
+TimeSpan TimeSpan::parseMillisecondString(const QString &timeString)
+{
+    TimeSpan result;
+    int index = timeString.indexOf("ms");
+    if(index > 0) {
+        QString trimmed = timeString.left(index).trimmed();
+        double ms = trimmed.toDouble();
+        result = TimeSpan::fromMilliseconds(ms);
+    }
+    return result;
+
 }
 
 QStringList TimeSpan::getTokens(const QString& timeString)
