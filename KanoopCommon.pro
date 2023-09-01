@@ -2,7 +2,7 @@ QT       += network
 QT       -= gui
 
 TEMPLATE = lib
-VERSION=1.0.20
+VERSION=1.0.21
 
 CONFIG += c++11
 

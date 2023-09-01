@@ -114,6 +114,7 @@ private:
   static TimeSpan parseAbbreviatedString(const QString& timeString);
   static TimeSpan parseColonDelimitedString(const QString& timeString);
   static TimeSpan parseMicrosecondString(const QString& timeString);
+  static TimeSpan parseMillisecondString(const QString& timeString);
   static QStringList getTokens(const QString &timeString);
   static int parseIntToToken(QString &remaining, const QString &until);
 
