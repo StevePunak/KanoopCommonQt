@@ -106,6 +106,7 @@ public:
     bool containsPoint(const QPointF& point) const;
     Line& shorten(double howMuch);
     Line& extend(double howMuch);
+    Line& grow(double howMuch);
     Geo::Direction direction() const;
     double minX() const;
     double maxX() const;

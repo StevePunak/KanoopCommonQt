@@ -335,6 +335,17 @@ Line &Line::extend(double howMuch)
     return *this;
 }
 
+Line &Line::grow(double howMuch)
+{
+    Angle angle = bearing();
+    Point newP2 = FlatGeo::getPoint(_p2, angle.degrees(), howMuch);
+    angle += 180;
+    Point newP1 = FlatGeo::getPoint(_p1, angle.degrees(), howMuch);
+    _p1 = newP1;
+    _p2 = newP2;
+    return *this;
+}
+
 Geo::Direction Line::direction() const
 {
     return Geo::bearingToDirection(qRound(bearing()));
