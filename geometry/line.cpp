@@ -335,6 +335,17 @@ Line &Line::extend(double howMuch)
     return *this;
 }
 
+Line &Line::grow(double howMuch)
+{
+    Angle angle = bearing();
+    Point newP2 = FlatGeo::getPoint(_p2, angle.degrees(), howMuch);
+    angle += 180;
+    Point newP1 = FlatGeo::getPoint(_p1, angle.degrees(), howMuch);
+    _p1 = newP1;
+    _p2 = newP2;
+    return *this;
+}
+
 Geo::Direction Line::direction() const
 {
     return Geo::bearingToDirection(qRound(bearing()));
@@ -423,6 +434,13 @@ Line &Line::move(double bearing, double distance)
 Line &Line::move(Geo::Direction direction, double distance)
 {
     return move(Geo::directionToBearing(direction), distance);
+}
+
+Line &Line::moveDelta(double dx, double dy)
+{
+    _p1.moveDelta(dx, dy);
+    _p2.moveDelta(dx, dy);
+    return *this;
 }
 
 Line&  Line::rotate(const Point &centroid, double angle)
@@ -552,6 +570,13 @@ Line Line::List::longest() const
     return result;
 }
 
+QPointF Line::List::closestPointTo(const QPointF &other)
+{
+    Line c;
+    double d;
+    return closestPointTo(other, c, d);
+}
+
 QPointF Line::List::closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance)
 {
     closestDistance = INFINITY;
@@ -632,12 +657,15 @@ double Line::List::maxY() const
  */
 Rectangle Line::List::boundingRectangle() const
 {
-    Point::List points;
-    points.append(Point(minX(), minY()));
-    points.append(Point(minX(), maxY()));
-    points.append(Point(maxX(), minY()));
-    points.append(Point(maxX(), maxY()));
-    Rectangle result = Rectangle::fromPoints(points);
+    Rectangle result;
+    if(count() > 0) {
+        Point::List points;
+        points.append(Point(minX(), minY()));
+        points.append(Point(minX(), maxY()));
+        points.append(Point(maxX(), minY()));
+        points.append(Point(maxX(), maxY()));
+        result = Rectangle::fromPoints(points);
+    }
     return result;
 }
 
@@ -668,6 +696,23 @@ Line Line::List::lineNearPoint(const Point &point, int margin) const
         }
     }
     return Line();
+}
+
+double Line::List::totalLength() const
+{
+    double result = 0;
+    for(const Line& line : *this) {
+        result += line.length();
+    }
+    return result;
+}
+
+Line::List& Line::List::moveDelta(double dx, double dy)
+{
+    for(Line& line : *this) {
+        line.moveDelta(dx, dy);
+    }
+    return *this;
 }
 
 QList<QLineF> Line::List::toQLineFList() const

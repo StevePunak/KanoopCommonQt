@@ -20,8 +20,10 @@ public:
 
     Point& move(Geo::Direction direction, double amount);
     Point& move(double bearing, double distance);
+    Point& moveDelta(double dx, double dy);
     Point& round();
     Point& offset(double x, double y);
+    Point delta(const Point& other);
 
     QString toString() const { return QString("%1, %2").arg(x()).arg(y()); }
     static Point fromString(const QString& value);

@@ -32,6 +32,13 @@ Point &Point::move(double bearing, double distance)
     return *this;
 }
 
+Point &Point::moveDelta(double dx, double dy)
+{
+    rx() += dx;
+    ry() += dy;
+    return *this;
+}
+
 Point &Point::round()
 {
     setX(qRound(x()));
@@ -44,6 +51,12 @@ Point &Point::offset(double x, double y)
     rx() += x;
     ry() += y;
     return *this;
+}
+
+Point Point::delta(const Point &other)
+{
+    Point result(x() - other.x(), y() - other.y());
+    return result;
 }
 
 Point Point::fromString(const QString &value)
