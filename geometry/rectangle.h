@@ -15,7 +15,9 @@ public:
     Rectangle(double x, double y, int w, int h) : QRectF(x, y, w, h) {}
 
     static Rectangle fromPoints(const Point::List& points);
+    static Rectangle fromPoints(const Point& p1, const Point& p2);
     static Rectangle fromCenterLine(const Line& centerLine, double expand);
+    static Rectangle fromCenterPoint(const Point& centerPoint, double expand);
 
     Point closestCorner(const Point& origin) const;
     Point::List corners() const;

@@ -18,6 +18,16 @@ Rectangle Rectangle::fromPoints(const Point::List &points)
     return result;
 }
 
+Rectangle Rectangle::fromPoints(const Point &p1, const Point &p2)
+{
+    int minX = qMin(p1.x(), p2.x());
+    int minY = qMin(p1.y(), p2.y());
+    int maxX = qMax(p1.x(), p2.x());
+    int maxY = qMax(p1.y(), p2.y());
+    Rectangle rect(minX, minY, maxX - minX, maxY - minY);
+    return rect;
+}
+
 Rectangle Rectangle::fromCenterLine(const Line &centerLine, double expand)
 {
     Rectangle result;
@@ -39,6 +49,14 @@ Rectangle Rectangle::fromCenterLine(const Line &centerLine, double expand)
     double w = maxX - minX;
     double h = maxY - minY;
     result = Rectangle(minX, minY, w, h);
+    return result;
+}
+
+Rectangle Rectangle::fromCenterPoint(const Point &centerPoint, double expand)
+{
+    double x = centerPoint.x() - expand;
+    double y = centerPoint.y() - expand;
+    Rectangle result(x, y, expand * 2, expand * 2);
     return result;
 }
 

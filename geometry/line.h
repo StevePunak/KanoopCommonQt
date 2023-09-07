@@ -51,6 +51,7 @@ public:
         Line lowest() const;
         Line shortest() const;
         Line longest() const;
+        QPointF closestPointTo(const QPointF& other);
         QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
         double minX() const;
         double maxX() const;
@@ -59,6 +60,8 @@ public:
         Rectangle boundingRectangle() const;
         Line lineContainingPoint(const Point& point) const;
         Line lineNearPoint(const Point& point, int margin) const;
+        double totalLength() const;
+        List &moveDelta(double dx, double dy);
 
         QList<QLineF> toQLineFList() const;
         QList<QLine> toQLineList() const;
@@ -103,6 +106,7 @@ public:
     bool containsPoint(const QPointF& point) const;
     Line& shorten(double howMuch);
     Line& extend(double howMuch);
+    Line& grow(double howMuch);
     Geo::Direction direction() const;
     double minX() const;
     double maxX() const;
@@ -119,6 +123,7 @@ public:
 
     Line& move(double bearing, double distance);
     Line& move(Geo::Direction direction, double distance);
+    Line& moveDelta(double dx, double dy);
     Line &rotate(const Point& centroid, double angle);
 
     QLine toQLine() const;

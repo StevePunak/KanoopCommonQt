@@ -9,10 +9,12 @@ Polygon Polygon::fromLine(const Line &line, int expandBy)
     angle += 90;
     Line l1 = line;
     l1.move(angle.degrees(), expandBy);
+    l1.grow(expandBy);
 
     angle += 180;
     Line l2 = line;
     l2.move(angle.degrees(), expandBy);
+    l2.grow(expandBy);
 
     Polygon result;
     result._points.append(l1.p1());
