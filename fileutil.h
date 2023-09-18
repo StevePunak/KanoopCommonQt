@@ -12,7 +12,7 @@ public:
     static QString getMD5String(const QString& filename);
     static QByteArray getMD5Bytes(const QString& filename);
     static bool readAllBytes(const QString& filename, QByteArray& data);
-    static bool readAllLines(const QString& filename, QStringList& data);
+    static bool readAllLines(const QString& filename, QStringList& data, QStringConverter::Encoding encoding = QStringConverter::Utf8);
     static bool writeAllBytes(const QString& filename, const QByteArray& data);
     static bool writeAllLines(const QString& filename, const QStringList& lines);
     static bool exists(const QString& filename);

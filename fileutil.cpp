@@ -37,13 +37,14 @@ bool FileUtil::readAllBytes(const QString &filename, QByteArray &data)
     return false;
 }
 
-bool FileUtil::readAllLines(const QString &filename, QStringList &lines)
+bool FileUtil::readAllLines(const QString &filename, QStringList &lines, QStringConverter::Encoding encoding)
 {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly))
     {
         lines.clear();
         QTextStream ts(&file);
+        ts.setEncoding(encoding);
         QString line;
         while((line = ts.readLine()).isNull() == false)
         {
