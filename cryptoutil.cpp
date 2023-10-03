@@ -32,6 +32,14 @@ QByteArray CryptoUtil::md5(const QByteArray &of)
     return hash.result();
 }
 
+uint64_t CryptoUtil::md5UInt64(const QByteArray &of)
+{
+    uint64_t result;
+    QByteArray fullMd5 = md5(of);
+    memcpy(&result, fullMd5.constData(), sizeof(result));
+    return result;
+}
+
 QString CryptoUtil::md5String(const QString &of)
 {
     QByteArray hash = md5(of.toLatin1());
