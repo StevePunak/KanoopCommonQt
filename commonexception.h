@@ -7,9 +7,7 @@
 class CommonException : public QException
 {
 public:
-    CommonException(const QString& message, qint32 code = 0) :
-        _message(message),
-        _code(code) {}
+    CommonException(const QString& message, qint32 code = 0);
 
     void raise() const override { throw *this; }
     CommonException *clone() const override { return new CommonException(*this); }

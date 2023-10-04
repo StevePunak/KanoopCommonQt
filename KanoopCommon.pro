@@ -31,6 +31,7 @@ target.path = $$OUTPUT_PREFIX/usr/lib
 
 SOURCES += \
     addresshelper.cpp \
+    commonexception.cpp \
     cryptoutil.cpp \
     datetimeutil.cpp \
     fileutil.cpp \

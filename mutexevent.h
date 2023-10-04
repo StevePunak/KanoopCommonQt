@@ -13,6 +13,7 @@ public:
         _isset(false),
         _debug(false),
         _wakeAllWaiters(wakeAllWaiters) {}
+    virtual ~MutexEvent() {}
 
     void set();
     void clear();
