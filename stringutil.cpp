@@ -122,6 +122,78 @@ QString StringUtil::trimBothEnds(const QString &value, const QList<QChar> &chars
     return result;
 }
 
+QString StringUtil::unquoted(const QString &value)
+{
+    QString result = value;
+    int index = value.indexOf(QUOTE);
+    if(index >= 0) {
+        int index2 = value.indexOf(QUOTE, index + 1);
+        if(index2 > index) {
+            result = value.mid(index + 1, (index2 - index) - 1);
+        }
+    }
+    return result;
+}
+
+QStringList StringUtil::trimmed(const QStringList &value, Qt::SplitBehavior behavior)
+{
+    QStringList result;
+    for(const QString& s : value) {
+        QString trimmed = s.trimmed();
+        if(trimmed.isEmpty() && behavior == Qt::SkipEmptyParts) {
+            continue;
+        }
+        result.append(trimmed);
+    }
+    return result;
+}
+
+QStringList StringUtil::splitWithQuotes(const QString &value, QChar separator, Qt::SplitBehavior behavior)
+{
+    return StringSplitter::splitWithQuotes(value, separator, behavior);
+}
+
+QStringList StringUtil::splitWithQuotes(const QString &value, QList<QChar> separators, Qt::SplitBehavior behavior)
+{
+    return StringSplitter::splitWithQuotes(value, separators, behavior);
+}
+
+QString StringUtil::combineToEol(const QStringList &lines, int index, const QChar &eolCharacter, int *consumed)
+{
+    return StringCombiner::combineToEol(lines, index, eolCharacter, consumed);
+}
+
+int StringUtil::indexOfWord(const QString& value, int wordNumber)
+{
+    static const QList<QChar> whitespace =
+    {
+        ' ', '\t'
+    };
+
+    int index = 0;
+    bool inWhiteSpace = value.length() > 0 && whitespace.contains(value.at(0));
+    int currentWord = -1;
+    for(index = 0;index < value.length();index++) {
+        QChar c = value.at(index);
+        if(whitespace.contains(c)) {
+            // 'c' is whitespace
+            if(inWhiteSpace) {
+                continue;
+            }
+            else {
+                inWhiteSpace = true;
+            }
+        }
+        else if(index == 0 || inWhiteSpace) {
+            if(++currentWord == wordNumber) {
+                break;
+            }
+            inWhiteSpace = false;
+        }
+    }
+    return currentWord == wordNumber ? index : -1;
+}
+
 int StringUtil::fuzzyIndexOf(const QString &needle, const QString &haystack, int maxDistance)
 {
     Bitap bitap(haystack, needle, maxDistance);
@@ -205,5 +277,83 @@ int StringUtil::Bitap::calculate(int maxDistance)
     }
 
     delete[] R;
+    return result;
+}
+
+QStringList StringUtil::StringSplitter::splitWithQuotes(const QString &value, QChar separator, Qt::SplitBehavior behavior)
+{
+    QList<QChar> separators;
+    separators << separator;
+    return splitWithQuotes(value, separators, behavior);
+}
+
+QStringList StringUtil::StringSplitter::splitWithQuotes(const QString &value, QList<QChar> separators, Qt::SplitBehavior behavior)
+{
+    StringSplitter splitter(value, separators, behavior);
+    splitter.performSplit();
+    return splitter._result;
+}
+
+void StringUtil::StringSplitter::performSplit()
+{
+    _current.clear();
+    _current.reserve(1024);
+    _inQuote = false;
+    for(int i = 0;i < _originalString.length();i++) {
+        QChar c = _originalString.at(i);
+        if(c == QUOTE) {
+            if(_inQuote == false) {
+                _inQuote = true;
+                appendCurrent();
+            }
+            else {
+                _inQuote = false;
+                appendCurrent();
+            }
+        }
+        else if(_inQuote) {
+            _current.append(c);
+        }
+        else if(_separators.contains(c)) {
+            appendCurrent();
+        }
+        else {
+            _current.append(c);
+        }
+    }
+
+    if(_current.isEmpty() == false) {
+        appendCurrent();
+    }
+}
+
+void StringUtil::StringSplitter::appendCurrent()
+{
+    if(_current.length() > 0 || _behavior == Qt::KeepEmptyParts) {
+        _result.append(_current);
+    }
+    _current.clear();
+}
+
+QString StringUtil::StringCombiner::combineToEol(const QStringList &lines, int index, const QChar &eolCharacter, int *consumed)
+{
+    QString result;
+    QTextStream output(&result);
+    int i = index;
+    for(;i < lines.count();i++) {
+        QString line = lines.at(i);
+        output << line;
+        if(line.endsWith(eolCharacter)) {
+            break;
+        }
+        else {
+            output << '\n';
+        }
+    }
+
+    if(consumed != nullptr) {
+        *consumed = (i - index) + 1;
+    }
+
     return result;
 }

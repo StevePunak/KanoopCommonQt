@@ -61,6 +61,50 @@ public:
     static QString trimBothEnds(const QString& value, const QList<QChar> &chars);
 
     /**
+     * @brief unquoted
+     * @param value
+     * @return The region between the quotes
+     */
+    static QString unquoted(const QString& value);
+    static QString quoted(const QString& value) { return QString("\"%1\"").arg(value); }
+
+    /**
+     * @brief trimmed
+     * @param value
+     * @param behavior
+     * @return A list of all the strings trimmed
+     */
+    static QStringList trimmed(const QStringList& value, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
+
+    /**
+     * @brief splitWithQuotes
+     * Split the string respecting quoted strings within
+     * @param value
+     * @param separator
+     * @param behavior
+     * @return
+     */
+    static QStringList splitWithQuotes(const QString& value, QChar separator, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
+    static QStringList splitWithQuotes(const QString& value, QList<QChar> separators, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
+
+    /**
+     * @brief combineToEol
+     * Combine strings from the list until hitting the string with an EOL at the end
+     * @param lines
+     * @param index
+     * @param eolCharacter
+     * @return
+     */
+    static QString combineToEol(const QStringList& lines, int index, const QChar& eolCharacter = ';', int* consumed = nullptr);
+
+    /**
+     * @brief indexOfWord
+     * @param wordNumber
+     * @return the index of the give word number (1, 2, 3 etc...)
+     */
+    static int indexOfWord(const QString &value, int wordNumber);
+
+    /**
      * @brief fuzzyIndexOf
      * Calculate the index of a fuzzy match of 'needle' into 'haystack' using BITAP algorithm.
      * Distance is the max Levenshtein distance to obtain a match.
@@ -127,6 +171,41 @@ public:
         }
         int _distance;
     };
+
+private:
+    class StringSplitter
+    {
+    public:
+        static QStringList splitWithQuotes(const QString& value, QChar separator, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
+        static QStringList splitWithQuotes(const QString& value, QList<QChar> separators, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
+
+    private:
+        StringSplitter(const QString& value, QList<QChar> separators, Qt::SplitBehavior behavior = Qt::KeepEmptyParts) :
+            _originalString(value), _separators(separators), _behavior(behavior), _inQuote(false) {}
+
+        void performSplit();
+        void appendCurrent();
+
+        QString _originalString;
+        QList<QChar> _separators;
+        Qt::SplitBehavior _behavior;
+
+        QString _current;
+        bool _inQuote;
+
+        QStringList _result;
+
+        static const char QUOTE = '\"';
+    };
+
+    class StringCombiner
+    {
+    public:
+        static QString combineToEol(const QStringList& lines, int index, const QChar& eolCharacter, int* consumed = nullptr);
+    };
+
+    static const char QUOTE = '\"';
+    static const char COLON = ':';
 };
 
 #endif // STRINGUTIL_H
