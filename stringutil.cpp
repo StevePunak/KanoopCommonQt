@@ -46,6 +46,33 @@ QString StringUtil::toString(const QByteArray &value, const QString &delimiter)
     return result.trimmed();
 }
 
+QString StringUtil::toString(const QList<QUuid> &value, const QString &delimiter)
+{
+    QString outputString;
+    outputString.reserve(value.size() * 256);
+    QTextStream output(&outputString);
+    for(int i = 0;i < value.count();i++)
+    {
+        output << value.at(i).toString(QUuid::WithoutBraces);
+        if(i < value.count() - 1)
+            output << delimiter;
+    }
+    return outputString;
+}
+
+QList<QUuid> StringUtil::uuidsFromString(const QString &value, const QString &delimiter)
+{
+    QList<QUuid> result;
+    QStringList parts = value.split(delimiter);
+    for(const QString& part : parts) {
+        QUuid uuid = QUuid::fromString(part);
+        if(uuid.isNull() == false) {
+            result.append(uuid);
+        }
+    }
+    return result;
+}
+
 QString StringUtil::toDelimitedString(const QStringList &list, char delimiter)
 {
     QString outputString;

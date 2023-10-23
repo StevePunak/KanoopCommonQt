@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <QUuid>
 #include "kanoopcommon.h"
 
 class KANOOP_EXPORT StringUtil
@@ -36,6 +37,14 @@ public:
      * Convert a byte array to a hex string
      */
     static QString toString(const QByteArray& value, const QString& delimiter = QString(" "));
+    /**
+     * Convert a list of QUuids to a string
+     */
+    static QString toString(const QList<QUuid>& value, const QString& delimiter = QString(" "));
+    /**
+     * Convert a delimited string to a list of UUIDs
+     */
+    static QList<QUuid> uuidsFromString(const QString& value, const QString& delimiter = QString(" "));
     /**
      * Convert a list of strings to a single string delimited by the supplied character
      */
