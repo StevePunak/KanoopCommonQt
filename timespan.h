@@ -95,6 +95,9 @@ public:
   TimeSpan addHours(double hours) const;
   TimeSpan addDays(double days) const;
 
+  static TimeSpan fromVariant(const QVariant& value) { return value.value<TimeSpan>(); }
+  QVariant toVariant() const { return QVariant::fromValue<TimeSpan>(*this); }
+
   static TimeSpan fromNanoseconds(double nanoseconds);
   static TimeSpan fromMicroseconds(double microseconds);
   static TimeSpan fromMilliseconds(double milliseconds);
