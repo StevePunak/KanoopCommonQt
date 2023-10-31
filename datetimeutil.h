@@ -43,6 +43,11 @@ private:
         result.setTimeSpec(Qt::UTC);
         return result;
     }
+    static QDateTime fromGitRepresentation(const QString& date)
+    {
+        QDateTime dateTime = QDateTime::fromString(date, "ddd MMM d hh:mm:ss yyyy tt").toUTC();
+        return dateTime;
+    }
 };
 
 #endif // DATETIMEUTIL_H

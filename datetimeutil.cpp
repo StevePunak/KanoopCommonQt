@@ -21,6 +21,7 @@ QDateTime DateTimeUtil::fromString(const QString &date)
         (result = fromSquashedString(date)).isValid() ||
         (result = QDateTime::fromString(date, Qt::ISODateWithMs)).isValid() ||
         (result = QDateTime::fromString(date)).isValid() ||
+        (result = fromGitRepresentation(date)).isValid() ||
         (result = fromAlternate1String(date)).isValid())
     {
     }
