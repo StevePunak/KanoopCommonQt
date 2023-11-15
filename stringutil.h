@@ -50,6 +50,10 @@ public:
      */
     static QString toDelimitedString(const QStringList& list, char delimiter = ' ');
     /**
+     * Convert a list of ints to a single string delimited by the supplied character
+     */
+    static QString toDelimitedString(const QList<int>& list, char delimiter = ' ');
+    /**
      * Format value as abbreviated byte count (K = kilobytes, M = megabytes, G=gigabytes)
      */
     static QString toKMG(qint64 byteCount);
