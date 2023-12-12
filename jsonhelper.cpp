@@ -86,3 +86,21 @@ QString JsonHelper::toIndented(const QByteArray &json)
     QString output = doc.toJson(QJsonDocument::Indented);
     return output;
 }
+
+QJsonArray JsonHelper::toJsonArray(const QStringList &value)
+{
+    QJsonArray result;
+    for(const QString& s : value) {
+        result.append(s);
+    }
+    return result;
+}
+
+QStringList JsonHelper::toStringList(const QJsonArray &value)
+{
+    QStringList result;
+    for(const QJsonValue& v : value) {
+        result.append(v.toString());
+    }
+    return result;
+}

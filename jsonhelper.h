@@ -16,6 +16,8 @@ public:
     static bool tryGetDouble(const QJsonObject& object, const QString& key, qreal& value);
     static bool tryGetBool(const QJsonObject& object, const QString& key, bool& value);
     static QString toIndented(const QByteArray& json);
+    static QJsonArray toJsonArray(const QStringList& value);
+    static QStringList toStringList(const QJsonArray& value);
 };
 
 #endif // JSONHELPER_H
