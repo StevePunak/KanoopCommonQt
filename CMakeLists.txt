@@ -15,7 +15,7 @@ file(GLOB_RECURSE KANOOP_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 qt_add_library(KanoopCommon ${KANOOP_COMMON_SOURCES} ${KANOOP_COMMON_HEADERS})
 
-set_target_properties(KanoopCommon PROPERTIES OUTPUT_NAME "KanoopCommon" SUFFIX ".so.${KANOOP_COMMON_VERSION}")
+set_target_properties(KanoopCommon PROPERTIES VERSION "${KANOOP_COMMON_VERSION}")
 set_target_properties(KanoopCommon PROPERTIES SOVERSION 1)
 set_target_properties(KanoopCommon PROPERTIES PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop/kanoopcommon.h")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/libKanoopCommon.pc.in" "libKanoopCommon.pc" @ONLY)
