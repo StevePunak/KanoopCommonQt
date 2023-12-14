@@ -1,11 +1,7 @@
 #ifndef GEOCOORDINATE_H
 #define GEOCOORDINATE_H
 
-#ifdef KANOOP_LIBRARY
 #include "Kanoop/geo/geotypes.h"
-#else
-#include <Kanoop/geotypes.h>
-#endif
 #include <QString>
 #include <QtMath>
 
