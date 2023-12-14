@@ -1,7 +1,13 @@
 #ifndef GEOCIRCLE_H
 #define GEOCIRCLE_H
-#include "Kanoop/geo/geocoordinate.h"
 #include <QtMath>
+
+#ifdef KANOOP_LIBRARY
+#include "Kanoop/geo/geocoordinate.h"
+#else
+#include <Kanoop/geocoordinate.h>
+#endif
+
 #include "Kanoop/kanoopcommon.h"
 
 class KANOOP_EXPORT GeoCircle
