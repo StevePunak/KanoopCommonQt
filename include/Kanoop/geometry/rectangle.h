@@ -4,8 +4,9 @@
 #include <QRectF>
 #include "point.h"
 #include "line.h"
+#include "Kanoop/kanoopcommon.h"
 
-class Rectangle : public QRectF
+class KANOOP_EXPORT Rectangle : public QRectF
 {
 public:
     Rectangle() : QRectF() {}

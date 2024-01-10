@@ -2,6 +2,7 @@
 #define FLATGEO_H
 
 #include "point.h"
+#include "Kanoop/kanoopcommon.h"
 #include <QRect>
 
 class Circle;
@@ -9,7 +10,7 @@ class Line;
 class Angle;
 class QRect;
 
-class FlatGeo
+class KANOOP_EXPORT FlatGeo
 {
 public:
     static double vectorAngle(const Line& l1, const Line& l2);
