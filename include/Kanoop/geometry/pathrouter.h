@@ -9,8 +9,9 @@
 
 #include "point.h"
 #include "rectangle.h"
+#include "Kanoop/kanoopcommon.h"
 
-class PathRouter
+class KANOOP_EXPORT PathRouter
 {
 public:
     PathRouter() :

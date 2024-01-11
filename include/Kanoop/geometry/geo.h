@@ -2,6 +2,7 @@
 #define GEO_H
 
 #include <QList>
+#include "Kanoop/kanoopcommon.h"
 
 namespace Geo {
 
@@ -41,12 +42,12 @@ enum SpatialRelationship {
     Contained                   = 0x0200,
 };
 
-QList<Direction> allDirections();
-Side directionToSide(Direction direction);
-Direction sideToDirection(Side side);
-double directionToBearing(Direction direction);
-Direction bearingToDirection(double bearing);
-Direction oppositeDirection(Direction direction);
+KANOOP_EXPORT QList<Direction> allDirections();
+KANOOP_EXPORT Side directionToSide(Direction direction);
+KANOOP_EXPORT Direction sideToDirection(Side side);
+KANOOP_EXPORT double directionToBearing(Direction direction);
+KANOOP_EXPORT Direction bearingToDirection(double bearing);
+KANOOP_EXPORT Direction oppositeDirection(Direction direction);
 
 } // namespace Geo
 

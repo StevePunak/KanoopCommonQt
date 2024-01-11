@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QRect>
 
+#include "Kanoop/kanoopcommon.h"
 #include "flatgeo.h"
 #include "point.h"
 
@@ -12,7 +13,7 @@ class QLineF;
 class QLine;
 class Circle;
 class Rectangle;
-class Line
+class KANOOP_EXPORT Line
 {
 public:
     Line() {}
@@ -32,7 +33,7 @@ public:
     Point p2() const { return _p2; }
     void setP2(const Point& value) { _p2 = value; }
 
-    class List : public QList<Line>
+    class KANOOP_EXPORT List : public QList<Line>
     {
     public:
         List() : QList<Line>() {}

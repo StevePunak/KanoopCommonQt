@@ -2,10 +2,11 @@
 #define POINT_H
 #include <QList>
 #include <QPointF>
+#include "Kanoop/kanoopcommon.h"
 
 #include "geo.h"
 
-class Point : public QPointF
+class KANOOP_EXPORT Point : public QPointF
 {
 public:
     Point() : QPointF() {}
