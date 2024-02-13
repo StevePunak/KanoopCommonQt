@@ -53,7 +53,7 @@ Point &Point::offset(double x, double y)
     return *this;
 }
 
-Point Point::delta(const Point &other)
+Point Point::delta(const Point &other) const
 {
     Point result(x() - other.x(), y() - other.y());
     return result;

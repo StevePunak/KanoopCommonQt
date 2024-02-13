@@ -24,7 +24,7 @@ public:
     Point& moveDelta(double dx, double dy);
     Point& round();
     Point& offset(double x, double y);
-    Point delta(const Point& other);
+    Point delta(const Point& other) const;
 
     QString toString() const { return QString("%1, %2").arg(x()).arg(y()); }
     static Point fromString(const QString& value);
