@@ -66,6 +66,20 @@ bool FileUtil::writeAllBytes(const QString &filename, const QByteArray &data)
     return false;
 }
 
+bool FileUtil::writeAllBytes(const QString& filename, const QByteArray& data, QStringConverter::Encoding encoding)
+{
+    bool result = false;
+    QString str(data);
+    QFile file(filename);
+    if(file.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream output(&file);
+        output.setEncoding(encoding);
+        output << str;
+        result = true;
+    }
+    return result;
+}
+
 bool FileUtil::writeAllLines(const QString &filename, const QStringList &lines)
 {
     QFile file(filename);

@@ -14,6 +14,7 @@ public:
     static bool readAllBytes(const QString& filename, QByteArray& data);
     static bool readAllLines(const QString& filename, QStringList& data, QStringConverter::Encoding encoding = QStringConverter::Utf8);
     static bool writeAllBytes(const QString& filename, const QByteArray& data);
+    static bool writeAllBytes(const QString& filename, const QByteArray& data, QStringConverter::Encoding encoding);
     static bool writeAllLines(const QString& filename, const QStringList& lines);
     static bool exists(const QString& filename);
     static bool remove(const QString& filename);
