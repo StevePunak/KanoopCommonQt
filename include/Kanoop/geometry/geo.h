@@ -18,6 +18,8 @@ enum Side
     BottomLeftCorner        = 0x0040,
     BottomRightCorner       = 0x0080,
 };
+Q_DECLARE_FLAGS(Sides, Side)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Sides)
 
 enum Direction
 {
@@ -27,6 +29,8 @@ enum Direction
     ToLeft = Left,
     ToRight = Right
 };
+Q_DECLARE_FLAGS(Directions, Direction)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Directions)
 
 enum SpatialRelationship {
     NoRelationship              = 0x0000,
@@ -41,6 +45,17 @@ enum SpatialRelationship {
     ToRightOf                   = 0x0100,
     Contained                   = 0x0200,
 };
+Q_DECLARE_FLAGS(SpatialRelationships, SpatialRelationship)
+Q_DECLARE_OPERATORS_FOR_FLAGS(SpatialRelationships)
+
+enum Axis {
+    NoAxis                      = 0x0000,
+    XAxis                       = 0x0001,
+    YAxis                       = 0x0002,
+    ZAxis                       = 0x0004,
+};
+Q_DECLARE_FLAGS(Axes, Axis)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Axes)
 
 KANOOP_EXPORT QList<Direction> allDirections();
 KANOOP_EXPORT Side directionToSide(Direction direction);
