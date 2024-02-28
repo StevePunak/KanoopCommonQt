@@ -1,5 +1,7 @@
 #include "Kanoop/geometry/rectangle.h"
 
+#include <Kanoop/geometry/size.h>
+
 using namespace Geo;
 
 Rectangle Rectangle::fromPoints(const Point::List &points)
@@ -197,4 +199,19 @@ Geo::Side Rectangle::closestSideToPoint(const Point& point) const
         }
     }
     return result;
+}
+
+void Rectangle::scale(double scale)
+{
+    Size size = Rectangle::size();
+    size.setWidth(width() * scale);
+    size.setHeight(height() * scale);
+    setSize(size);
+}
+
+Rectangle Rectangle::scaled(double scale) const
+{
+    Rectangle rect = *this;
+    rect.scale(scale);
+    return rect;
 }

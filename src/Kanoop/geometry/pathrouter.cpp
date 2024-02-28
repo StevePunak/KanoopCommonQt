@@ -542,7 +542,7 @@ bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
                     if(distanceToB == INFINITY) {
                         continue;
                     }
-                    nextLine = seekClearLine(a, _direction, targetDirection, distanceToB);      // START HERE!
+                    nextLine = seekClearLine(a, _direction, targetDirection, distanceToB);
                     if(nextLine.isPerpendicular() == false) {
                         logText(KLOG_ERROR, "Line is not perpendiclar");
                     }
