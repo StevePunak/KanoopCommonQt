@@ -27,5 +27,11 @@ add_compile_definitions(KANOOP_LIBRARY)
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)  # Disables all the APIs deprecated before Qt 6.0.0
 
-install(TARGETS KanoopCommon LIBRARY DESTINATION "$ENV{KYBER_OUTPUT_PREFIX}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop" DESTINATION "$ENV{KYBER_OUTPUT_PREFIX}/${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" FILES_MATCHING PATTERN "*.h")
+# Set install prefix.  This is necessary when installing without KYBER_OUTPUT_PREFIX set as this causes the path to start with two
+# forward-slashes which CMake interprets to mean a network path.  Thus, we only include the "/" if there is something ahead of it.
+if (DEFINED $ENV{KYBER_OUTPUT_PREFIX})
+    set(KANOOP_INSTALL_PREFIX "$ENV{KYBER_OUTPUT_PREFIX}/")
+endif()
+
+install(TARGETS KanoopCommon LIBRARY DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop" DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" FILES_MATCHING PATTERN "*.h")
