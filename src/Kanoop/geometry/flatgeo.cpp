@@ -54,7 +54,14 @@ double FlatGeo::angularDifference(const Line &l1, const Line &l2)
 Point FlatGeo::getPoint(const QPointF &from, double bearing, double distance)
 {
     double radBearing = radians(bearing);
-    return Point(from.x() + qSin(radBearing) * distance, from.y() - qCos(radBearing) * distance);
+
+    double x = from.x() + qSin(radBearing) * distance;
+    x = roundedDouble(x, Precision);
+
+    double y = from.y() - qCos(radBearing) * distance;
+    y = roundedDouble(y, Precision);
+
+    return Point(x, y);
 }
 
 QPointF FlatGeo::intersection(const Line &l1, const Line &l2)
@@ -247,5 +254,14 @@ Angle FlatGeo::anglev2(const Line &l1, const Line &l2)
 QString FlatGeo::roundedString(double value, int precision)
 {
     return QString("%1").arg(value, precision, 'f');
+}
+
+double FlatGeo::roundedDouble(double value, int precision)
+{
+    precision = 10 * precision;
+    value *= precision;
+    value = qRound(value);
+    value /= precision;
+    return value;
 }
 

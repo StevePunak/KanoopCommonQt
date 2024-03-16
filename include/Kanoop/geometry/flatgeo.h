@@ -83,13 +83,13 @@ public:
     static QString makePointString(const QPoint& p);
     static QString makePointString(const QPointF& p);
 
+    static const int Precision = 6;
+
 private:
     static Angle anglev2(const Line& l1, const Line& l2);
     static QString roundedString(double value, int precision);
+    static double roundedDouble(double value, int precision);
 };
 
 
 #endif // FLATGEO_H
-
-
-

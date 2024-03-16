@@ -36,8 +36,12 @@ public:
     bool containsAnyPoint(const Line& line) const;
     Point centerPoint() const;
     Geo::Side closestSideToPoint(const Point &point) const;
-    void scale(double scale);
+    Rectangle& scale(double scale);
     Rectangle scaled(double scale) const;
+    Rectangle& grow(double amount);
+    Rectangle grown(double amount) const;
+    Rectangle& shrink(double amount) { return grow(-amount); }
+    Rectangle shrunk(double amount) const { return grown(-amount); }
 
     QString toString() const { return QString("x,y %1, %2  w,h %3, %4").arg(x()).arg(y()).arg(width()).arg(height()); }
 
