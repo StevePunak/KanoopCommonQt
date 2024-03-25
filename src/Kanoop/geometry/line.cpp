@@ -17,6 +17,17 @@ Line::Line(const QPointF &origin, double bearing, double distance) :
 Line::Line(const QPointF &origin, Geo::Direction direction, double distance) :
     _p1(origin), _p2(FlatGeo::getPoint(origin, Geo::directionToBearing(direction), distance)) {}
 
+Line Line::fromString(const QString& value)
+{
+    Line result;
+    QStringList parts = value.split('/');
+    if(parts.count() == 2) {
+        result.setP1(Point::fromString(parts.at(0)));
+        result.setP2(Point::fromString(parts.at(1)));
+    }
+    return result;
+}
+
 Point Line::midpoint() const
 {
     double x = _p2.x() - ((_p2.x() - _p1.x()) / 2);
@@ -462,7 +473,7 @@ QLineF Line::toQLineF() const
 
 QString Line::toString() const
 {
-    return QString("p1: %1  p2: %2").arg(FlatGeo::makePointString(_p1)).arg(FlatGeo::makePointString(_p2));
+    return QString("%1/%2").arg(FlatGeo::makePointString(_p1)).arg(FlatGeo::makePointString(_p2));
 }
 
 
@@ -482,6 +493,17 @@ Line::List Line::List::fromPoints(const QList<QPointF>& points)
     List result;
     for(int i = 0;i < points.count() - 1;i++) {
         result.append(Line(points.at(i), points.at(i+1)));
+    }
+    return result;
+}
+
+Line::List Line::List::fromString(const QString& value)
+{
+    Line::List result;
+    QStringList parts = value.split('+', Qt::SkipEmptyParts);
+    for(const QString& part : parts) {
+        Line line = Line::fromString(part);
+        result.append(line);
     }
     return result;
 }
@@ -741,7 +763,7 @@ QString Line::List::toString() const
         const Line& line = this->at(i);
         output << QString("(%1)").arg(line.toString());
         if(i < count() - 1) {
-            output << ',';
+            output << '+';
         }
     }
     return result;

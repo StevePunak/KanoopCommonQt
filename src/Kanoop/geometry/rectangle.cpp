@@ -201,12 +201,13 @@ Geo::Side Rectangle::closestSideToPoint(const Point& point) const
     return result;
 }
 
-void Rectangle::scale(double scale)
+Rectangle& Rectangle::scale(double scale)
 {
     Size size = Rectangle::size();
     size.setWidth(width() * scale);
     size.setHeight(height() * scale);
     setSize(size);
+    return *this;
 }
 
 Rectangle Rectangle::scaled(double scale) const
@@ -214,4 +215,17 @@ Rectangle Rectangle::scaled(double scale) const
     Rectangle rect = *this;
     rect.scale(scale);
     return rect;
+}
+
+Rectangle& Rectangle::grow(double amount)
+{
+    QRectF::adjust(-amount, -amount, amount, amount);
+    return *this;
+}
+
+Rectangle Rectangle::grown(double amount) const
+{
+    Rectangle result = *this;
+    result.grow(amount);
+    return result;
 }

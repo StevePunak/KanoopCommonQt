@@ -1,6 +1,7 @@
 #ifndef LINE_H
 #define LINE_H
 
+#include <QLineF>
 #include <QList>
 #include <QPoint>
 #include <QRect>
@@ -23,9 +24,15 @@ public:
         _p1(p1), _p2(p2) {}
     Line(const QPointF& origin, double bearing, double distance);
     Line(const QPointF& origin, Geo::Direction direction, double distance);
+    Line(const QLineF& other) :
+        Line(other.p1(), other.p2()) {}
+    Line(const QLine& other) :
+        Line(other.p1(), other.p2()) {}
 
     bool operator ==(const Line& other) const { return _p1 == other._p1 && _p2 == other._p2; }
     bool operator !=(const Line& other) const { return (*this == other) == false; }
+
+    static Line fromString(const QString& value);
 
     Point p1() const { return _p1; }
     void setP1(const Point& value) { _p1 = value; }
@@ -45,6 +52,7 @@ public:
 
         static List fromPoints(const QList<QPoint>& points);
         static List fromPoints(const QList<QPointF>& points);
+        static List fromString(const QString& value);
         Line longestHorizontalLine();
         Line longestVerticalLine();
         bool containsLineWithSameEndpoints(const Line& line) const;
