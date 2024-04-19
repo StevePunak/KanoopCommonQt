@@ -32,10 +32,27 @@ public:
     class List : public QList<Point>
     {
     public:
+        List() {}
+        List(const QList<Point>& other)
+        {
+            for(const Point& p : other) {
+                append(p);
+            }
+        }
+
         Point topLeft() const;
         Point topRight() const;
         Point bottomLeft() const;
         Point bottomRight() const;
+
+        QList<QPoint> toPointList() const
+        {
+            QList<QPoint> result;
+            for(const Point& point : *this) {
+                result.append(point.toPoint());
+            }
+            return result;
+        }
     };
 };
 
