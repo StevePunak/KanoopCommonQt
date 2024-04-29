@@ -47,14 +47,14 @@ public:
   TimeSpan operator+(const TimeSpan& other) const;
   TimeSpan operator-(const TimeSpan& other) const;
   TimeSpan operator*(const TimeSpan& other) const;
+  TimeSpan operator*(double value) const;
   TimeSpan operator/(const TimeSpan& other) const;
+  TimeSpan operator/(double value) const;
   void operator+=(const TimeSpan& other);
   void operator-=(const TimeSpan& other);
   void operator*=(const TimeSpan& other);
   void operator/=(const TimeSpan& other);
 
-  void operator*(double value);
-  void operator/(double value);
   void operator*=(double value);
   void operator/=(double value);
 

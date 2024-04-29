@@ -146,10 +146,17 @@ TimeSpan TimeSpan::operator -(const TimeSpan& other) const
     return temp;
 }
 
-TimeSpan TimeSpan::operator*(const TimeSpan &other)
+TimeSpan TimeSpan::operator*(const TimeSpan &other) const
 {
     TimeSpan temp;
     temp._nanoseconds = _nanoseconds * other._nanoseconds;
+    return temp;
+}
+
+TimeSpan TimeSpan::operator*(double value) const
+{
+    TimeSpan temp;
+    temp._nanoseconds = _nanoseconds * value;
     return temp;
 }
 
@@ -157,6 +164,13 @@ TimeSpan TimeSpan::operator/(const TimeSpan &other) const
 {
     TimeSpan temp;
     temp._nanoseconds = _nanoseconds / other._nanoseconds;
+    return temp;
+}
+
+TimeSpan TimeSpan::operator/(double value) const
+{
+    TimeSpan temp;
+    temp._nanoseconds = _nanoseconds / value;
     return temp;
 }
 
@@ -216,16 +230,6 @@ void TimeSpan::operator*=(double value)
 }
 
 void TimeSpan::operator/=(double value)
-{
-    _nanoseconds /= value;
-}
-
-void TimeSpan::operator*(double value)
-{
-    _nanoseconds *= value;
-}
-
-void TimeSpan::operator/(double value)
 {
     _nanoseconds /= value;
 }
