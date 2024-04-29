@@ -153,7 +153,7 @@ TimeSpan TimeSpan::operator*(const TimeSpan &other) const
     return temp;
 }
 
-TimeSpan TimeSpan::operator*(const int& value) const
+TimeSpan TimeSpan::operator*(double value) const
 {
     TimeSpan temp;
     temp._nanoseconds = _nanoseconds * value;
@@ -167,7 +167,7 @@ TimeSpan TimeSpan::operator/(const TimeSpan &other) const
     return temp;
 }
 
-TimeSpan TimeSpan::operator/(const int& value) const
+TimeSpan TimeSpan::operator/(double value) const
 {
     TimeSpan temp;
     temp._nanoseconds = _nanoseconds / value;
@@ -222,6 +222,16 @@ bool TimeSpan::operator >=(const TimeSpan& other) const
 bool TimeSpan::operator <=(const TimeSpan& other) const
 {
     return _nanoseconds <= other._nanoseconds;
+}
+
+void TimeSpan::operator*=(double value)
+{
+    _nanoseconds *= value;
+}
+
+void TimeSpan::operator/=(double value)
+{
+    _nanoseconds /= value;
 }
 
 TimeSpan TimeSpan::addNanoseconds(double nanoseconds) const
