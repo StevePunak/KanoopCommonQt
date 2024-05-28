@@ -2,6 +2,9 @@
 
 #include <Kanoop/geometry/size.h>
 
+#include <QLocale>
+#include <QRegularExpression>
+
 using namespace Geo;
 
 Rectangle Rectangle::fromPoints(const Point::List &points)
@@ -59,6 +62,38 @@ Rectangle Rectangle::fromCenterPoint(const Point &centerPoint, double expand)
     double x = centerPoint.x() - expand;
     double y = centerPoint.y() - expand;
     Rectangle result(x, y, expand * 2, expand * 2);
+    return result;
+}
+
+Rectangle Rectangle::fromString(const QString& value)
+{
+    Rectangle result;
+
+    static const QRegularExpression regex(QStringLiteral("[+-]"));
+
+    int index = value.indexOf(regex);
+    if(index > 0) {
+        double w = 0, h = 0, x = 0, y = 0;
+        QString sizePart = value.mid(0, index);
+        QString posPart = value.mid(index);
+        QStringList sizeParts = sizePart.split('x');
+        if(sizeParts.count() == 2) {
+            w = sizeParts[0].toDouble();
+            h = sizeParts[1].toDouble();
+        }
+
+        if(posPart.length() > 1) {
+            int split = posPart.indexOf(regex, 1);
+            if(split > 0) {
+                QString xs = posPart.mid(0, split);
+                QString ys = posPart.mid(split);
+                x = xs.toDouble();
+                y = ys.toDouble();
+
+                result = Rectangle(x, y, w, h);
+            }
+        }
+    }
     return result;
 }
 
@@ -228,4 +263,15 @@ Rectangle Rectangle::grown(double amount) const
     Rectangle result = *this;
     result.grow(amount);
     return result;
+}
+
+QString Rectangle::toString() const
+{
+    QString posString = QString("%1%2%3%4")
+                            .arg(x() >= 0 ? '+' : '-').arg(x(), 0, 'f', QLocale::FloatingPointShortest)
+                            .arg(y() >= 0 ? '+' : '-').arg(y(), 1, 'f', QLocale::FloatingPointShortest);
+    return QString("%1x%2%3")
+        .arg(width(), 0, 'f', QLocale::FloatingPointShortest)
+        .arg(height(), 1, 'f', QLocale::FloatingPointShortest)
+        .arg(posString);
 }
