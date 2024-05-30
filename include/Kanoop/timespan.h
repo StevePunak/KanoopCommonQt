@@ -65,20 +65,88 @@ public:
   bool operator>=(const TimeSpan& other) const;
   bool operator<=(const TimeSpan& other) const;
 
+  /**
+   * @brief days
+   * @return Number of days represented in the days field of this TimeSpan when printed
+   */
   qint64 days() const;
+
+  /**
+   * @brief hours
+   * @return Number of hours represented in the hours field of this TimeSpan when printed
+   */
   qint64 hours() const;
+
+  /**
+   * @brief minutes
+   * @return Number of hours represented in the minutes field of this TimeSpan when printed
+   */
   qint64 minutes() const;
+
+  /**
+   * @brief seconds
+   * @return Number of seconds represented in the seconds field of this TimeSpan when printed
+   */
   qint64 seconds() const;
+
+  /**
+   * @brief milliseconds
+   * @return Number of milliseconds represented in the miliseconds field of this TimeSpan when printed
+   */
   qint64 milliseconds() const;
+
+  /**
+   * @brief microseconds
+   * @return Number of microseconds represented in the microseconds field of this TimeSpan when printed
+   */
   qint64 microseconds() const;
+
+  /**
+   * @brief nanoseconds
+   * @return Number of nanoseconds represented in the nanoseconds field of this TimeSpan when printed
+   */
   qint64 nanoseconds() const;
 
+  /**
+   * @brief totalSeconds
+   * @return The total number of seconds represented in the TimeSpan
+   */
   double totalSeconds() const;
+
+  /**
+   * @brief totalMinutes
+   * @return The total number of minutes represented in the TimeSpan
+   */
   double totalMinutes() const;
+
+  /**
+   * @brief totalHours
+   * @return The total number of hours represented in the TimeSpan
+   */
   double totalHours() const;
+
+  /**
+   * @brief totalDays
+   * @return The total number of days represented in the TimeSpan
+   */
   double totalDays() const;
+
+  /**
+   * @brief totalMilliseconds
+   * @return The total number of milliseconds represented in the TimeSpan
+   */
   double totalMilliseconds() const;
+
+  /**
+   * @brief totalMicroseconds
+   * @return The total number of microseconds represented in the TimeSpan
+   */
   double totalMicroseconds() const;
+
+  /**
+   * @brief totalNanoseconds
+   * @return The total number of nanoseconds represented in the TimeSpan
+   */
   double totalNanoseconds() const;
 
   bool isZero() const { return _nanoseconds == 0; }
@@ -86,7 +154,7 @@ public:
   bool isPositive() const { return _nanoseconds > 0; }
 
   void toTimeSpec(struct timespec& timespec) const;
-  QString toString() const;
+  QString toString(bool microseconds = false) const;
   QString toAbbreviatedFormat(bool showMilliseconds = false) const;
   QString toDumpString() const;
 

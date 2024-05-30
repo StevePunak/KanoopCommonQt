@@ -320,7 +320,6 @@ qint64 TimeSpan::microseconds() const
     value -= hours() * NanosecondsPerHour;
     value -= minutes() * NanosecondsPerMinute;
     value -= seconds() * NanosecondsPerSecond;
-    value -= milliseconds() * NanosecondsPerMillisecond;
     value /= (qint64)NanosecondsPerMicrosecond;
     return value;
 }
@@ -332,8 +331,6 @@ qint64 TimeSpan::nanoseconds() const
     value -= hours() * NanosecondsPerHour;
     value -= minutes() * NanosecondsPerMinute;
     value -= seconds() * NanosecondsPerSecond;
-    value -= milliseconds() * NanosecondsPerMillisecond;
-    value -= microseconds() * NanosecondsPerMicrosecond;
     return value;
 }
 
@@ -555,23 +552,25 @@ void TimeSpan::toTimeSpec(struct timespec& timespec) const
     timespec.tv_nsec = _nanoseconds % (qint64)NanosecondsPerSecond;
 }
 
-QString TimeSpan::toString() const
+QString TimeSpan::toString(bool microseconds) const
 {
     QString result;
     if(qAbs(_nanoseconds) > 1000000)
     {
+        int smallValue = microseconds ? TimeSpan::microseconds() : milliseconds();
+        int smallValueFieldLength = microseconds ? 6 : 3;
         result = days() == 0
                 ? QString("%1:%2:%3.%4").
                   arg(hours(), 2, 10, QChar('0')).
                   arg(minutes(), 2, 10, QChar('0')).
                   arg(seconds(), 2, 10, QChar('0')).
-                  arg(milliseconds(), 3, 10, QChar('0'))
+                  arg(smallValue, smallValueFieldLength, 10, QChar('0'))
                 : QString("%1.:%2:%3:%4.%5").
                   arg(days()).
                   arg(hours(), 2, 10, QChar('0')).
                   arg(minutes(), 2, 10, QChar('0')).
                   arg(seconds(), 2, 10, QChar('0')).
-                  arg(milliseconds(), 3, 10, QChar('0'));
+                  arg(smallValue, smallValueFieldLength, 10, QChar('0'));
     }
     else
     {
