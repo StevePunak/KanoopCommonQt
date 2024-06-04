@@ -536,6 +536,13 @@ TimeSpan TimeSpan::diff(const QDateTime &now, const QDateTime &then)
     return result;
 }
 
+TimeSpan TimeSpan::diff(std::chrono::system_clock::time_point now, std::chrono::system_clock::time_point then)
+{
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(then - now);
+    TimeSpan result = fromNanoseconds(duration.count());
+    return result;
+}
+
 TimeSpan TimeSpan::absDiff(const QDateTime &t1, const QDateTime &t2)
 {
     TimeSpan result;
@@ -543,6 +550,20 @@ TimeSpan TimeSpan::absDiff(const QDateTime &t1, const QDateTime &t2)
         result = fromMilliseconds(t1.toMSecsSinceEpoch() - t2.toMSecsSinceEpoch());
     else
         result = fromMilliseconds(t2.toMSecsSinceEpoch() - t1.toMSecsSinceEpoch());
+    return result;
+}
+
+TimeSpan TimeSpan::absDiff(std::chrono::system_clock::time_point t1, std::chrono::system_clock::time_point t2)
+{
+    TimeSpan result;
+    if(t1 > t2) {
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t2);
+        result = fromNanoseconds(duration.count());
+    }
+    else {
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
+        result = fromNanoseconds(duration.count());
+    }
     return result;
 }
 

@@ -179,7 +179,9 @@ public:
   static TimeSpan fromString(const QString& timeString);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
   static TimeSpan diff(const QDateTime& now, const QDateTime& then);
+  static TimeSpan diff(std::chrono::system_clock::time_point now, std::chrono::system_clock::time_point then);
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
+  static TimeSpan absDiff(std::chrono::system_clock::time_point t1, std::chrono::system_clock::time_point t2);
 
   static TimeSpan max(const TimeSpan& t1, const TimeSpan& t2) { return t1 > t2 ? t1 : t2; }
   static TimeSpan min(const TimeSpan& t1, const TimeSpan& t2) { return t1 < t2 ? t1 : t2; }
