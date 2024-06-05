@@ -40,6 +40,19 @@ bool AddressHelper::tryParseAddressPort(const QString &addressString, QHostAddre
     return false;
 }
 
+QHostAddress AddressHelper::resolveIPv4Address(const QString& hostName)
+{
+    QHostAddress result;
+    QHostInfo hostInfo = QHostInfo::fromName(hostName);
+    for(const QHostAddress& address : hostInfo.addresses()) {
+        if(address.protocol() == QHostAddress::IPv4Protocol) {
+            result = address;
+            break;
+        }
+    }
+    return result;
+}
+
 QHostAddress AddressHelper::getLocalIP()
 {
     return getLocalIP(QStringList());
