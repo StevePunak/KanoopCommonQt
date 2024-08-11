@@ -18,6 +18,7 @@ public:
     static QString toIndented(const QByteArray& json);
     static QJsonArray toJsonArray(const QStringList& value);
     static QStringList toStringList(const QJsonArray& value);
+    static QStringList fromJsonArray(const QJsonArray& value) { return toStringList(value); }
 };
 
 #endif // JSONHELPER_H
