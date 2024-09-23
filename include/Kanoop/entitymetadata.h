@@ -10,19 +10,16 @@ class EntityMetadata
 {
 public:
     EntityMetadata() :
-        _type(0) {}
+        _type(0), _iconId(0) {}
 
-    EntityMetadata(int type) :
-        _type(type) {}
+    EntityMetadata(int type);
 
-    EntityMetadata(int type, const QVariant& data, KANOOP::ModelRole role = KANOOP::DataRole) :
-        _type(type)
-    {
-        _data[role] = data;
-    }
+    EntityMetadata(int type, const QVariant& data, KANOOP::ModelRole role = KANOOP::DataRole);
 
     int type() const { return _type; }
     QString typeString() const;
+
+    int iconId() const { return _iconId; }
 
     QVariant data(KANOOP::ModelRole role = KANOOP::DataRole) const { return _data.value(role); }
     void setData(const QVariant& value, KANOOP::ModelRole role = KANOOP::DataRole) { _data.insert(role, value); }
@@ -33,16 +30,20 @@ public:
 
     bool isValid() const { return _type != 0; }
 
-    static void registerMetadata(int type, const QString& name);
+    static void registerMetadata(int type, const QString& name, int iconId = 0);
+    static void registerIcon(int type, int iconId);
 
     static QString getTypeString(int type);
     static int getTypeFromString(const QString& value);
 
 private:
+    void resolveIconId();
+
     int _type;
     QMap<KANOOP::ModelRole, QVariant> _data;
+    int _iconId;
 
-    static QMap<int, EntityMetadataInfo> _registeredTypes;
+    static QMap<int, EntityMetadataInfo*> _registeredTypes;
 };
 
 class EntityMetadataList : public QList<EntityMetadata>

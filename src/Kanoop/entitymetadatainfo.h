@@ -8,8 +8,8 @@ public:
     EntityMetadataInfo() :
         _id(0), _iconId(0) {}
 
-    EntityMetadataInfo(int id, const QString& name) :
-        _id(id), _name(name), _iconId(0) {}
+    EntityMetadataInfo(int id, const QString& name, int iconId = 0) :
+        _id(id), _name(name), _iconId(iconId) {}
 
     int id() const { return _id; }
     QString name() const { return _name; }
