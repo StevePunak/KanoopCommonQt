@@ -24,8 +24,11 @@ set_target_properties(${PROJ} PROPERTIES SOVERSION 1)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/libKanoopCommon.pc.in" "libKanoopCommon.pc" @ONLY)
 
 target_include_directories(${PROJ} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJ} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop)
 target_include_directories(${PROJ} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(${PROJ} PRIVATE Qt6::Network)
+
+find_package(Qt6 REQUIRED COMPONENTS Network Xml)
+target_link_libraries(${PROJ} PRIVATE Qt6::Network Qt6::Xml)
 
 add_compile_definitions(KANOOP_LIBRARY)
 add_compile_definitions(QT_DEPRECATED_WARNINGS)

@@ -29,7 +29,8 @@ public:
     static QString toISOString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
     static QString toStandardString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz"); }
     static QString toSquashedString() { return QDateTime::currentDateTimeUtc().toString("yyyyMMddhhmmsszzz"); }
-    static QString toSquashedString(QDateTime date) { return date.toString("yyyyMMddhhmmsszzz"); }
+    static QString toSquashedString(const QDateTime& date) { return date.toString("yyyyMMddhhmmsszzz"); }
+    static QString toStandardTimeString(const QDateTime& date) { return date.time().toString("HH:mm:ss.zzz"); }
 
 private:
     /**

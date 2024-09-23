@@ -2,7 +2,7 @@
 #include "Kanoop/commonexception.h"
 #include "Kanoop/geometry/flatgeo.h"
 
-#include "Kanoop/klog.h"
+#include "Kanoop/log.h"
 
 #include "Kanoop/geo/geotypes.h"
 
@@ -11,7 +11,7 @@ using namespace Geo;
 SpanningTree::SpanningTree(const Line::List &lines) :
     _lines(lines),
     _origin(nullptr), _destination(nullptr),
-    _debugLevel(KLog::Informational)
+    _debugLevel(Log::Info)
 {
     initializeFromLines();
 }
@@ -45,7 +45,7 @@ void SpanningTree::initializeFromLines()
 
 Line::List SpanningTree::computePath()
 {
-    debugLog(KLOG_INFO, "Begin compute path");
+    debugLog(LVL_INFO, "Begin compute path");
     Line::List result;
     try
     {
@@ -63,9 +63,9 @@ Line::List SpanningTree::computePath()
     }
     catch(const CommonException& e)
     {
-        debugLog(KLOG_WARNING, e.message());
+        debugLog(LVL_WARNING, e.message());
     }
-    debugLog(KLOG_INFO, "End compute path");
+    debugLog(LVL_INFO, "End compute path");
     return result;
 }
 
@@ -78,7 +78,7 @@ void SpanningTree::setOrigin(const QPointF &origin, Direction preferredDirection
     }
     catch(CommonException& e)
     {
-        debugLog(KLOG_WARNING, e.message());
+        debugLog(LVL_WARNING, e.message());
     }
 }
 
@@ -91,7 +91,7 @@ void SpanningTree::setDestination(const QPointF &destination)
     }
     catch(CommonException& e)
     {
-        debugLog(KLOG_WARNING, e.message());
+        debugLog(LVL_WARNING, e.message());
     }
 }
 
@@ -112,11 +112,11 @@ void SpanningTree::initializeVertices()
     TreePathVertice::List vertices = _vertices.values();
     for(TreePathVertice* vertice : vertices) {
         if(vertice == _origin) {
-            debugLog(KLOG_DEBUG, QString("Set origin vertice to %1").arg(vertice->toString()));
+            debugLog(LVL_DEBUG, QString("Set origin vertice to %1").arg(vertice->toString()));
             vertice->setDistance(0);
         }
         else {
-            debugLog(KLOG_DEBUG, QString("Set other vertice to %1").arg(vertice->toString()));
+            debugLog(LVL_DEBUG, QString("Set other vertice to %1").arg(vertice->toString()));
             vertice->setDistance(INFINITY);
         }
 
@@ -151,7 +151,7 @@ TreePathVertice* SpanningTree::addAdHocVertice(const QPointF point, TreePathVert
         double closestDistance;
         Line L;
         QPointF closestPoint = findClosestPointInLines(point, L, closestDistance, preferredDirection);
-        debugLog(KLOG_DEBUG, QString("Added ad-hoc vertice of type %1 at point %2 closest to line [[%3]] at %4 pixels")
+        debugLog(LVL_DEBUG, QString("Added ad-hoc vertice of type %1 at point %2 closest to line [[%3]] at %4 pixels")
                                  .arg(type)
                                  .arg(Geo::string(point))
                                  .arg(L.toString())
@@ -260,7 +260,7 @@ bool SpanningTree::cycle()
         }
     }
     if(current != nullptr) {
-        debugLog(KLOG_DEBUG, QString("(Cycle) Set current vertice to %1").arg(current->toString()));
+        debugLog(LVL_DEBUG, QString("(Cycle) Set current vertice to %1").arg(current->toString()));
     }
 
     if(current != nullptr && current->distance() != INFINITY) {
@@ -272,7 +272,7 @@ bool SpanningTree::cycle()
                 if(current->distance() + distance < neighbor->distance()) {
                     neighbor->setDistance(current->distance() + distance);
                     neighbor->setSource(current);
-                    debugLog(KLOG_DEBUG, QString("--- Set %1's neighbor %2 to distance of %3")
+                    debugLog(LVL_DEBUG, QString("--- Set %1's neighbor %2 to distance of %3")
                                                      .arg(current->toString())
                                                      .arg(neighbor->toString())
                                                      .arg(neighbor->distance()));
@@ -288,10 +288,10 @@ bool SpanningTree::cycle()
     }
     else if(current != nullptr) {
         _unvisited.removeOne(current);
-        debugLog(KLOG_WARNING, QString("VERTICE %1 has no solution!").arg(current->toString()));
+        debugLog(LVL_WARNING, QString("VERTICE %1 has no solution!").arg(current->toString()));
     }
     else {
-        debugLog(KLOG_ERROR, "Should never get here!");
+        debugLog(LVL_ERROR, "Should never get here!");
     }
 
     return _unvisited.count() > 0;
@@ -311,7 +311,7 @@ Line::List SpanningTree::getPath()
     }while(vertice != nullptr && lastInserted != _origin);
 
     if(lastInserted != _origin) {
-        debugLog(KLOG_ERROR, "Never resolved the origin");
+        debugLog(LVL_ERROR, "Never resolved the origin");
     }
     return Line::List::fromPoints(path);
 }
@@ -319,7 +319,7 @@ Line::List SpanningTree::getPath()
 void SpanningTree::debugLog(const char *file, int line, int level, const QString &text)
 {
     if(level <= _debugLevel) {
-        KLog::sysLogText(file, line, (KLog::LogLevel)level, text);
+        Log::logText(file, line, (Log::LogLevel)level, text);
     }
 }
 

@@ -140,6 +140,15 @@ QString StringUtil::trimFront(const QString &value, const QList<QChar> &chars)
     return result;
 }
 
+QString StringUtil::trimEnd(const QString& value)
+{
+    QString result = value;
+    int i;
+    for(i = result.length() - 1;i >= 0 && result.at(i).isSpace();i--);
+    result = result.left(i + 1);
+    return result;
+}
+
 QString StringUtil::trimEnd(const QString& value, const QList<QChar> &chars)
 {
     QString result = value;

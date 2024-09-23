@@ -12,6 +12,18 @@
 
 namespace KANOOP {
 
+enum ModelRole
+{
+    DataRole = Qt::UserRole + 0x1000,
+    EntityTypeRole,
+    UUidRole,
+    EntityMetadataRole,
+    MetadataTypeRole,
+    NameRole,
+
+    UserRole = DataRole + 0x8000,
+};
+
 template <class T>
 class EnumToStringMap : public QMap<T, QString>
 {

@@ -1,0 +1,2 @@
+#include "serialization/ideserializablefromxml.h"
+
