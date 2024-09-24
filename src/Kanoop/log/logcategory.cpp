@@ -11,7 +11,7 @@
 
 using namespace Log;
 
-LogLevel LogCategory::DefaultLogLevel       = Log::Info;
+LogLevel LogCategory::DefaultLogLevel       = Log::Debug;
 
 LogCategory LogCategory::append(const QString &name)
 {
