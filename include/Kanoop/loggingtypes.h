@@ -17,20 +17,19 @@
 ******************************************************************************************/
 #ifndef LOGGINGTYPES_H
 #define LOGGINGTYPES_H
-#include <syslog.h>
 
 namespace Log {
 
 enum LogLevel
 {
-    Emergency       = LOG_EMERG,        // 0
-    Alert           = LOG_ALERT,        // 1
-    Critical        = LOG_CRIT,         // 2
-    Error           = LOG_ERR,          // 3
-    Warning         = LOG_WARNING,      // 4
-    Notice          = LOG_NOTICE,       // 5
-    Info            = LOG_INFO,         // 6
-    Debug           = LOG_DEBUG,        // 7
+    Emergency       = 0,        // 0
+    Alert           = 1,        // 1
+    Critical        = 2,         // 2
+    Error           = 3,          // 3
+    Warning         = 4,      // 4
+    Notice          = 5,       // 5
+    Info            = 6,         // 6
+    Debug           = 7,        // 7
 };
 
 enum OutputFlags

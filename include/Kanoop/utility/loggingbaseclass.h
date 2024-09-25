@@ -3,10 +3,11 @@
 
 #include <Kanoop/logcategory.h>
 #include <Kanoop/log.h>
+#include <Kanoop/kanoopcommon.h>
 
 #define UNIMPLEMENTED  logText(LVL_WARNING, QString("---------------- %1 UNIMPLEMENTED  ----------------").arg(__FUNCTION__));
 
-class LoggingBaseClass
+class KANOOP_EXPORT LoggingBaseClass
 {
 public:
     LoggingBaseClass(const Log::LogCategory& category = Log::LogCategory());

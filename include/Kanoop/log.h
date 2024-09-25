@@ -22,8 +22,8 @@
 #include <QMutex>
 #include <QString>
 #include <QTextStream>
-#include <syslog.h>
 #include "loggingtypes.h"
+#include <Kanoop/kanoopcommon.h>
 
 #define LVL_EMERGENCY       __FILE__,__LINE__,Log::LogLevel::Emergency
 #define LVL_ALERT           __FILE__,__LINE__,Log::LogLevel::Alert
@@ -41,7 +41,7 @@ class LogCategoryPrivate;
 
 class LogCategory;
 
-class Logger
+class KANOOP_EXPORT Logger
 {
 public:
     Logger();
@@ -107,33 +107,33 @@ private:
     static const QList<QString> _LevelStrings;
 };
 
-void logText(const char* file, int lineNumber, LogLevel level, const QString& text);
-void logText(const char* file, int lineNumber, LogLevel level, const LogCategory& category, const QString& text);
-void logHex(const char* file, int lineNumber, LogLevel level, const LogCategory& category, const QByteArray& data, const QString& tag = QString());
-void logHex(const char* file, int lineNumber, LogLevel level, const QByteArray& data, const QString& tag = QString());
+KANOOP_EXPORT void logText(const char* file, int lineNumber, LogLevel level, const QString& text);
+KANOOP_EXPORT void logText(const char* file, int lineNumber, LogLevel level, const LogCategory& category, const QString& text);
+KANOOP_EXPORT void logHex(const char* file, int lineNumber, LogLevel level, const LogCategory& category, const QByteArray& data, const QString& tag = QString());
+KANOOP_EXPORT void logHex(const char* file, int lineNumber, LogLevel level, const QByteArray& data, const QString& tag = QString());
 
-Logger* systemLog();
+KANOOP_EXPORT Logger* systemLog();
 
-LogLevel level();
-void setLevel(LogLevel value);
+KANOOP_EXPORT LogLevel level();
+KANOOP_EXPORT void setLevel(LogLevel value);
 
-OutputFlags flags();
-void setFlags(OutputFlags flags);
+KANOOP_EXPORT OutputFlags flags();
+KANOOP_EXPORT void setFlags(OutputFlags flags);
 
-QString filename();
-void setFilename(const QString& filename);
+KANOOP_EXPORT QString filename();
+KANOOP_EXPORT void setFilename(const QString& filename);
 
-QString identity();
-void setIdentity(const QString& value);
+KANOOP_EXPORT QString identity();
+KANOOP_EXPORT void setIdentity(const QString& value);
 
-void enableOutputFlags(OutputFlags flags);
-void disableOutputFlags(OutputFlags flags);
+KANOOP_EXPORT void enableOutputFlags(OutputFlags flags);
+KANOOP_EXPORT void disableOutputFlags(OutputFlags flags);
 
-LogCategory registerCategory(const QString& name);
-LogCategory registerCategory(const QString &name, LogLevel level);
-void setCategoryLevel(const QString& name, LogLevel level);
+KANOOP_EXPORT LogCategory registerCategory(const QString& name);
+KANOOP_EXPORT LogCategory registerCategory(const QString &name, LogLevel level);
+KANOOP_EXPORT void setCategoryLevel(const QString& name, LogLevel level);
 
-LogLevel parseLevel(const QString& value, bool* parsed = nullptr);
+KANOOP_EXPORT LogLevel parseLevel(const QString& value, bool* parsed = nullptr);
 
 } // namespace log
 

@@ -12,6 +12,7 @@ TreePathVertice::TreePathVertice(const QPointF& position, VerticeType type, Span
     _source(nullptr)
 {
     _hashName = makeHashName(position);
+    Q_UNUSED(_spanningTree)
 }
 
 void TreePathVertice::tryAddNeighbor(TreePathVertice *neighbor)

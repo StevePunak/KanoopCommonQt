@@ -246,13 +246,17 @@ void Logger::closeFile()
 
 void Logger::openSyslog()
 {
+#ifndef WIN32
     closelog();
     openlog(_identity, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_LOCAL1);
+#endif
 }
 
 void Logger::closeSyslog()
 {
+#ifndef WIN32
     closelog();
+#endif
 }
 
 void Logger::outputToDestinations(LogLevel level, const QString &text)
@@ -277,7 +281,9 @@ void Logger::outputToDestinations(LogLevel level, const QString &text)
     }
 
     if(_flags & Syslog) {
+#ifndef WIN32
         syslog(level, "%s", text.toLocal8Bit().constData());
+#endif
     }
 }
 
