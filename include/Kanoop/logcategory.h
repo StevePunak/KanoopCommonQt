@@ -20,11 +20,12 @@
 
 #include <QString>
 #include "loggingtypes.h"
+#include <Kanoop/kanoopcommon.h>
 
 namespace Log
 {
 
-class LogCategory
+class KANOOP_EXPORT LogCategory
 {
 public:
     LogCategory() : _level(DefaultLogLevel) {}

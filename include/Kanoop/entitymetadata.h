@@ -6,7 +6,7 @@
 
 class EntityMetadataInfo;
 
-class EntityMetadata
+class KANOOP_EXPORT EntityMetadata
 {
 public:
     EntityMetadata() :
