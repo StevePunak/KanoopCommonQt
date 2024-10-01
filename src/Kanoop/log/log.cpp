@@ -82,7 +82,7 @@ void Logger::logText(const char *file, int lineNumber, LogLevel level, const Log
     QString buffer;
     QTextStream output(&buffer);
     if(_flags & Timestamp) {
-        output << DateTimeUtil::toStandardString() << ' ';
+        output << DateTimeUtil::currentToStandardString() << ' ';
     }
     if(_flags & LineNumbers) {
         output << QFileInfo(file).fileName().left(16).leftJustified(16, QChar(' ')) << ' ' << lineNumber << ' ';
@@ -121,7 +121,7 @@ void Logger::logHex(const char *file, int lineNumber, LogLevel level, const LogC
     QString buffer;
     QTextStream output(&buffer);
     if(_flags & Timestamp) {
-        output << DateTimeUtil::toStandardString() << ' ';
+        output << DateTimeUtil::currentToStandardString() << ' ';
     }
     if(_flags & LineNumbers) {
         output << QFileInfo(file).fileName() << ' ' << lineNumber << ' ';

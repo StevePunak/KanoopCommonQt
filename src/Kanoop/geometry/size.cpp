@@ -7,6 +7,18 @@ Rectangle Size::toRectangle() const
     return Rectangle(0, 0, width(), height());
 }
 
+void Size::grow(double amount)
+{
+    setWidth(width() + amount);
+    setHeight(height() + amount);
+}
+
+void Size::shrink(double amount)
+{
+    setWidth(width() - amount);
+    setHeight(height() - amount);
+}
+
 Size Size::fromString(const QString& value)
 {
     Size result;

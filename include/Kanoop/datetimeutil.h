@@ -24,13 +24,20 @@ public:
     static QDateTime fromString(const QString& date);
     static QDateTime fromVariant(const QVariant& date);
 
-    static QString toStandardString(const QDateTime& date) { return date.toString("yyyy-MM-dd hh:mm:ss.zzz"); }
+    static QString toStandardString(const QDateTime& date, bool milliseconds = true)
+    {
+        return milliseconds ? date.toString("yyyy-MM-dd hh:mm:ss.zzz") : date.toString("yyyy-MM-dd hh:mm:ss");
+    }
     static QString toISOString(const QDateTime& date) { return date.toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
-    static QString toISOString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
-    static QString toStandardString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz"); }
-    static QString toSquashedString() { return QDateTime::currentDateTimeUtc().toString("yyyyMMddhhmmsszzz"); }
     static QString toSquashedString(const QDateTime& date) { return date.toString("yyyyMMddhhmmsszzz"); }
     static QString toStandardTimeString(const QDateTime& date) { return date.time().toString("HH:mm:ss.zzz"); }
+
+    static QString currentToISOString() { return QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
+    static QString currentToStandardString(bool milliseconds = true)
+    {
+        return milliseconds ? QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz") : QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss");
+    }
+    static QString currentToSquashedString() { return QDateTime::currentDateTimeUtc().toString("yyyyMMddhhmmsszzz"); }
 
 private:
     /**
