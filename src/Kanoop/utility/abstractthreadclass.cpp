@@ -132,5 +132,6 @@ void AbstractThreadClass::onThreadFinished()
         logText(LVL_ERROR, QString("%1: Thread start exception: %2").arg(objectName()).arg(e.message()));
     }
     _stopEvent.set();
+    emit finished();
 }
 
