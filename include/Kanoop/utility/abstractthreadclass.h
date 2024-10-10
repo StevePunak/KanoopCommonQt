@@ -8,10 +8,11 @@
 
 #include <Kanoop/mutexevent.h>
 #include <Kanoop/log.h>
+#include <Kanoop/kanoopcommon.h>
 
 #include "loggingbaseclass.h"
 
-class AbstractThreadClass : public QObject,
+class KANOOP_EXPORT AbstractThreadClass : public QObject,
                             public LoggingBaseClass
 {
     Q_OBJECT
@@ -26,7 +27,7 @@ public:
 
     virtual void abort();
 
-    bool waitForCompletion(const TimeSpan& timeout);
+    bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
 
     bool success() const { return _success; }
     QString completionMessage() const { return _message; }
