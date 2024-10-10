@@ -8,10 +8,11 @@
 
 #include <Kanoop/mutexevent.h>
 #include <Kanoop/log.h>
+#include <Kanoop/kanoopcommon.h>
 
 #include "loggingbaseclass.h"
 
-class AbstractThreadClass : public QObject,
+class KANOOP_EXPORT AbstractThreadClass : public QObject,
                             public LoggingBaseClass
 {
     Q_OBJECT
