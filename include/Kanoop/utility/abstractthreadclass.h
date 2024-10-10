@@ -26,7 +26,7 @@ public:
 
     virtual void abort();
 
-    bool waitForCompletion(const TimeSpan& timeout);
+    bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
 
     bool success() const { return _success; }
     QString completionMessage() const { return _message; }
