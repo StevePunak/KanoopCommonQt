@@ -1,27 +1,34 @@
 cmake_minimum_required(VERSION 3.16)
 include(GNUInstallDirs)
 
-project(KanoopCommon)
+set(PROJ KanoopCommon)
+project(${PROJ})
 
 find_package(Qt6 REQUIRED COMPONENTS Network)
 qt_standard_project_setup()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
-set(KANOOP_COMMON_VERSION "1.1.9")
+set(KANOOP_COMMON_VERSION "2.0.1")
 
 file(GLOB_RECURSE KANOOP_COMMON_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE KANOOP_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-qt_add_library(KanoopCommon ${KANOOP_COMMON_SOURCES} ${KANOOP_COMMON_HEADERS})
+qt_add_library(${PROJ} ${KANOOP_COMMON_SOURCES} ${KANOOP_COMMON_HEADERS})
 
-set_target_properties(KanoopCommon PROPERTIES VERSION "${KANOOP_COMMON_VERSION}")
-set_target_properties(KanoopCommon PROPERTIES SOVERSION 1)
+target_compile_options(${PROJ} PRIVATE -Wextra -Wall -Werror)
+
+set_target_properties(${PROJ} PROPERTIES VERSION "${KANOOP_COMMON_VERSION}")
+set_target_properties(${PROJ} PROPERTIES SOVERSION 1)
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/libKanoopCommon.pc.in" "libKanoopCommon.pc" @ONLY)
 
-target_include_directories(KanoopCommon PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(KanoopCommon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_link_libraries(KanoopCommon PRIVATE Qt6::Network)
+target_include_directories(${PROJ} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJ} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop)
+target_include_directories(${PROJ} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+find_package(Qt6 REQUIRED COMPONENTS Network Xml)
+target_link_libraries(${PROJ} PRIVATE Qt6::Network Qt6::Xml)
 
 add_compile_definitions(KANOOP_LIBRARY)
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
@@ -33,5 +40,5 @@ if (DEFINED $ENV{KYBER_OUTPUT_PREFIX})
     set(KANOOP_INSTALL_PREFIX "$ENV{KYBER_OUTPUT_PREFIX}/")
 endif()
 
-install(TARGETS KanoopCommon LIBRARY DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+install(TARGETS ${PROJ} LIBRARY DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop" DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" FILES_MATCHING PATTERN "*.h")

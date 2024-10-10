@@ -62,6 +62,13 @@ public:
      * Trim the given characters from the front of the string
      */
     static QString trimFront(const QString& value, const QList<QChar> &chars);
+
+    /**
+     * @brief trimEnd
+     * @param value
+     * @return String with trailing whitespace removed
+     */
+    static QString trimEnd(const QString& value);
     /**
      * @brief trimEnd
      * Trim the given characters from the end of the string

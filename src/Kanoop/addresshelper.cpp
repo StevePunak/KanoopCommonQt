@@ -2,7 +2,7 @@
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QStringList>
-#include <Kanoop/klog.h>
+#include <Kanoop/log.h>
 #include <QRegularExpression>
 
 bool AddressHelper::tryParseAddressPort(const QString &addressString, QString &address, quint16 &port)

@@ -3,8 +3,9 @@
 
 #include <QException>
 #include <QString>
+#include <Kanoop/kanoopcommon.h>
 
-class CommonException : public QException
+class KANOOP_EXPORT CommonException : public QException
 {
 public:
     CommonException(const QString& message, qint32 code = 0);

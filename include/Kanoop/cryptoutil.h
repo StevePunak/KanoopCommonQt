@@ -4,7 +4,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QStringList>
-#include "kanoopcommon.h"
+#include <Kanoop/kanoopcommon.h>
 
 class KANOOP_EXPORT CryptoUtil
 {

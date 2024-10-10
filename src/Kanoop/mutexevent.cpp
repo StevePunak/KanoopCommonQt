@@ -1,5 +1,5 @@
 #include "Kanoop/mutexevent.h"
-#include "Kanoop/klog.h"
+#include "Kanoop/log.h"
 
 void MutexEvent::set()
 {

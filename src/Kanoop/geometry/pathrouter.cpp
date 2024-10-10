@@ -26,7 +26,7 @@
  *
  */
 #include "Kanoop/geometry/pathrouter.h"
-#include "Kanoop/klog.h"
+#include "Kanoop/log.h"
 
 #include "Kanoop/commonexception.h"
 
@@ -45,7 +45,7 @@ PathRouter::PathRouter(const Point &origin, const Point &destination, const QRec
     _consolidateEmptyRectangles(true),
     _routeAroundMargins(true),
     _verticalConstraint(-1),
-    _debugLevel(KLog::Informational)
+    _debugLevel(Log::Info)
 {
 }
 
@@ -65,7 +65,7 @@ bool PathRouter::pass1()
     Point a = _originPoint;
     Point b = _destinationPoint;
 
-    logText(KLOG_INFO, QString("Pass 1 - Calculate path from %1 to %2 with %3 obstacles. Initial direction: %4. Routing margin: %5")
+    logText(LVL_INFO, QString("Pass 1 - Calculate path from %1 to %2 with %3 obstacles. Initial direction: %4. Routing margin: %5")
                            .arg(a.toString())
                            .arg(b.toString())
                            .arg(_obstacles.count())
@@ -85,14 +85,14 @@ bool PathRouter::pass1()
 
             // if the last two are the same, we have failed
             if(_pathLines.count() >= 2 && (_pathLines[_pathLines.count() - 2] == _pathLines[_pathLines.count() - 1])) {
-                logText(KLOG_ERROR, "Failed to resolve");
+                logText(LVL_ERROR, "Failed to resolve");
                 break;
             }
             a = _pathLines.last().p2();
 
             // prevent infinite looping
             if(cycles++ > MAX_CYCLES) {
-                logText(KLOG_ERROR, "Abandoning after too many cycles");
+                logText(LVL_ERROR, "Abandoning after too many cycles");
                 break;
             }
         }while(!_complete);
@@ -100,7 +100,7 @@ bool PathRouter::pass1()
     }
     catch(const CommonException& e)
     {
-        logText(KLOG_ERROR, QString(e.message()));
+        logText(LVL_ERROR, QString(e.message()));
         result = false;
     }
     return result;
@@ -113,7 +113,7 @@ bool PathRouter::pass1()
  */
 bool PathRouter::pass2()
 {
-    logText(KLOG_DEBUG, QString("Pass 2 - Line Consolidation"));
+    logText(LVL_DEBUG, QString("Pass 2 - Line Consolidation"));
 
     bool result = false;
 
@@ -136,7 +136,7 @@ bool PathRouter::pass2()
 
             // if we were able to make a valid rectangle and it contains no objects, we can consolidate these lines
             if(rect.isValid()) {
-                logText(KLOG_DEBUG, QString("Made valid rectangle [%1] with consolidated line [%2]").arg(rect.toString()).arg(consolidatedLine.toString()));
+                logText(LVL_DEBUG, QString("Made valid rectangle [%1] with consolidated line [%2]").arg(rect.toString()).arg(consolidatedLine.toString()));
                 QList<Rectangle> ignore;
                 if(_obstacles.contains(rect)) {
                     ignore.append(rect);
@@ -171,7 +171,7 @@ bool PathRouter::pass2()
  */
 bool PathRouter::pass3()
 {
-    logText(KLOG_DEBUG, QString("Pass 3 - Apply margins"));
+    logText(LVL_DEBUG, QString("Pass 3 - Apply margins"));
 
     bool result = false;
 
@@ -183,7 +183,7 @@ bool PathRouter::pass3()
     QMap<int, int> triesAtIndex;
     for(int i = 0;i < _pathLines.count();i++) {
         if(triesAtIndex[i] >= MAX_TRIES) {
-            logText(KLOG_INFO, "Giving up after retries");
+            logText(LVL_INFO, "Giving up after retries");
             continue;
         }
 
@@ -191,7 +191,7 @@ bool PathRouter::pass3()
         Rectangle obstacle;
         Line obstacleEdge;
         if(lineLiesNearObstacleEdge(line, _routingMargin, obstacle, obstacleEdge)) {
-            logText(KLOG_DEBUG, QString("Line [%1] lies on edge [%2] of obstacle [%3]. There are %4 adjacent lines")
+            logText(LVL_DEBUG, QString("Line [%1] lies on edge [%2] of obstacle [%3]. There are %4 adjacent lines")
                                     .arg(line.toString()).arg(obstacleEdge.toString()).arg(obstacle.toString()).arg(countAdjacentLines(_pathLines)));
 
             // get opposite direction of previous line. we will try and move in that direction by the margin
@@ -215,7 +215,7 @@ bool PathRouter::pass3()
                             Line next = _pathLines.at(i + 1);
                             Line newNextLine(proposedNewLine.p2(), next.p2());
                             if(newNextLine.isPerpendicular() == false) {
-                                logText(KLOG_ERROR, "Trying to insert a non-perpendicular line");
+                                logText(LVL_ERROR, "Trying to insert a non-perpendicular line");
                             }
                             newLines.append(newNextLine);
                         }
@@ -257,7 +257,7 @@ bool PathRouter::pass3()
                 }
                 else {
                     // It's the first line we need to move
-                    logText(KLOG_WARNING, "Need to move first line TODO");
+                    logText(LVL_WARNING, "Need to move first line TODO");
                 }
 
                 // if we introduced adjacent lines, remove them and pop back for another pass
@@ -340,7 +340,7 @@ bool PathRouter::cycleChooseDirection(const Point &a, const Point &b)
                     result = true;
                 }
                 else {
-                    logText(KLOG_WARNING, "Failed to find path off obstacle");
+                    logText(LVL_WARNING, "Failed to find path off obstacle");
                 }
             }
         }
@@ -413,7 +413,7 @@ bool PathRouter::cycleFindWayOffObstacle(const Point &a, const Point &b)
     Line edge;
     if(pointLiesOnObstacleEdge(a, obstacle, edge)) {
         if(obstacle == _destinationObstacle) {
-            logText(KLOG_DEBUG, QString("Point %1 lies on the destination obstacle").arg(a.toString()));
+            logText(LVL_DEBUG, QString("Point %1 lies on the destination obstacle").arg(a.toString()));
             Line closestEdge = _destinationObstacle.closestEdge(b);
             if(edge == closestEdge) {
                 // we are on the correct edge... just map to the closest point
@@ -494,7 +494,7 @@ bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
                 result = true;
             }
             else {
-                logText(KLOG_WARNING, "Failed to find path off obstacle (2)");
+                logText(LVL_WARNING, "Failed to find path off obstacle (2)");
             }
         }
         else {
@@ -544,7 +544,7 @@ bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
                     }
                     nextLine = seekClearLine(a, _direction, targetDirection, distanceToB);
                     if(nextLine.isPerpendicular() == false) {
-                        logText(KLOG_ERROR, "Line is not perpendiclar");
+                        logText(LVL_ERROR, "Line is not perpendiclar");
                     }
                     if(nextLine.isValid()) {
                         appendPathLine(nextLine);
@@ -552,7 +552,7 @@ bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
                     }
                 }
                 if(result == false) {
-                    logText(KLOG_DEBUG, "No clear line. WHAT NOW?");
+                    logText(LVL_DEBUG, "No clear line. WHAT NOW?");
                 }
             }
         }
@@ -571,7 +571,7 @@ bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
                 }
             }
             else {
-                logText(KLOG_DEBUG, "Going in same directions WHAT NOW?");
+                logText(LVL_DEBUG, "Going in same directions WHAT NOW?");
             }
         }
     }
@@ -662,7 +662,7 @@ bool PathRouter::lineCrossesObstacle(const Line& line, const QList<Rectangle> &i
     }
     catch(const CommonException& e)
     {
-        logText(KLOG_ERROR, e.message());
+        logText(LVL_ERROR, e.message());
         result  = false;
     }
     return result;
@@ -945,7 +945,7 @@ Line PathRouter::rayInDirection(const Point &origin, Geo::Direction direction) c
         other = Point(_canvas.right(), origin.y());
         break;
     default:
-        logText(KLOG_ERROR, "Invalid direction");
+        logText(LVL_ERROR, "Invalid direction");
         break;
     }
     result = Line(origin, other).round();
@@ -975,7 +975,7 @@ Line PathRouter::seekClearLine(const Point &origin, Geo::Direction moveAxis, Dir
             ray.round();
         }
         if(ray.isPerpendicular() == false) {
-            logText(KLOG_ERROR, "Ray is not perpendicular");
+            logText(LVL_ERROR, "Ray is not perpendicular");
         }
         Rectangle obstacle;
         Point intersection;
@@ -1193,7 +1193,7 @@ void PathRouter::mergeAdjacentLines(Line::List &lines)
             if(j < lines.count()) {
                 Line nextLine = lines.at(j);
                 if(newLine.p2() != nextLine.p1()) {
-//                    logText(KLOG_DEBUG, QString("Shortening new line [%1] to meet up with next endpoint at [%2]").arg(newLine.toString()).arg(nextLine.p1().toString()));
+//                    logText(LVL_DEBUG, QString("Shortening new line [%1] to meet up with next endpoint at [%2]").arg(newLine.toString()).arg(nextLine.p1().toString()));
                     newLine.setP2(nextLine.p1());
                 }
             }
@@ -1252,29 +1252,29 @@ int PathRouter::countAdjacentLines(const Line::List &lines)
 void PathRouter::appendPathLine(const Line &line)
 {
     Line constrainedLine = line;
-    logText(KLOG_DEBUG, QString("Appending path line %1").arg(constrainedLine.toString()));
+    logText(LVL_DEBUG, QString("Appending path line %1").arg(constrainedLine.toString()));
     if(lineCrossesVerticalConstraint(constrainedLine)) {
         constrainedLine.setP2(Point(_verticalConstraint, constrainedLine.p2().y()));
-        logText(KLOG_DEBUG, QString("Constraining path line vertically from %1 to %2").arg(line.toString()).arg(constrainedLine.toString()));
+        logText(LVL_DEBUG, QString("Constraining path line vertically from %1 to %2").arg(line.toString()).arg(constrainedLine.toString()));
     }
 
     if(constrainedLine.isPerpendicular() == false) {
-        logText(KLOG_ERROR, "Appending non-perpendicular line!");
+        logText(LVL_ERROR, "Appending non-perpendicular line!");
     }
     _pathLines.append(constrainedLine);
 }
 
 void PathRouter::dumpPathLines(const QString& label) const
 {
-    logText(KLOG_DEBUG, QString("Dumping path lines for %1").arg(label));
+    logText(LVL_DEBUG, QString("Dumping path lines for %1").arg(label));
     for(const Line& line : _pathLines) {
-        logText(KLOG_DEBUG, QString("Path line %1").arg(line.toString()));
+        logText(LVL_DEBUG, QString("Path line %1").arg(line.toString()));
     }
 }
 
 void PathRouter::logText(const char *file, int line, int level, const QString &text) const
 {
     if(level <= _debugLevel) {
-        KLog::sysLogText(file, line, (KLog::LogLevel)level, text);
+        Log::logText(file, line, (Log::LogLevel)level, text);
     }
 }

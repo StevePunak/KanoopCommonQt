@@ -14,6 +14,9 @@ public:
 
     Rectangle toRectangle() const;
 
+    void grow(double amount);
+    void shrink(double amount);
+
     QString toString() const { return QString("%1, %2").arg(width()).arg(height()); }
     static Size fromString(const QString& value);
 };
