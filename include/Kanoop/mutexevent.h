@@ -11,6 +11,7 @@ class KANOOP_EXPORT MutexEvent
 public:
     MutexEvent(bool wakeAllWaiters = false) :
         _isset(false),
+        _isWaiting(false),
         _debug(false),
         _wakeAllWaiters(wakeAllWaiters) {}
     virtual ~MutexEvent() {}
@@ -23,6 +24,8 @@ public:
         return wait(timeout.totalMilliseconds());
     }
 
+    bool isWaiting() const { return _isWaiting; }
+
     void setDebug() { _debug = true; }
     void setWakeAllWaiters(bool value) { _wakeAllWaiters = value; }
 
@@ -30,6 +33,7 @@ private:
     QWaitCondition  _condition;
     QMutex _checkMutex;
     bool _isset;
+    bool _isWaiting;
     bool _debug;
     bool _wakeAllWaiters;
 };

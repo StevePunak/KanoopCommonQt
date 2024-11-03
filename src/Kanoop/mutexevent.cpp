@@ -23,6 +23,7 @@ bool MutexEvent::wait(int msecs)
 {
     _checkMutex.lock();
     bool result = _isset;
+    _isWaiting = true;
 
     if(_isset == false)
     {
@@ -37,12 +38,14 @@ bool MutexEvent::wait(int msecs)
 
         _checkMutex.lock();
         _isset = false;
+        _isWaiting = false;
         _checkMutex.unlock();
 
         mutex.unlock();
     }
     else
     {
+        _isWaiting = false;
         _checkMutex.unlock();
     }
     return result;
