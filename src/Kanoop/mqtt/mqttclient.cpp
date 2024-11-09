@@ -51,6 +51,12 @@ void MqttClient::threadFinished()
     }
 }
 
+QMqttSubscription* MqttClient::subscribe(const QString& topic, uint8_t qos)
+{
+    QMqttSubscription* result = _client->subscribe(topic, qos);
+    return result;
+}
+
 void MqttClient::onClientConnected()
 {
     logText(LVL_DEBUG, "Client connected");
@@ -59,6 +65,7 @@ void MqttClient::onClientConnected()
 
 void MqttClient::onDisconnected()
 {
+    logText(LVL_DEBUG, "Client connected");
     emit clientDisconnected();
     if(_autoReconnect) {
         logText(LVL_DEBUG, QString("Client disconnected. Will reconnect in %1").arg(_autoReconnectTime.toString()));

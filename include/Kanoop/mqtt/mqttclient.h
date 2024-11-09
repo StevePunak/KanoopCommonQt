@@ -25,6 +25,11 @@ public:
     TimeSpan autoReconnectTime() const { return _autoReconnectTime; }
     void setAutoReconnectTime(const TimeSpan& value) { _autoReconnectTime = value; }
 
+    QString clientId() const { return _clientId; }
+    void setClientId(const QString& value) { _clientId = value; }
+
+    QMqttSubscription* subscribe(const QString& topic, uint8_t qos = 0);
+
     QMqttClient* client() const { return _client; }
 
 protected:
@@ -36,6 +41,7 @@ private:
     bool _connectAtStart = true;
     bool _autoReconnect = true;
     TimeSpan _autoReconnectTime = TimeSpan::fromSeconds(1);
+    QString _clientId;
 
     QMqttClient* _client = nullptr;
 

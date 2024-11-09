@@ -13,7 +13,7 @@
 #include "loggingbaseclass.h"
 
 class KANOOP_EXPORT AbstractThreadClass : public QObject,
-                            public LoggingBaseClass
+                                          public LoggingBaseClass
 {
     Q_OBJECT
 
