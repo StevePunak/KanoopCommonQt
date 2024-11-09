@@ -29,8 +29,11 @@ public:
 
     bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
 
+    bool isRunning() const { return _thread.isRunning(); }
+
     bool success() const { return _success; }
     QString completionMessage() const { return _message; }
+
 
 protected:
     virtual void threadStarted() = 0;
