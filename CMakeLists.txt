@@ -9,7 +9,7 @@ qt_standard_project_setup()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
-set(KANOOP_COMMON_VERSION "2.0.1")
+set(KANOOP_COMMON_VERSION "2.0.2")
 
 file(GLOB_RECURSE KANOOP_COMMON_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 file(GLOB_RECURSE KANOOP_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
@@ -27,8 +27,8 @@ target_include_directories(${PROJ} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJ} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop)
 target_include_directories(${PROJ} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-find_package(Qt6 REQUIRED COMPONENTS Network Xml)
-target_link_libraries(${PROJ} PRIVATE Qt6::Network Qt6::Xml)
+find_package(Qt6 REQUIRED COMPONENTS Network Xml Mqtt)
+target_link_libraries(${PROJ} PRIVATE Qt6::Network Qt6::Xml Qt6::Mqtt)
 
 add_compile_definitions(KANOOP_LIBRARY)
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
