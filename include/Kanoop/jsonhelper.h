@@ -1,3 +1,11 @@
+/**
+ *  AddressHelper
+ *
+ *  Some static helper methods for QJson where the C# tryGet() model is
+ *  desired.
+ *
+ *  Stephen Punak, May 16 2020
+ */
 #ifndef JSONHELPER_H
 #define JSONHELPER_H
 #include <QString>

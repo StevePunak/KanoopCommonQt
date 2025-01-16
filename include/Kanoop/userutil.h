@@ -1,3 +1,10 @@
+/**
+ *  UserUtil
+ *
+ *  Some static helper methods for Linux users / groups
+ *
+ *  Stephen Punak, July 08 2019
+ */
 #ifndef USERUTIL_H
 #define USERUTIL_H
 

@@ -1,3 +1,17 @@
+/**
+ *  RateMonitor
+ *
+ *  Calculate the rate at which something is happening (e.g. packets-per-second)
+ *
+ *  Every time the thing happens, call addEvent().
+ *
+ *  Use eventsPerSecond() to obtain the actual rate.
+ *
+ *  setEvaluationTime() sets the sliding time window over which the calculation
+ *  is performed.
+ *
+ *  Stephen Punak, July 08 2019
+ */
 #ifndef RATEMONITOR_H
 #define RATEMONITOR_H
 

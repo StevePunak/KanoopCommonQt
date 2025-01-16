@@ -1,3 +1,13 @@
+/**
+ *  StringUtil
+ *
+ *  Some static helper methods for converting strings to and from other types.
+ *
+ *  Additionally, methods exist for fuzzy string comparisons using the BITAP
+ *  and Levenshtein Distance algorithms.
+ *
+ *  Stephen Punak, February 12 2021
+ */
 #ifndef STRINGUTIL_H
 #define STRINGUTIL_H
 
@@ -12,7 +22,7 @@ class KANOOP_EXPORT StringUtil
 {
 public:
     /**
-     * Convert the give string to a boolean:
+     * @brief Convert the give string to a boolean:
      *   1 or 'true'   = true
      *   other         = false
      */

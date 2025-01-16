@@ -1,3 +1,12 @@
+/**
+ *  KanoopCommonQt
+ *
+ *  A Qt port of the KanoopCommon C# library
+ *
+ *  Lots of useful classes to provide helper functions to Qt
+ *
+ *  Stephen Punak, July 04 2019
+ */
 #ifndef KANOOPCOMMON_H
 #define KANOOPCOMMON_H
 #include <QtCore/qglobal.h>

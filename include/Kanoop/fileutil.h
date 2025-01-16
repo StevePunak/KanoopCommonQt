@@ -1,3 +1,11 @@
+/**
+ *  FileUtil
+ *
+ *  Some static helper methods for one line file reads / writes and other
+ *  file manipulations.
+ *
+ *  Stephen Punak, October 02 2020
+ */
 #ifndef FILEUTIL_H
 #define FILEUTIL_H
 

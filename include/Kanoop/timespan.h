@@ -66,8 +66,10 @@ public:
   bool operator<=(const TimeSpan& other) const;
 
   /**
-   * @brief days
-   * @return Number of days represented in the days field of this TimeSpan when printed
+   * Number of days represented in the days field of this super TimeSpan
+   * when printed.
+   *
+   * @return Number of whole days represented in the days field of this TimeSpan when printed
    */
   qint64 days() const;
 
@@ -149,6 +151,10 @@ public:
    */
   double totalNanoseconds() const;
 
+  /**
+   * @brief Is this timespan zero total nanoseconds
+   * @return true if this timespan is zero
+   */
   bool isZero() const { return _nanoseconds == 0; }
   bool isNegative() const { return _nanoseconds < 0; }
   bool isPositive() const { return _nanoseconds > 0; }

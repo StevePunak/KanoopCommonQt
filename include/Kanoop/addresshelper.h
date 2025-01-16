@@ -1,3 +1,10 @@
+/**
+ *  AddressHelper
+ *
+ *  Some static helper methods for address resolution and parsing
+ *
+ *  Stephen Punak, July 08 2019
+ */
 #ifndef ADDRESSHELPER_H
 #define ADDRESSHELPER_H
 #include <QHostAddress>

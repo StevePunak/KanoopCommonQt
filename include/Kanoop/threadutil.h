@@ -1,3 +1,10 @@
+/**
+ *  ThreadHelper
+ *
+ *  Some static helper methods for create a string describing threads.
+ *
+ *  Stephen Punak, July 08 2019
+ */
 #ifndef THREADUTIL_H
 #define THREADUTIL_H
 #include <QString>

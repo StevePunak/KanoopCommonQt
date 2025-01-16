@@ -1,3 +1,14 @@
+/**
+ *  DateTimeUtil
+ *
+ *  Some static helper methods for converting date/times to and from strings.
+ *
+ *  In general, on of two formats are preferred:
+ *    1. ISO-8601 ZULU      e.g. 2021-09-17T05:30:00.123Z
+ *    2. MySQL              e.g. 2021-09-17 05:30:00.123
+ *
+ *  Stephen Punak, September 17 2020
+ */
 #ifndef DATETIMEUTIL_H
 #define DATETIMEUTIL_H
 #include <QDateTime>

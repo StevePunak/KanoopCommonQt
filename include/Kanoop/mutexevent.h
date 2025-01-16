@@ -1,3 +1,18 @@
+/**
+ *  MutexEvent
+ *
+ *  A very useful object for multi-threaded applications which wish to be
+ *  be event driven.
+ *
+ *  It is based on the C# AutoResetEvent class which combines a mutex and
+ *  a cond_var.
+ *
+ *  The event driven thread call wait() with an optional timeout.
+ *
+ *  The event generating thread calls set() and the waiting thread wakes up.
+ *
+ *  Stephen Punak, May 15 2020
+ */
 #ifndef MUTEXEVENT_H
 #define MUTEXEVENT_H
 
