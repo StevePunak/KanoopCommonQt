@@ -7,13 +7,12 @@ QByteArray CryptoUtil::fileMd5(const QString &filename)
 {
     QFile file(filename);
     QByteArray result;
-    if(file.open(QFile::ReadOnly))
-    {
+    if(file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Md5);
-        char buffer[65536];
-        int bytesRead;
-        while((bytesRead = file.read(buffer, sizeof(buffer))) > 0)
-            hash.addData(buffer, bytesRead);
+        while(file.atEnd() == false) {
+            QByteArray fileData = file.read(0xffff);
+            hash.addData(fileData);
+        }
         result = hash.result();
     }
     return result;

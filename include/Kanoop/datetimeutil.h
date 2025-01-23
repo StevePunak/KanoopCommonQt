@@ -13,6 +13,7 @@
 #define DATETIMEUTIL_H
 #include <QDateTime>
 #include <QString>
+#include <QTimeZone>
 #include <QVariant>
 #include "kanoopcommon.h"
 
@@ -22,13 +23,13 @@ public:
     static QDateTime fromISOString(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, Qt::DateFormat::ISODateWithMs);
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
         return result;
     }
     static QDateTime fromStandardString(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd hh:mm:ss.zzz");
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
         return result;
     }
     static QDateTime fromSquashedString(const QString& date);
@@ -59,7 +60,7 @@ private:
     static QDateTime fromAlternate1String(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd dddd hh:mm:ss.zzz");
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
         return result;
     }
     static QDateTime fromGitRepresentation(const QString& date)

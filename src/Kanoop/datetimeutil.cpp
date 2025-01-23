@@ -9,7 +9,7 @@ QDateTime DateTimeUtil::fromSquashedString(const QString& date)
         (result = QDateTime::fromString(date, "yyyyMMddhhmm")).isValid() ||
         (result = QDateTime::fromString(date, "yyyyMMddhh")).isValid() ||
         (result = QDateTime::fromString(date, "yyyyMMdd")).isValid())
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
     return result;
 }
 
@@ -31,6 +31,6 @@ QDateTime DateTimeUtil::fromString(const QString &date)
 QDateTime DateTimeUtil::fromVariant(const QVariant &date)
 {
     QDateTime result = date.toDateTime();
-    result.setOffsetFromUtc(0);
+    result.setTimeZone(QTimeZone::utc());
     return result;
 }
