@@ -1,3 +1,14 @@
+/**
+ *  PathUtil
+ *
+ *  Some static helper methods for files. Much of the functionallity
+ *  in here has been overtaken by the QFileInfo native Qt object.
+ *
+ *  However, the extremely useful combine() method will combine many
+ *  strings into a well-formatted path name.
+ *
+ *  Stephen Punak, July 04 2019
+ */
 #ifndef PATHUTIL_H
 #define PATHUTIL_H
 #include <QString>

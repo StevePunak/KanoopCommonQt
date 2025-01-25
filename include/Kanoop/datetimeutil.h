@@ -1,7 +1,19 @@
+/**
+ *  DateTimeUtil
+ *
+ *  Some static helper methods for converting date/times to and from strings.
+ *
+ *  In general, on of two formats are preferred:
+ *    1. ISO-8601 ZULU      e.g. 2021-09-17T05:30:00.123Z
+ *    2. MySQL              e.g. 2021-09-17 05:30:00.123
+ *
+ *  Stephen Punak, September 17 2020
+ */
 #ifndef DATETIMEUTIL_H
 #define DATETIMEUTIL_H
 #include <QDateTime>
 #include <QString>
+#include <QTimeZone>
 #include <QVariant>
 #include "kanoopcommon.h"
 
@@ -11,13 +23,13 @@ public:
     static QDateTime fromISOString(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, Qt::DateFormat::ISODateWithMs);
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
         return result;
     }
     static QDateTime fromStandardString(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd hh:mm:ss.zzz");
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
         return result;
     }
     static QDateTime fromSquashedString(const QString& date);
@@ -48,7 +60,7 @@ private:
     static QDateTime fromAlternate1String(const QString& date)
     {
         QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd dddd hh:mm:ss.zzz");
-        result.setTimeSpec(Qt::UTC);
+        result.setTimeZone(QTimeZone::utc());
         return result;
     }
     static QDateTime fromGitRepresentation(const QString& date)

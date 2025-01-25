@@ -1,3 +1,23 @@
+/**
+ *  EntityMetadata
+ *
+ *  This is a container class for trivial (copyable) objects.
+ *
+ *  The primary idea is the EntityMetadata containing the target object can be passed
+ *  around in place of the object itself. The EntityMetadata object itself can contain
+ *  whatever additional data is needed by use if the data() and setData() methods.
+ *
+ *  User defined entity types should be defined in an enumeration and registered at
+ *  initialization with registerMetadata().
+ *
+ *  Icons ID's can be associated with specific entity types using registerIcon()
+ *  when used in conjunction with KanoopCommonGuiQt
+ *
+ *  It is primarily intended for use by the AbstractItemView / AbstractItemModel
+ *  paradigm, but has found use in several other applications.
+ *
+ *  Stephen Punak, September 23 2024
+ */
 #ifndef ENTITYMETADATA_H
 #define ENTITYMETADATA_H
 

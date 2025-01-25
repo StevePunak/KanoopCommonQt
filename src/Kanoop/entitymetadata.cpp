@@ -52,7 +52,4 @@ void EntityMetadata::resolveIconId()
     if(metadataInfo != nullptr) {
         _iconId = metadataInfo->iconId();
     }
-    else {
-        Log::logText(LVL_WARNING, "Failed to find metadata into");
-    }
 }

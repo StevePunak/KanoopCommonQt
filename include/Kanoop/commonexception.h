@@ -1,3 +1,10 @@
+/**
+ *  AddressHelper
+ *
+ *  A base class for Qt exceptions
+ *
+ *  Stephen Punak, September 17 2023
+ */
 #ifndef COMMONEXCEPTION_H
 #define COMMONEXCEPTION_H
 

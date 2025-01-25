@@ -1,9 +1,10 @@
-// LockingQueue
-//
-// Multi-producer Multi-consumer blocking queue
-//
-// Stephen Punak 2019
-//
+/**
+ *  LockingQueue
+ *
+ *  Thread-safe Multi-producer Multi-consumer blocking queue
+ *
+ *  Stephen Punak, July 08 2019
+ */
 #ifndef LOCKINGQUEUE_H
 #define LOCKINGQUEUE_H
 

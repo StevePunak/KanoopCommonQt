@@ -1,3 +1,12 @@
+/**
+ *  CryptoUtil
+ *
+ *  Some static helper methods for MD5 hashes (to and from strings).
+ *
+ *  It is basically a front-end for QCryptographicHash functions.
+ *
+ *  Stephen Punak, February 17 2021
+ */
 #ifndef CRYPTOUTIL_H
 #define CRYPTOUTIL_H
 
