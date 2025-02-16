@@ -48,6 +48,10 @@ public:
      */
     static QString toString(const QByteArray& value, const QString& delimiter = QString(" "));
     /**
+     * Convert a byte array to a hexadecimal table
+     */
+    static QString toHexTable(const QByteArray& buffer, bool showOffset = true, bool showText = true, int tableWidth = 16);
+    /**
      * Convert a list of QUuids to a string
      */
     static QString toString(const QList<QUuid>& value, const QString& delimiter = QString(" "));
