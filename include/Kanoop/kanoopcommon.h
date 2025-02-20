@@ -55,7 +55,7 @@ public:
 
         for(auto it = EnumToStringMap<T>::constBegin();it != EnumToStringMap<T>::constEnd();it++) {
             QString value = it.value();
-            if(value == name.toLower()) {
+            if(value == name) {
                 return it.key();
             }
         }
