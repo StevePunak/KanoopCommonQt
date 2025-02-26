@@ -3,6 +3,7 @@
 
 #include <Kanoop/logcategory.h>
 #include <Kanoop/log.h>
+#include <Kanoop/logconsumer.h>
 #include <Kanoop/kanoopcommon.h>
 
 #define UNIMPLEMENTED  logText(LVL_WARNING, QString("---------------- %1 UNIMPLEMENTED  ----------------").arg(__FUNCTION__));
@@ -23,6 +24,9 @@ protected:
     void logText(const char* file, int lineNumber, Log::LogLevel level, const Log::LogCategory& category, const QString& text) const;
     void logHex(const char* file, int lineNumber, Log::LogLevel level, const QByteArray& data, const QString& tag = QString()) const;
     void logHex(const char* file, int lineNumber, Log::LogLevel level, const Log::LogCategory& category, const QByteArray& data, const QString& tag = QString()) const;
+
+    void addLogConsumer(LogConsumer* consumer);
+    void removeLogConsumer(LogConsumer* consumer);
 
 private:
     void commonInit();

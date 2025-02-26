@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include <logcategory.h>
 #ifndef WIN32
+#include <logconsumer.h>
 #include <syslog.h>
 #endif
 
@@ -74,8 +75,9 @@ void Logger::logText(const char *file, int lineNumber, LogLevel level, const Log
 
     QString buffer;
     QTextStream output(&buffer);
+    QDateTime timestamp = QDateTime::currentDateTimeUtc();
     if(_flags & Timestamp) {
-        output << DateTimeUtil::currentToStandardString() << ' ';
+        output << DateTimeUtil::toStandardString(timestamp, true) << ' ';
     }
     if(_flags & LineNumbers) {
         output << QFileInfo(file).fileName().left(16).leftJustified(16, QChar(' ')) << ' ' << lineNumber << ' ';
@@ -93,7 +95,7 @@ void Logger::logText(const char *file, int lineNumber, LogLevel level, const Log
 
     output << text << Qt::endl;
 
-    outputToDestinations(level, buffer);
+    outputToDestinations(level, category, timestamp, buffer, text);
 
     _writeLock.unlock();
 }
@@ -113,8 +115,9 @@ void Logger::logHex(const char *file, int lineNumber, LogLevel level, const LogC
 
     QString buffer;
     QTextStream output(&buffer);
+    QDateTime timestamp = QDateTime::currentDateTimeUtc();
     if(_flags & Timestamp) {
-        output << DateTimeUtil::currentToStandardString() << ' ';
+        output << DateTimeUtil::toStandardString(timestamp, true) << ' ';
     }
     if(_flags & LineNumbers) {
         output << QFileInfo(file).fileName() << ' ' << lineNumber << ' ';
@@ -141,7 +144,7 @@ void Logger::logHex(const char *file, int lineNumber, LogLevel level, const LogC
     QString hex = bufferToHex(data);
     output << hex << Qt::endl;
 
-    outputToDestinations(level, buffer);
+    outputToDestinations(level, category, timestamp, buffer, hex);
 
     _writeLock.unlock();
 }
@@ -222,6 +225,20 @@ void Logger::setCategoryLevel(const QString &name, LogLevel level)
     _writeLock.unlock();
 }
 
+void Logger::addConsumer(LogConsumer* consumer)
+{
+    _writeLock.lock();
+    _surplusConsumers.append(consumer);
+    _writeLock.unlock();
+}
+
+void Logger::removeConsumer(LogConsumer* consumer)
+{
+    _writeLock.lock();
+    _surplusConsumers.removeAll(consumer);
+    _writeLock.unlock();
+}
+
 void Logger::openFile()
 {
     if(_file.isOpen() && _filename != _file.fileName()) {
@@ -255,30 +272,37 @@ void Logger::closeSyslog()
 #endif
 }
 
-void Logger::outputToDestinations(LogLevel level, const QString &text)
+void Logger::outputToDestinations(LogLevel level, const LogCategory &category, const QDateTime& timestamp, const QString &formattedText, const QString& unformattedText)
 {
     if(_flags & Console) {
         if(level <= Error) {
-            _stderr << text;
+            _stderr << formattedText;
             _stderr.flush();
         }
         else {
-            _stdout << text;
+            _stdout << formattedText;
             _stdout.flush();
         }
     }
 
     if(_flags & File && _file.isOpen()) {
-        _file.write(text.toUtf8());
+        _file.write(formattedText.toUtf8());
+    }
+
+    if(_surplusConsumers.count() > 0) {
+        LogEntry entry(level, category, timestamp, formattedText, unformattedText);
+        for(LogConsumer* consumer : _surplusConsumers) {
+            consumer->addLogEntry(entry);
+        }
     }
 
     if(_flags & QDebug) {
-        qDebug() << text;
+        qDebug() << formattedText;
     }
 
     if(_flags & Syslog) {
 #ifndef WIN32
-        syslog(level, "%s", text.toLocal8Bit().constData());
+        syslog(level, "%s", formattedText.toLocal8Bit().constData());
 #endif
     }
 }
@@ -416,6 +440,16 @@ LogCategory Log::registerCategory(const QString& name)
 void Log::setCategoryLevel(const QString &name, LogLevel level)
 {
     systemLog()->setCategoryLevel(name, level);
+}
+
+void Log::addConsumer(LogConsumer* consumer)
+{
+    systemLog()->addConsumer(consumer);
+}
+
+void Log::removeConsumer(LogConsumer* consumer)
+{
+    systemLog()->removeConsumer(consumer);
 }
 
 LogLevel Log::parseLevel(const QString &value, bool *parsed)
