@@ -8,7 +8,7 @@
 
 namespace Log {
 
-class LogEntry
+class KANOOP_EXPORT LogEntry
 {
 public:
     LogEntry() {}
@@ -31,7 +31,7 @@ private:
 
 } // namespace Log
 
-class LogConsumer : public QObject
+class KANOOP_EXPORT LogConsumer : public QObject
 {
     Q_OBJECT
 public:
