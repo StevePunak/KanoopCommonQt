@@ -14,8 +14,8 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <logcategory.h>
-#ifndef WIN32
 #include <logconsumer.h>
+#ifndef WIN32
 #include <syslog.h>
 #endif
 
