@@ -28,7 +28,7 @@ QStringList ProcUtil::runningProcessNames()
             }
         }
     }
-#elif Q_OS_WIN
+#elif defined(Q_OS_WIN)
     HANDLE handle;
     PROCESSENTRY32 pe32;
     handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
