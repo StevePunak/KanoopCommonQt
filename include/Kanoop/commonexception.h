@@ -20,8 +20,8 @@ public:
     void raise() const override { throw *this; }
     CommonException *clone() const override { return new CommonException(*this); }
 
-    QString message() const { return _message; }
-    qint32 code() const { return _code; }
+    virtual QString message() const { return _message; }
+    virtual qint32 code() const { return _code; }
 
 private:
     QString _message;
