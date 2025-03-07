@@ -43,3 +43,13 @@ void LoggingBaseClass::logHex(const char *file, int lineNumber, Log::LogLevel le
     Log::logHex(file, lineNumber, level, category, data, tag);
 }
 
+void LoggingBaseClass::addLogConsumer(LogConsumer* consumer)
+{
+    Log::addConsumer(consumer);
+}
+
+void LoggingBaseClass::removeLogConsumer(LogConsumer* consumer)
+{
+    Log::removeConsumer(consumer);
+}
+

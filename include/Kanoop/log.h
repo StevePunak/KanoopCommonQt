@@ -29,6 +29,8 @@
 #define LVL_INFO            __FILE__,__LINE__,Log::LogLevel::Info
 #define LVL_DEBUG           __FILE__,__LINE__,Log::LogLevel::Debug
 
+
+class LogConsumer;
 namespace Log
 {
 
@@ -67,6 +69,9 @@ public:
 //    LogCategory registerCategory(const LogCategory& category, LogLevel level);
     void setCategoryLevel(const QString& name, LogLevel level);
 
+    void addConsumer(LogConsumer* consumer);
+    void removeConsumer(LogConsumer* consumer);
+
     bool isLogOpen() const { return _logOpen; }
 
 private:
@@ -80,7 +85,7 @@ private:
     void openSyslog();
     void closeSyslog();
 
-    void outputToDestinations(LogLevel level, const QString& text);
+    void outputToDestinations(LogLevel level, const LogCategory& category, const QDateTime& timestamp, const QString& formattedText, const QString& unformattedText);
 
     static QString bufferToHex(const QByteArray& buffer);
 
@@ -93,6 +98,8 @@ private:
 
     QTextStream _stdout;
     QTextStream _stderr;
+
+    QList<LogConsumer*> _surplusConsumers;
 
     QFile _file;
     QMutex _writeLock;
@@ -127,6 +134,9 @@ KANOOP_EXPORT void disableOutputFlags(OutputFlags flags);
 KANOOP_EXPORT LogCategory registerCategory(const QString& name);
 KANOOP_EXPORT LogCategory registerCategory(const QString &name, LogLevel level);
 KANOOP_EXPORT void setCategoryLevel(const QString& name, LogLevel level);
+
+KANOOP_EXPORT void addConsumer(LogConsumer* consumer);
+KANOOP_EXPORT void removeConsumer(LogConsumer* consumer);
 
 KANOOP_EXPORT LogLevel parseLevel(const QString& value, bool* parsed = nullptr);
 

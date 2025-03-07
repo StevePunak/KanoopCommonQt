@@ -46,6 +46,48 @@ QString StringUtil::toString(const QByteArray &value, const QString &delimiter)
     return result.trimmed();
 }
 
+QString StringUtil::toHexTable(const QByteArray& buffer, bool showOffset, bool showText, int tableWidth)
+{
+    QString text;
+    QTextStream output(&text);
+
+    for(int index = 0;index < buffer.length();index += 16) {
+        if(showOffset) {
+            output << QString("%1: ").arg(index, 6, 16, QChar('0'));
+        }
+
+        QString ascii;
+        QTextStream asciiOutput(&ascii);
+        int i;
+        for(i = index;i < index + tableWidth && i < buffer.length();i++) {
+            output << QString("%1").arg((quint8)buffer.constData()[i], 2, 16, QChar('0'));
+            QChar character = buffer.constData()[i];
+            if(character.isPrint()) {
+                asciiOutput << character;
+            }
+            else {
+                asciiOutput << '.';
+            }
+            if(i + 1 < index + 16 && i < buffer.length()) {
+                output << ' ';
+            }
+        }
+
+        for(;i < index + 16;i++) {
+            output << "  ";
+            if(i < index + 15) {
+                output << ' ';
+            }
+        }
+
+        if(showText) {
+            output << "   " << ascii;
+        }
+        output << Qt::endl;
+    }
+    return text;
+}
+
 QString StringUtil::toString(const QList<QUuid> &value, const QString &delimiter)
 {
     QString outputString;
