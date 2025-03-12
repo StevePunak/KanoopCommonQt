@@ -168,6 +168,9 @@ void Logger::setFilename(const QString &filename)
         closeFile();
         openFile();
     }
+    else if(_file.isOpen() == false) {
+        openFile();
+    }
 }
 
 void Logger::setIdentity(const QString &value)
@@ -246,7 +249,7 @@ void Logger::openFile()
     }
     if(_file.isOpen() == false) {
         _file.setFileName(_filename);
-        if(_file.open(QFile::WriteOnly) == false) {
+        if(_file.open(QFile::WriteOnly | QFile::Append) == false) {
             _stderr << "Failed to open log file at " << _filename << Qt::endl;
         }
     }
@@ -287,6 +290,7 @@ void Logger::outputToDestinations(LogLevel level, const LogCategory &category, c
 
     if(_flags & File && _file.isOpen()) {
         _file.write(formattedText.toUtf8());
+        _file.flush();
     }
 
     if(_surplusConsumers.count() > 0) {
