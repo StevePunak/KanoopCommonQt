@@ -6,6 +6,7 @@
 #include <Kanoop/log.h>
 
 QMap<int, EntityMetadataInfo*> EntityMetadata::_registeredTypes;
+QMap<QString, int> EntityMetadata::_nameToTypeMap;
 
 EntityMetadata::EntityMetadata(int type) :
     _type(type), _iconId(0)
@@ -20,6 +21,19 @@ EntityMetadata::EntityMetadata(int type, const QVariant &data, KANOOP::ModelRole
     resolveIconId();
 }
 
+EntityMetadata::EntityMetadata(int type, const QVariant& data, const QUuid& uuid, KANOOP::ModelRole role) :
+    _type(type), _iconId(0)
+{
+    _data[role] = data;
+    resolveIconId();
+    setUuid(uuid);
+}
+
+QString EntityMetadata::typeString() const
+{
+    return getTypeString(_type);
+}
+
 void EntityMetadata::registerMetadata(int type, const QString &name, int iconId)
 {
     static QMutex _lock;
@@ -31,6 +45,7 @@ void EntityMetadata::registerMetadata(int type, const QString &name, int iconId)
     }
     else if(metadataInfo == nullptr) {
         _registeredTypes.insert(type, new EntityMetadataInfo(type, name, iconId));
+        _nameToTypeMap.insert(name, type);
     }
     _lock.unlock();
 }
@@ -44,6 +59,22 @@ void EntityMetadata::registerIcon(int type, int iconId)
     else {
         Log::logText(LVL_WARNING, "Failed to find metadata into");
     }
+}
+
+QString EntityMetadata::getTypeString(int type)
+{
+    QString result;
+    EntityMetadataInfo* metadataInfo = _registeredTypes.value(type);
+    if(metadataInfo != nullptr) {
+        result = metadataInfo->name();
+    }
+    return result;
+}
+
+int EntityMetadata::getTypeFromString(const QString& value)
+{
+    int result = _nameToTypeMap.value(value);
+    return result;
 }
 
 void EntityMetadata::resolveIconId()

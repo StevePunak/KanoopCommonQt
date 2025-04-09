@@ -5,7 +5,7 @@
  *
  *  The primary idea is the EntityMetadata containing the target object can be passed
  *  around in place of the object itself. The EntityMetadata object itself can contain
- *  whatever additional data is needed by use if the data() and setData() methods.
+ *  whatever additional data is needed by using the data() and setData() methods.
  *
  *  User defined entity types should be defined in an enumeration and registered at
  *  initialization with registerMetadata().
@@ -21,6 +21,7 @@
 #ifndef ENTITYMETADATA_H
 #define ENTITYMETADATA_H
 
+#include <QUuid>
 #include <QVariant>
 #include <Kanoop/kanoopcommon.h>
 
@@ -35,6 +36,7 @@ public:
     EntityMetadata(int type);
 
     EntityMetadata(int type, const QVariant& data, KANOOP::ModelRole role = KANOOP::DataRole);
+    EntityMetadata(int type, const QVariant& data, const QUuid& uuid, KANOOP::ModelRole role = KANOOP::DataRole);
 
     int type() const { return _type; }
     QString typeString() const;
@@ -44,6 +46,9 @@ public:
     QVariant data(KANOOP::ModelRole role = KANOOP::DataRole) const { return _data.value(role); }
     void setData(const QVariant& value, KANOOP::ModelRole role = KANOOP::DataRole) { _data.insert(role, value); }
     bool hasData(KANOOP::ModelRole role) const { return _data.contains(role); }
+
+    QUuid uuid() const { return data(KANOOP::UUidRole).toUuid(); }
+    void setUuid(const QUuid& value) { setData(value, KANOOP::UUidRole); }
 
     QVariant toVariant() const { return  QVariant::fromValue<EntityMetadata>(*this); }
     static EntityMetadata fromVariant(const QVariant& value) { return value.value<EntityMetadata>(); }
@@ -64,6 +69,7 @@ private:
     int _iconId;
 
     static QMap<int, EntityMetadataInfo*> _registeredTypes;
+    static QMap<QString, int> _nameToTypeMap;
 };
 
 class EntityMetadataList : public QList<EntityMetadata>
