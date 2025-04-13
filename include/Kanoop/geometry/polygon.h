@@ -3,7 +3,7 @@
 #include "point.h"
 #include "line.h"
 
-class Polygon
+class KANOOP_EXPORT Polygon
 {
 public:
     Polygon() {}

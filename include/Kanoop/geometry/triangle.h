@@ -2,8 +2,9 @@
 #define TRIANGLE_H
 
 #include <QPointF>
+#include "Kanoop/kanoopcommon.h"
 
-class Triangle
+class KANOOP_EXPORT Triangle
 {
 public:
     Triangle() {}

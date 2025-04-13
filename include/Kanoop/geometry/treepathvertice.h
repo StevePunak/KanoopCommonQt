@@ -4,9 +4,10 @@
 #include <QMap>
 #include <QPointF>
 #include <QString>
+#include "Kanoop/kanoopcommon.h"
 
 class SpanningTree;
-class TreePathVertice
+class KANOOP_EXPORT TreePathVertice
 {
 public:
     enum VerticeType

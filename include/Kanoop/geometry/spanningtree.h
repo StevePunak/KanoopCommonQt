@@ -3,7 +3,7 @@
 #include "treepathvertice.h"
 #include "line.h"
 
-class SpanningTree
+class KANOOP_EXPORT SpanningTree
 {
 public:
     SpanningTree() :

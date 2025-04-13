@@ -2,8 +2,9 @@
 #define ANGLE_H
 
 #include <QString>
+#include "Kanoop/kanoopcommon.h"
 
-class Angle
+class KANOOP_EXPORT Angle
 {
 public:
     Angle() : _degrees(-1) {}

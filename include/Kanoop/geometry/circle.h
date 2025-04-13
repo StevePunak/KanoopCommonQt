@@ -2,9 +2,10 @@
 #define CIRCLE_H
 
 #include <QPointF>
+#include "Kanoop/kanoopcommon.h"
 
 class Line;
-class Circle
+class KANOOP_EXPORT Circle
 {
 public:
     Circle() : _radius(0) {}
