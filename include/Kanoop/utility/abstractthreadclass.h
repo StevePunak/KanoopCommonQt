@@ -39,6 +39,8 @@ protected:
     virtual void threadStarted() = 0;
     virtual void threadFinished() {}
 
+    bool waitForStart(const TimeSpan& timeout);
+
     void finishAndStop(bool success, const QString& message = QString());
 
     void writeLine(const QString& line) { _stdout << line << Qt::endl; }

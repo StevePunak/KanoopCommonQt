@@ -26,6 +26,7 @@ void AbstractThreadClass::commonInit()
     connect(&_thread, &QThread::started, this, &AbstractThreadClass::onThreadStarted);
     connect(&_thread, &QThread::finished, this, &AbstractThreadClass::onThreadFinished);
     moveToThread(&_thread);
+    _startEvent.setWakeAllWaiters(true);
 }
 
 AbstractThreadClass::~AbstractThreadClass()
@@ -99,6 +100,11 @@ bool AbstractThreadClass::waitForCompletion(const TimeSpan &timeout)
         logText(LVL_WARNING, QString("%1: Thread never finished").arg(objectName()));
     }
     return result;
+}
+
+bool AbstractThreadClass::waitForStart(const TimeSpan& timeout)
+{
+    return _startEvent.wait(timeout);
 }
 
 void AbstractThreadClass::finishAndStop(bool success, const QString &message)

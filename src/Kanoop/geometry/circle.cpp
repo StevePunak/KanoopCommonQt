@@ -1,6 +1,32 @@
 #include "Kanoop/geometry/circle.h"
 #include "Kanoop/geometry/line.h"
 #include <QtMath>
+#include <stringutil.h>
+
+Circle Circle::fromThreePoints(const Point& a, const Point& b, const Point& c)
+{
+    // calculate midpoints
+    Point midpointAB = Line(a, b).midpoint();
+    Point midpointAC = Line(a, c).midpoint();
+
+    // Calculate slopes
+    double slopeAB = Line(a, b).slope();
+    double slopeAC = Line(a, c).slope();
+
+    // Caclulate perpendicular slopes
+    double perpendicularSlopeAB = -1 / slopeAB;
+    double perpendicularSlopeAC = -1 / slopeAC;
+
+    // Calculate y-intercepts for perpendicular bisectors
+    double bisectorAB_b = midpointAB.y() - perpendicularSlopeAB * midpointAB.x();
+    double bisectorAC_b = midpointAC.y() - perpendicularSlopeAC * midpointAC.x();
+
+    // Find the intersection point (circle center)
+    Point origin = findIntersection(perpendicularSlopeAB, bisectorAB_b, perpendicularSlopeAC, bisectorAC_b);
+
+    Circle result(origin, FlatGeo::distance(origin, a));
+    return result;
+}
 
 double Circle::circumference() const
 {
@@ -59,4 +85,17 @@ int Circle::intersects(const Line &line, QPointF &intersection1, QPointF &inters
         intersections = 2;
     }
     return intersections;
+}
+
+QString Circle::toString() const
+{
+    return QString("c: %1  r: %2").arg(_center.toString()).arg(StringUtil::toString(_radius));
+}
+
+Point Circle::findIntersection(double m1, double b1, double m2, double b2)
+{
+    Point intersection;
+    intersection.setX((b2 - b1) / (m1 - m2));
+    intersection.setY(m1 * intersection.x() + b1);
+    return intersection;
 }
