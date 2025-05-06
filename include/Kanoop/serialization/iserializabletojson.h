@@ -17,6 +17,12 @@ public:
     virtual QJsonObject serializeToJsonObject() const = 0;
 };
 
+class ISerializableIntoJsonObject
+{
+public:
+    virtual void serializeIntoJsonObject(QJsonObject& object) const = 0;
+};
+
 class ISerializableToJsonArray
 {
 public:

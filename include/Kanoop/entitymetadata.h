@@ -43,9 +43,9 @@ public:
 
     int iconId() const { return _iconId; }
 
-    QVariant data(KANOOP::ModelRole role = KANOOP::DataRole) const { return _data.value(role); }
-    void setData(const QVariant& value, KANOOP::ModelRole role = KANOOP::DataRole) { _data.insert(role, value); }
-    bool hasData(KANOOP::ModelRole role) const { return _data.contains(role); }
+    QVariant data(int role = KANOOP::DataRole) const { return _data.value(role); }
+    void setData(const QVariant& value, int role = KANOOP::DataRole) { _data.insert(role, value); }
+    bool hasData(int role) const { return _data.contains(role); }
 
     QUuid uuid() const { return data(KANOOP::UUidRole).toUuid(); }
     void setUuid(const QUuid& value) { setData(value, KANOOP::UUidRole); }
@@ -65,7 +65,7 @@ private:
     void resolveIconId();
 
     int _type;
-    QMap<KANOOP::ModelRole, QVariant> _data;
+    QMap<int, QVariant> _data;
     int _iconId;
 
     static QMap<int, EntityMetadataInfo*> _registeredTypes;
