@@ -60,6 +60,7 @@ public:
 
     static QString getTypeString(int type);
     static int getTypeFromString(const QString& value);
+    static QString getMimeTypeString(int type) { return QString("application-epcpower/%1").arg(getTypeString(type)); }
 
 private:
     void resolveIconId();
