@@ -67,6 +67,7 @@ public:
      * Convert a list of ints to a single string delimited by the supplied character
      */
     static QString toDelimitedString(const QList<int>& list, char delimiter = ' ');
+    static QString toDelimitedString(const QList<uint8_t>& list, char delimiter = ' ');
     /**
      * Format value as abbreviated byte count (K = kilobytes, M = megabytes, G=gigabytes)
      */

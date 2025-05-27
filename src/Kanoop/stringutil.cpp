@@ -142,6 +142,13 @@ QString StringUtil::toDelimitedString(const QList<int> &list, char delimiter)
     return outputString;
 }
 
+QString StringUtil::toDelimitedString(const QList<uint8_t>& list, char delimiter)
+{
+    QList<int> values;
+    for(uint8_t value : list) { values.append(value); }
+    return toDelimitedString(values, delimiter);
+}
+
 QString StringUtil::toKMG(qint64 byteCount)
 {
     QString result;
