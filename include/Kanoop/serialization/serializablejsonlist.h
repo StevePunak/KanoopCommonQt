@@ -32,4 +32,31 @@ public:
     }
 };
 
+template <typename T>
+class SerializableJsonPtrList : public QList<QSharedPointer<T>>
+{
+public:
+    QJsonArray serializeToJsonArray() const {
+        QJsonArray jsonArray;
+        static_assert(std::is_base_of<ISerializableToJsonObject, T>::value, "T not derived from ISerializableToJsonObject");
+        for(typename QList<QSharedPointer<T>>::const_iterator it = this->constBegin();it != this->constEnd();it++) {
+            QSharedPointer<T> item = *it;
+            QSharedPointer<ISerializableToJsonObject> ptr = qSharedPointerCast<ISerializableToJsonObject>(item);
+            QJsonObject obj = ptr->serializeToJsonObject();
+            jsonArray.append(obj);
+        }
+        return jsonArray;
+    }
+
+    void deserializeFromJsonArray(const QJsonArray& jsonArray) {
+        static_assert(std::is_base_of<IDeserializableFromJsonObject, T>::value, "T not derived from IDeserializableFromJsonObject");
+        for(const QJsonValue& jsonValue : jsonArray) {
+            QSharedPointer<T> item(new T());
+            QSharedPointer<IDeserializableFromJsonObject> ptr = qSharedPointerCast<IDeserializableFromJsonObject>(item);
+            ptr->deserializeFromJsonObject(jsonValue.toObject());
+            this->append(item);
+        }
+    }
+};
+
 #endif // SERIALIZABLEJSONLIST_H
