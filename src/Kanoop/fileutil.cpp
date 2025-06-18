@@ -95,6 +95,17 @@ bool FileUtil::writeAllLines(const QString &filename, const QStringList &lines)
     return false;
 }
 
+bool FileUtil::appendAllBytes(const QString& filename, const QByteArray& data)
+{
+    QFile file(filename);
+    if(file.open(QIODevice::Append | QIODevice::WriteOnly))
+    {
+        file.write(data);
+        return true;
+    }
+    return false;
+}
+
 bool FileUtil::exists(const QString &filename)
 {
     QFile file(filename);

@@ -24,6 +24,7 @@ public:
     static bool writeAllBytes(const QString& filename, const QByteArray& data);
     static bool writeAllBytes(const QString& filename, const QByteArray& data, QStringConverter::Encoding encoding);
     static bool writeAllLines(const QString& filename, const QStringList& lines);
+    static bool appendAllBytes(const QString& filename, const QByteArray& data);
     static bool exists(const QString& filename);
     static bool remove(const QString& filename);
     static bool touch(const QString& filename);

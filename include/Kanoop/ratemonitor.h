@@ -32,6 +32,10 @@ public:
     void addEvent(int count = 1);
     double eventsPerSecond();
 
+    QVariant data() const { return _data; }
+    void setData(QVariant value) { _data = value; }
+
+    int evaluationMsecs() const { return _evaluationMsecs; }
     void setEvaluationTime(int msecs) { _evaluationMsecs = msecs; }
 
 private:
@@ -49,7 +53,9 @@ private:
         qint64 _timestamp;
         qint64 _count;
     };
-    int _evaluationMsecs;
+
+    int _evaluationMsecs = 1000;
+    QVariant _data;
 
     QList<RateEvent> _events;
     QMutex _lock;
