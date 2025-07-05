@@ -17,9 +17,9 @@ void LoggingBaseClass::commonInit()
 {
     if(_baseCategory.isValid()) {
         _baseCategory = Log::registerCategory(_baseCategory.name());
-        _level1 = Log::registerCategory(_baseCategory.append("lvl1").name());
-        _level2 = Log::registerCategory(_baseCategory.append("lvl2").name());
-        _level3 = Log::registerCategory(_baseCategory.append("lvl3").name());
+        _level1 = Log::registerCategory(_baseCategory.append("lvl1").name(), Log::Info);
+        _level2 = Log::registerCategory(_baseCategory.append("lvl2").name(), Log::Info);
+        _level3 = Log::registerCategory(_baseCategory.append("lvl3").name(), Log::Info);
     }
 }
 
