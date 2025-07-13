@@ -36,6 +36,7 @@ class KANOOP_EXPORT LogConsumer : public QObject
     Q_OBJECT
 public:
     explicit LogConsumer(QObject *parent = nullptr);
+    virtual ~LogConsumer();
 
     void addLogEntry(const Log::LogEntry& entry);
 

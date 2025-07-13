@@ -24,6 +24,7 @@ public:
         Copyright,
         Cubed,
         Degrees,
+        Delta,
         Micro,
         OneHalf,
         OneQuarter,
@@ -56,6 +57,7 @@ private:
             insert(Copyright,               QChar(0x00a9));
             insert(Cubed,                   QChar(0x00b3));
             insert(Degrees,                 QChar(0x00b0));
+            insert(Delta,                   QChar(0x0394));
             insert(Micro,                   QChar(0x00b5));
             insert(OneHalf,                 QChar(0x00bd));
             insert(OneQuarter,              QChar(0x00bc));

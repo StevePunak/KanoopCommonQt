@@ -18,7 +18,7 @@ class LockingQueue : public QList<T>
 public:
     T dequeue(quint32 waitTimeMs, bool& success)
     {
-        T result = 0;
+        T result = T();
         success = false;
 
         _queueLock.lock();              // don't allow anyone to add until we check the count
