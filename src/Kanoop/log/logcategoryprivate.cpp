@@ -8,7 +8,6 @@
 **
 ******************************************************************************************/
 #include "logcategoryprivate.h"
-#include <Kanoop/cryptoutil.h>
 
 using namespace Log;
 

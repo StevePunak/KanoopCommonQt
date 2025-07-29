@@ -8,3 +8,5 @@ KanoopCommon\.pro\.user\.4\.9-pre1
 *.10-pre1
 
 *.1ae53b0
+
+build/

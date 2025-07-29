@@ -22,6 +22,7 @@
 using namespace Log;
 
 static Logger* _systemLog = nullptr;
+
 const QList<QString> Log::Logger::_LevelStrings = {                       // clazy:exclude=non-pod-global-static
     "EMRG", "ALRT", "CRIT", "ERR", "WRN", "NOT", "INF", "DBG"
 };
@@ -293,12 +294,17 @@ void Logger::outputToDestinations(LogLevel level, const LogCategory &category, c
         _file.flush();
     }
 
+    Q_UNUSED(category)
+    Q_UNUSED(timestamp)
+    Q_UNUSED(unformattedText)
+#ifdef LOG_CONSUMER
     if(_surplusConsumers.count() > 0) {
         LogEntry entry(level, category, timestamp, formattedText, unformattedText);
         for(LogConsumer* consumer : _surplusConsumers) {
             consumer->addLogEntry(entry);
         }
     }
+#endif
 
     if(_flags & QDebug) {
         qDebug() << formattedText;
@@ -446,6 +452,8 @@ void Log::setCategoryLevel(const QString &name, LogLevel level)
     systemLog()->setCategoryLevel(name, level);
 }
 
+#if 1
+
 void Log::addConsumer(LogConsumer* consumer)
 {
     systemLog()->addConsumer(consumer);
@@ -455,6 +463,8 @@ void Log::removeConsumer(LogConsumer* consumer)
 {
     systemLog()->removeConsumer(consumer);
 }
+
+#endif
 
 LogLevel Log::parseLevel(const QString &value, bool *parsed)
 {
@@ -498,3 +508,4 @@ LogLevel Log::parseLevel(const QString &value, bool *parsed)
 
     return result;
 }
+
