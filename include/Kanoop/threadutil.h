@@ -16,6 +16,7 @@ class KANOOP_EXPORT ThreadUtil
 public:
     static QString currentThreadString();
     static QString threadString(QThread* thread);
+    static inline void spinSleep(uint64_t usecs);
 };
 
 #endif // THREADUTIL_H
