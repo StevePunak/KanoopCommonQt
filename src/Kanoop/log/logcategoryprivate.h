@@ -14,8 +14,6 @@
 
 #include <QMap>
 
-#include <Kanoop/cryptoutil.h>
-
 namespace Log
 {
 
