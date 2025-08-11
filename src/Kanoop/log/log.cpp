@@ -294,17 +294,12 @@ void Logger::outputToDestinations(LogLevel level, const LogCategory &category, c
         _file.flush();
     }
 
-    Q_UNUSED(category)
-    Q_UNUSED(timestamp)
-    Q_UNUSED(unformattedText)
-#ifdef LOG_CONSUMER
     if(_surplusConsumers.count() > 0) {
         LogEntry entry(level, category, timestamp, formattedText, unformattedText);
         for(LogConsumer* consumer : _surplusConsumers) {
             consumer->addLogEntry(entry);
         }
     }
-#endif
 
     if(_flags & QDebug) {
         qDebug() << formattedText;
