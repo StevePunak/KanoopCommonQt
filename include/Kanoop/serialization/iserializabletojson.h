@@ -4,14 +4,15 @@
 #include <QByteArray>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <Kanoop/kanoopcommon.h>
 
-class ISerializableToJson
+class KANOOP_EXPORT ISerializableToJson
 {
 public:
     virtual QByteArray serializeToJson() const = 0;
 };
 
-class ISerializableToJsonObject
+class KANOOP_EXPORT ISerializableToJsonObject
 {
 public:
     virtual QJsonObject serializeToJsonObject() const = 0;
@@ -28,7 +29,7 @@ protected:
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
 
-class ISerializableIntoJsonObject
+class KANOOP_EXPORT ISerializableIntoJsonObject
 {
 public:
     virtual void serializeIntoJsonObject(QJsonObject& object) const = 0;
@@ -45,7 +46,7 @@ protected:
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
 
-class ISerializableToJsonArray
+class KANOOP_EXPORT ISerializableToJsonArray
 {
 public:
     virtual QJsonArray serializeToJsonArray() const = 0;
