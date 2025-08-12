@@ -27,6 +27,17 @@ public:
     static QJsonArray toJsonArray(const QStringList& value);
     static QStringList toStringList(const QJsonArray& value);
     static QStringList fromJsonArray(const QJsonArray& value) { return toStringList(value); }
+    static void appendToArray(QJsonArray& destArray, const QJsonArray& sourceArray);
+
+    static QJsonValue uuidOrNull(const QUuid& uuid) { return uuid.isNull() ? QJsonValue() : uuid.toString(QUuid::WithoutBraces); }
+    static QJsonValue stringOrNull(const QString& value) { return value.isEmpty() ? QJsonValue() : value; }
+    static QJsonValue intOrNull(const QVariant& value) { return value.isNull() ? QJsonValue() : value.toInt(); }
+    static QJsonValue doubleOrNull(const QVariant& value) { return value.isNull() ? QJsonValue() : value.toDouble(); }
+    static QJsonValue doubleStringOrNull(const QVariant& value, int precision = 6);
+    static QJsonValue arrayOrNull(const QStringList& value);
+    static QVariant intOrNull(const QJsonValue& value) {  QVariant result;  return value.isNull() ? result : value.toInt(); }
+    static QVariant doubleOrNull(const QJsonValue& value);
+    static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
 
 #endif // JSONHELPER_H

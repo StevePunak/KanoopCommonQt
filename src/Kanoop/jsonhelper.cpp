@@ -1,6 +1,7 @@
 #include "Kanoop/jsonhelper.h"
 
 #include <QJsonDocument>
+#include <stringutil.h>
 
 
 bool JsonHelper::tryGetString(const QJsonObject &object, const QString &key, QString &value)
@@ -104,3 +105,37 @@ QStringList JsonHelper::toStringList(const QJsonArray &value)
     }
     return result;
 }
+
+void JsonHelper::appendToArray(QJsonArray& destArray, const QJsonArray& sourceArray)
+{
+    for(const QJsonValue& value : sourceArray) {
+        destArray.append(value);
+    }
+}
+
+QJsonValue JsonHelper::doubleStringOrNull(const QVariant& value, int precision)
+{
+    return value.isNull() ? QJsonValue() : QString("%1").arg(value.toDouble(), 0, 'f', precision);
+}
+
+QJsonValue JsonHelper::arrayOrNull(const QStringList& value)
+{
+    if(value.count() == 0) { return QJsonValue(); }
+    QJsonArray result;
+    for(const QString& text : value) { result.append(text); }
+    return result;
+}
+
+QVariant JsonHelper::doubleOrNull(const QJsonValue& value)
+{
+    QVariant result;
+    if(value.isString()) return value.toString().isEmpty() ? result : value.toString().toDouble();
+    return value.isNull() ? result : value.toDouble();
+}
+
+QVariant JsonHelper::doubleStringOrNull(const QJsonValue& value, int precision)
+{
+    QVariant result;
+    return value.isNull() ? result : StringUtil::toString(value.toString().toDouble(), precision);
+}
+
