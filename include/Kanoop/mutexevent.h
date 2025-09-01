@@ -41,6 +41,9 @@ public:
 
     bool isWaiting() const { return _isWaiting; }
 
+    QVariant data() const { return _data; }
+    void setData(const QVariant& value) { _data = value; }
+
     void setDebug() { _debug = true; }
     void setWakeAllWaiters(bool value) { _wakeAllWaiters = value; }
 
@@ -51,6 +54,8 @@ private:
     bool _isWaiting;
     bool _debug;
     bool _wakeAllWaiters;
+
+    QVariant _data;
 };
 
 #endif // MUTEXEVENT_H

@@ -46,6 +46,7 @@ bool MutexEvent::wait(int msecs)
     else
     {
         _isWaiting = false;
+        _isset = false;
         _checkMutex.unlock();
     }
     return result;
