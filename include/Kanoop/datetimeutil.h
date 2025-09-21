@@ -26,12 +26,7 @@ public:
         result.setTimeZone(QTimeZone::utc());
         return result;
     }
-    static QDateTime fromStandardString(const QString& date)
-    {
-        QDateTime result = QDateTime::fromString(date, "yyyy-MM-dd hh:mm:ss.zzz");
-        result.setTimeZone(QTimeZone::utc());
-        return result;
-    }
+    static QDateTime fromStandardString(const QString& date);
     static QDateTime fromSquashedString(const QString& date);
     static QDateTime fromString(const QString& date);
     static QDateTime fromVariant(const QVariant& date);

@@ -1,6 +1,26 @@
 #include "Kanoop/datetimeutil.h"
 
 
+QDateTime DateTimeUtil::fromStandardString(const QString& date)
+{
+    static const QStringList formats = {
+        "yyyy-MM-dd hh:mm:ss.zzz",
+        "yyyy-MM-dd hh:mm:ss",
+        "yyyy-MM-dd",
+        "yyyy/MM/dd hh:mm:ss.zzz",
+        "yyyy/MM/dd hh:mm:ss",
+        "yyyy/MM/dd",
+    };
+    QDateTime result;
+    for(const QString& format : formats) {
+        if((result = QDateTime::fromString(date, format)).isValid()) {
+            break;
+        }
+    }
+    result.setTimeZone(QTimeZone::utc());
+    return result;
+}
+
 QDateTime DateTimeUtil::fromSquashedString(const QString& date)
 {
     QDateTime result;
