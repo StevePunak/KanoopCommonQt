@@ -2,7 +2,7 @@
 #define ISERIALIZABLEINTODATASTREAM_H
 #include <Kanoop/kanoopcommon.h>
 
-class KANOOP_EXPORT ISerializableIntoDataStream
+class ISerializableIntoDataStream
 {
 public:
     virtual void deserializeFromDataStream(QDataStream& stream) = 0;

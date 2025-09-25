@@ -2,7 +2,7 @@
 #define ISERIALIZABLETOBYTEARRAY_H
 #include <Kanoop/kanoopcommon.h>
 
-class KANOOP_EXPORT ISerializableToByteArray
+class ISerializableToByteArray
 {
 public:
     virtual void deserializeFromByteArray(const QByteArray& data) = 0;
