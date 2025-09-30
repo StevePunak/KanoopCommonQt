@@ -141,6 +141,10 @@ KANOOP_EXPORT void removeConsumer(LogConsumer* consumer);
 
 KANOOP_EXPORT LogLevel parseLevel(const QString& value, bool* parsed = nullptr);
 
+KANOOP_EXPORT QDateTime getLogStartTime(const QString& filename);
+KANOOP_EXPORT QDateTime getLogEndTime(const QString& filename);
+
+
 } // namespace log
 
 #endif // LOG_H

@@ -515,3 +515,49 @@ LogLevel Log::parseLevel(const QString &value, bool *parsed)
     return result;
 }
 
+
+QDateTime Log::getLogStartTime(const QString& filename)
+{
+    static const QString StandardTime = DateTimeUtil::toStandardString(QDateTime::currentDateTimeUtc(), true);
+
+    QDateTime result;
+    QFile file(filename);
+    if(file.open(QFile::ReadOnly) == false) {
+        return result;
+    }
+
+    QTextStream input(&file);
+    while(input.atEnd() == false) {
+        QString line = input.readLine();
+        if(line.length() >= StandardTime.length() && (result = DateTimeUtil::fromStandardString(line.left(StandardTime.length()))).isValid()) {
+            break;
+        }
+    }
+    return result;
+}
+
+QDateTime Log::getLogEndTime(const QString& filename)
+{
+    static const QString StandardTime = DateTimeUtil::toStandardString(QDateTime::currentDateTimeUtc(), true);
+
+    QDateTime result;
+
+    QFile file(filename);
+    if(file.open(QFile::ReadOnly) == false) {
+        return result;
+    }
+
+    int64_t pos = std::max((int64_t)(file.size() - 0x10000), (int64_t)0);
+    if(file.seek(pos) == false) {
+        return result;
+    }
+
+    QTextStream input(&file);
+    while(input.atEnd() == false) {
+        QString line = input.readLine();
+        if(line.length() >= StandardTime.length() && (result = DateTimeUtil::fromStandardString(line.left(StandardTime.length()))).isValid()) {
+            break;
+        }
+    }
+    return result;
+}
