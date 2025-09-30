@@ -54,7 +54,7 @@ void Logger::rotateLog(const QString &newFileName)
     _writeLock.lock();
     _file.close();
     if(_file.rename(newFileName) ==false) {
-        _stderr << "Failed to rename " << _file.fileName()<< " to " << newFileName << Qt::endl;
+        _stderr << "Failed to rename " << _file.fileName() << " to " << newFileName << Qt::endl;
     }
     openLog();
     _writeLock.unlock();
