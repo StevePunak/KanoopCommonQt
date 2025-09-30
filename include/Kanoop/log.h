@@ -44,6 +44,7 @@ public:
     Logger();
 
     void openLog();
+    void rotateLog(const QString &newFileName);
 
     void logText(const char* file, int lineNumber, LogLevel level, const QString& text);
     void logText(const char* file, int lineNumber, LogLevel level, const LogCategory& category, const QString& text);
