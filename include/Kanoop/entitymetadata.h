@@ -76,6 +76,17 @@ private:
 class EntityMetadataList : public QList<EntityMetadata>
 {
 public:
+    EntityMetadataList findByType(int type) const
+    {
+        EntityMetadataList result;
+        for(const EntityMetadata& metadata : *this) {
+            if(metadata.type() == type) {
+                result.append(metadata);
+            }
+        }
+        return result;
+    }
+
     QVariant toVariant() const { return QVariant::fromValue<EntityMetadataList>(*this); }
     static EntityMetadataList fromVariant(const QVariant& value) { return value.value<EntityMetadataList>(); }
 };
