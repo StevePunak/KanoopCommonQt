@@ -49,6 +49,17 @@ void Logger::openLog()
     _logOpen = true;
 }
 
+void Logger::rotateLog(const QString &newFileName)
+{
+    _writeLock.lock();
+    _file.close();
+    if(_file.rename(newFileName) ==false) {
+        _stderr << "Failed to rename " << _file.fileName() << " to " << newFileName << Qt::endl;
+    }
+    openLog();
+    _writeLock.unlock();
+}
+
 void Logger::logText(const char *file, int lineNumber, LogLevel level, const QString &text)
 {
     logText(file, lineNumber, level, LogCategory(), text);
