@@ -27,6 +27,8 @@
 #include <QTextStream>
 #include <QDebug>
 
+#include <utility/unicode.h>
+
 const double TimeSpan::NanosecondsPerMicrosecond       = (double)__NanosecondsPerMicrosecond;
 const double TimeSpan::NanosecondsPerMillisecond       = (double)__NanosecondsPerMillisecond;
 const double TimeSpan::NanosecondsPerSecond            = (double)__NanosecondsPerSecond;
@@ -376,66 +378,83 @@ TimeSpan TimeSpan::fromDays(double days)
     return ts;
 }
 
-TimeSpan TimeSpan::fromString(const QString &timeString)
+TimeSpan TimeSpan::fromString(const QString &timeString, bool* parsed)
 {
     QStringList tokens = getTokens(timeString);
 
     if(tokens.contains("d") || tokens.contains("h") || tokens.contains("m") || tokens.contains("s"))
-        return parseAbbreviatedString(timeString);
+        return parseAbbreviatedString(timeString, parsed);
     else if(timeString.contains(':'))
-        return parseColonDelimitedString(timeString);
+        return parseColonDelimitedString(timeString, parsed);
     else if(timeString.length() > 0 && timeString[0].isDigit())
     {
         if(tokens.contains("us")) {
-            return parseMicrosecondString(timeString);
+            return parseMicrosecondString(timeString, parsed);
         }
         else if(tokens.contains("ms")) {
-            return parseMillisecondString(timeString);
+            return parseMillisecondString(timeString, parsed);
         }
         else {
-            return TimeSpan::fromMilliseconds(timeString.toInt());
+            int ms = timeString.toInt(parsed);
+            return TimeSpan::fromMilliseconds(ms);
         }
     }
     return TimeSpan::zero();
 }
 
-TimeSpan TimeSpan::parseAbbreviatedString(const QString &timeString)
+TimeSpan TimeSpan::parseAbbreviatedString(const QString &timeString, bool* parsed)
 {
     QString remaining = timeString.trimmed();
     TimeSpan result = TimeSpan::zero();
+    bool valid = false;
 
     int days = parseIntToToken(remaining, "d");
-    if(days >= 0)
+    if(days >= 0) {
         result = result + TimeSpan::fromDays(days);
+        valid = true;
+    }
 
     int hours = parseIntToToken(remaining, "h");
-    if(hours >= 0)
+    if(hours >= 0) {
         result = result + TimeSpan::fromHours(hours);
+        valid = true;
+    }
 
     int minutes = parseIntToToken(remaining, "m");
-    if(minutes >= 0)
+    if(minutes >= 0) {
         result = result + TimeSpan::fromMinutes(minutes);
+        valid = true;
+    }
 
     int seconds = parseIntToToken(remaining, "s");
-    if(seconds >= 0)
+    if(seconds >= 0) {
         result = result + TimeSpan::fromSeconds(seconds);
+        valid = true;
+    }
 
     int milliseconds = parseIntToToken(remaining, "ms");
-    if(milliseconds >= 0)
+    if(milliseconds >= 0) {
         result = result + TimeSpan::fromMilliseconds(milliseconds);
+        valid = true;
+    }
+
+    if(parsed != nullptr) {
+        *parsed = valid;
+    }
+
     return result;
 }
 
-TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString)
+TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString, bool* parsed)
 {
     QStringList parts = timeString.split(':');
+    bool valid = false;
     int days = 0;
     int hours = 0;
     int minutes = 0;
     int seconds = 0;
     int ms = 0;
-    if(parts.length() > 0)
-    {
+    if(parts.length() > 0) {
         double s = parts.last().toDouble();
         seconds = (int)s;
         // This rigamorole help with double lack of precision (e.g.: 1.003 will normally parse to 1.0029999999)
@@ -443,49 +462,64 @@ TimeSpan TimeSpan::parseColonDelimitedString(const QString &timeString)
         s =  qRound(s * 1000);
         ms = s;
         parts.removeLast();
+        valid = true;
     }
-    if(parts.length() > 0)
-    {
+    if(parts.length() > 0) {
         minutes = parts.last().toInt();
         parts.removeLast();
+        valid = true;
     }
-    if(parts.length() > 0)
-    {
+    if(parts.length() > 0) {
         hours = parts.last().toInt();
         parts.removeLast();
+        valid = true;
     }
-    if(parts.length() > 0)
-    {
+    if(parts.length() > 0) {
         days = parts.last().toInt();
+        valid = true;
     }
 
     TimeSpan result = TimeSpan(days, hours, minutes, seconds, ms);
+    if(parsed != nullptr) {
+        *parsed = valid;
+    }
     return result;
 }
 
-TimeSpan TimeSpan::parseMicrosecondString(const QString &timeString)
+TimeSpan TimeSpan::parseMicrosecondString(const QString &timeString, bool* parsed)
 {
     TimeSpan result;
+    bool valid = false;
     int index = timeString.indexOf("us");
     if(index > 0) {
         QString trimmed = timeString.left(index).trimmed();
         double us = trimmed.toDouble();
         result = TimeSpan::fromMicroseconds(us);
+        valid = true;
+    }
+
+    if(parsed != nullptr) {
+        *parsed = valid;
     }
     return result;
 }
 
-TimeSpan TimeSpan::parseMillisecondString(const QString &timeString)
+TimeSpan TimeSpan::parseMillisecondString(const QString &timeString, bool* parsed)
 {
     TimeSpan result;
+    bool valid = false;
     int index = timeString.indexOf("ms");
     if(index > 0) {
         QString trimmed = timeString.left(index).trimmed();
         double ms = trimmed.toDouble();
         result = TimeSpan::fromMilliseconds(ms);
+        valid = true;
+    }
+
+    if(parsed != nullptr) {
+        *parsed = valid;
     }
     return result;
-
 }
 
 QStringList TimeSpan::getTokens(const QString& timeString)
@@ -571,6 +605,27 @@ void TimeSpan::toTimeSpec(struct timespec& timespec) const
 {
     timespec.tv_sec = (long)totalSeconds();
     timespec.tv_nsec = _nanoseconds % (qint64)NanosecondsPerSecond;
+}
+
+QString TimeSpan::toString(Format format, bool microseconds) const
+{
+    QString result;
+    switch(format) {
+    case Milliseconds:
+        result = QString("%1ms").arg(totalMilliseconds());
+        break;
+    case MicroSeconds:
+        result = QString("%1%2s").arg(totalMicroseconds()).arg(Unicode::specialCharacter(Unicode::Micro));
+        break;
+    case Abbreviated:
+        result = toAbbreviatedFormat(true);
+        break;
+    case Auto:
+    default:
+        result = toString(microseconds);
+        break;
+    }
+    return result;
 }
 
 QString TimeSpan::toString(bool microseconds) const

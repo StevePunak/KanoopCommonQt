@@ -65,6 +65,13 @@ public:
   bool operator>=(const TimeSpan& other) const;
   bool operator<=(const TimeSpan& other) const;
 
+  enum Format {
+    Auto,
+    Milliseconds,
+    MicroSeconds,
+    Abbreviated,
+  };
+
   /**
    * Number of days represented in the days field of this super TimeSpan
    * when printed.
@@ -160,6 +167,7 @@ public:
   bool isPositive() const { return _nanoseconds > 0; }
 
   void toTimeSpec(struct timespec& timespec) const;
+  QString toString(Format format, bool microseconds = false) const;
   QString toString(bool microseconds = false) const;
   QString toAbbreviatedFormat(bool showMilliseconds = false) const;
   QString toDumpString() const;
@@ -182,7 +190,7 @@ public:
   static TimeSpan fromMinutes(double minutes);
   static TimeSpan fromHours(double hours);
   static TimeSpan fromDays(double days);
-  static TimeSpan fromString(const QString& timeString);
+  static TimeSpan fromString(const QString& timeString, bool* parsed = nullptr);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
   static TimeSpan diff(const QDateTime& now, const QDateTime& then);
   static TimeSpan diff(std::chrono::system_clock::time_point now, std::chrono::system_clock::time_point then);
@@ -193,10 +201,10 @@ public:
   static TimeSpan min(const TimeSpan& t1, const TimeSpan& t2) { return t1 < t2 ? t1 : t2; }
 
 private:
-  static TimeSpan parseAbbreviatedString(const QString& timeString);
-  static TimeSpan parseColonDelimitedString(const QString& timeString);
-  static TimeSpan parseMicrosecondString(const QString& timeString);
-  static TimeSpan parseMillisecondString(const QString& timeString);
+  static TimeSpan parseAbbreviatedString(const QString& timeString, bool* parsed = nullptr);
+  static TimeSpan parseColonDelimitedString(const QString& timeString, bool* parsed = nullptr);
+  static TimeSpan parseMicrosecondString(const QString& timeString, bool* parsed = nullptr);
+  static TimeSpan parseMillisecondString(const QString& timeString, bool* parsed = nullptr);
   static QStringList getTokens(const QString &timeString);
   static int parseIntToToken(QString &remaining, const QString &until);
 
