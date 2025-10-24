@@ -38,6 +38,8 @@ public:
     EntityMetadata(int type, const QVariant& data, KANOOP::ModelRole role = KANOOP::DataRole);
     EntityMetadata(int type, const QVariant& data, const QUuid& uuid, KANOOP::ModelRole role = KANOOP::DataRole);
 
+    bool operator==(const EntityMetadata& other) const;
+
     int type() const { return _type; }
     QString typeString() const;
 
@@ -65,9 +67,9 @@ public:
 private:
     void resolveIconId();
 
-    int _type;
+    int _type = 0;
     QMap<int, QVariant> _data;
-    int _iconId;
+    int _iconId = 0;
 
     static QMap<int, EntityMetadataInfo*> _registeredTypes;
     static QMap<QString, int> _nameToTypeMap;
