@@ -29,6 +29,23 @@ EntityMetadata::EntityMetadata(int type, const QVariant& data, const QUuid& uuid
     setUuid(uuid);
 }
 
+bool EntityMetadata::operator==(const EntityMetadata& other) const
+{
+    bool result = _type == other._type &&
+                  _iconId == other._iconId &&
+                  _data.count() == other._data.count();
+    if(result == true) {
+        QList<int> keys = _data.keys();
+        for(int i = 0;i < keys.count();i++) {
+            int key = keys.at(i);
+            if((result = _data[key] == other._data[key]) == false) {
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 QString EntityMetadata::typeString() const
 {
     return getTypeString(_type);
