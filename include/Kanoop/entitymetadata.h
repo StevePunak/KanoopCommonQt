@@ -75,7 +75,7 @@ private:
     static QMap<QString, int> _nameToTypeMap;
 };
 
-class EntityMetadataList : public QList<EntityMetadata>
+class KANOOP_EXPORT EntityMetadataList : public QList<EntityMetadata>
 {
 public:
     EntityMetadataList findByType(int type) const
