@@ -94,8 +94,9 @@ QString UserUtil::currentUserName()
 
 QString UserUtil::currentUserName()
 {
+#define MAX_UNLEN 512
     QString result;
-    char acUserName[UNLEN + 1];
+    char acUserName[MAX_UNLEN + 1];
     DWORD nUserName = sizeof(acUserName);
     if (GetUserNameA(acUserName, &nUserName)) { // Use GetUserNameA for char array
         result = acUserName;
