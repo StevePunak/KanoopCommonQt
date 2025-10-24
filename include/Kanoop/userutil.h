@@ -13,8 +13,9 @@
 #include <pwd.h>
 #include <grp.h>
 #include <QString>
+#include "kanoopcommon.h"
 
-class UserUtil
+class KANOOP_EXPORT UserUtil
 {
 public:
     static gid_t gidFromName(const QString& name);
