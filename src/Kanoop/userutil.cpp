@@ -2,7 +2,11 @@
 
 #ifndef __WIN32
 #include "unistd.h"
+#else
+#include <windows.h>
+#endif
 
+#ifndef __WIN32
 gid_t UserUtil::gidFromName(const QString &name)
 {
     gid_t ret = 0;
@@ -48,14 +52,6 @@ uid_t UserUtil::currentUser()
     return uidFromName(currentUserName());
 }
 
-QString UserUtil::currentUserName()
-{
-    char buf[1024];
-    if(getlogin_r(buf, sizeof(buf)) != 0)
-        buf[0] = 0;
-    return QString(buf);
-}
-
 QString UserUtil::currentUserFullName()
 {
     QString result;
@@ -86,4 +82,26 @@ bool UserUtil::isUserMemberOfGroup(uid_t uid, gid_t gid)
     return false;
 }
 
+QString UserUtil::currentUserName()
+{
+    char buf[1024];
+    if(getlogin_r(buf, sizeof(buf)) != 0)
+        buf[0] = 0;
+    return QString(buf);
+}
+
+#else
+
+QString UserUtil::currentUserName()
+{
+#define MAX_UNLEN 512
+    QString result;
+    char acUserName[MAX_UNLEN + 1];
+    DWORD nUserName = sizeof(acUserName);
+    if (GetUserNameA(acUserName, &nUserName)) { // Use GetUserNameA for char array
+        result = acUserName;
+    }
+    return result;
+}
 #endif
+
