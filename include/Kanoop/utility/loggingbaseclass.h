@@ -14,6 +14,8 @@ public:
     LoggingBaseClass(const Log::LogCategory& category = Log::LogCategory());
     LoggingBaseClass(const QString& category);
 
+    Log::LogCategory logCategory() const { return _baseCategory; }
+
 protected:
     Log::LogCategory LVL0() const { return _baseCategory; }
     Log::LogCategory LVL1() const { return _level1; }

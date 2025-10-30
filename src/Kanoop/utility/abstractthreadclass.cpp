@@ -75,6 +75,7 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
         logText(LVL_WARNING, QString("%1: Tried to stop while not running").arg(objectName()));
     }
     else {
+        _stopping = true;
         _thread.quit();
         if(_stopEvent.wait(timeout) == false) {
             logText(LVL_ERROR, QString("%1: Thread stop never completed. Aborting thread!").arg(objectName()));
@@ -82,6 +83,7 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
             result = false;
         }
     }
+    _stopping = false;
     return result;
 }
 
@@ -111,6 +113,7 @@ void AbstractThreadClass::finishAndStop(bool success, const QString &message)
 {
     _success = success;
     _message = message;
+    _stopping = true;
     _thread.quit();
 }
 
@@ -139,5 +142,6 @@ void AbstractThreadClass::onThreadFinished()
     }
     _stopEvent.set();
     emit finished();
+    _stopping = false;
 }
 

@@ -30,6 +30,7 @@ public:
     bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
 
     bool isRunning() const { return _thread.isRunning(); }
+    bool isStopping() const { return _stopping; }
 
     bool success() const { return _success; }
     QString completionMessage() const { return _message; }
@@ -49,8 +50,10 @@ protected:
 private:
     void commonInit();
 
-    bool _success;
+    bool _success = false;
     QString _message;
+
+    bool _stopping = false;
 
     QThread _thread;
     QTextStream _stdout;
