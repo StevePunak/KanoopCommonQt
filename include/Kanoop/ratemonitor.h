@@ -29,7 +29,10 @@ public:
     RateMonitor(int evaluationMsecs) :
         _evaluationMsecs(evaluationMsecs) {}
 
+public slots:
     void addEvent(int count = 1);
+
+public:
     double eventsPerSecond();
 
     QVariant data() const { return _data; }

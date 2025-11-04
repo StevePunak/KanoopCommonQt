@@ -24,6 +24,8 @@ protected:
 
     QTcpSocket* socket() const { return _socket; }
 
+    TcpServer* server() const { return _server; }
+
 private:
     virtual void threadStarted() override final;
     virtual void threadFinished() override final;
