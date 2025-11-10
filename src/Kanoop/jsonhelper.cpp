@@ -115,7 +115,11 @@ void JsonHelper::appendToArray(QJsonArray& destArray, const QJsonArray& sourceAr
 
 QJsonValue JsonHelper::doubleStringOrNull(const QVariant& value, int precision)
 {
-    return value.isNull() ? QJsonValue() : QString("%1").arg(value.toDouble(), 0, 'f', precision);
+    QJsonValue result;
+    if(value.isNull() == false) {
+        result = StringUtil::toString(value.toDouble(), precision);
+    }
+    return result;
 }
 
 QJsonValue JsonHelper::arrayOrNull(const QStringList& value)
