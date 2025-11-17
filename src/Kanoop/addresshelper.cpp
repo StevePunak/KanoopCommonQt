@@ -42,7 +42,10 @@ bool AddressHelper::tryParseAddressPort(const QString &addressString, QHostAddre
 
 QHostAddress AddressHelper::resolveIPv4Address(const QString& hostName)
 {
-    QHostAddress result;
+    QHostAddress result(hostName);
+    if(result.protocol() == QAbstractSocket::IPv4Protocol) {
+        return result;
+    }
     QHostInfo hostInfo = QHostInfo::fromName(hostName);
     for(const QHostAddress& address : hostInfo.addresses()) {
         if(address.protocol() == QHostAddress::IPv4Protocol) {
