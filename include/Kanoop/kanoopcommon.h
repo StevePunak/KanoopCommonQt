@@ -45,7 +45,7 @@ public:
                    : defaultValue;
     }
 
-    T getType(const QString& name, const T defaultValue = T()) const
+    T getType(const QString& name, Qt::CaseSensitivity caseSensitivity, const T defaultValue = T()) const
     {
         bool ok;
         int enumValue = name.toInt(&ok);
@@ -55,11 +55,16 @@ public:
 
         for(auto it = EnumToStringMap<T>::constBegin();it != EnumToStringMap<T>::constEnd();it++) {
             QString value = it.value();
-            if(value == name) {
+            if(QString::compare(value, name, caseSensitivity) == 0) {
                 return it.key();
             }
         }
         return defaultValue;
+    }
+
+    T getType(const QString& name, const T defaultValue = T()) const
+    {
+        return getType(name, Qt::CaseSensitive, defaultValue);
     }
 
     QList<T> getTypes() const
