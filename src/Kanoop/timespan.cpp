@@ -631,7 +631,7 @@ QString TimeSpan::toString(Format format, bool microseconds) const
 QString TimeSpan::toString(bool microseconds) const
 {
     QString result;
-    if(qAbs(_nanoseconds) > 1000000)
+    if(qAbs(_nanoseconds) >= 1000000)
     {
         int smallValue = microseconds ? TimeSpan::microseconds() : milliseconds();
         int smallValueFieldLength = microseconds ? 6 : 3;
