@@ -10,19 +10,20 @@
 ******************************************************************************************/
 #ifndef LOGGINGTYPES_H
 #define LOGGINGTYPES_H
+#include <Kanoop/kanoopcommon.h>
 
 namespace Log {
 
 enum LogLevel
 {
-    Emergency       = 0,        // 0
-    Alert           = 1,        // 1
-    Critical        = 2,         // 2
-    Error           = 3,          // 3
-    Warning         = 4,      // 4
-    Notice          = 5,       // 5
-    Info            = 6,         // 6
-    Debug           = 7,        // 7
+    Emergency       = 0,    // 0
+    Alert           = 1,    // 1
+    Critical        = 2,    // 2
+    Error           = 3,    // 3
+    Warning         = 4,    // 4
+    Notice          = 5,    // 5
+    Info            = 6,    // 6
+    Debug           = 7,    // 7
 };
 
 enum OutputFlags
@@ -38,6 +39,26 @@ enum OutputFlags
 
     Standard = LineNumbers | Timestamp | Level | Console
 };
+
+class LogLevelToStringMap : public KANOOP::EnumToStringMap<LogLevel>
+{
+public:
+    LogLevelToStringMap()
+    {
+        insert(Emergency,   "Emergency");
+        insert(Alert,       "Alert");
+        insert(Critical,    "Critical");
+        insert(Error,       "Error");
+        insert(Warning,     "Warning");
+        insert(Notice,      "Notice");
+        insert(Info,        "Info");
+        insert(Debug,       "Debug");
+    }
+};
+
+KANOOP_EXPORT LogLevel getLogLevel(const QString& levelName);
+KANOOP_EXPORT QList<LogLevel> getLogLevels();
+KANOOP_EXPORT QString getLogLevelString(LogLevel level);
 
 } // namespace Log
 

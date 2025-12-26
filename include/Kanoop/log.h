@@ -67,7 +67,7 @@ public:
 
     LogCategory registerCategory(const QString& name);
     LogCategory registerCategory(const LogCategory& category);
-//    LogCategory registerCategory(const LogCategory& category, LogLevel level);
+    QList<LogCategory> categories() const;
     void setCategoryLevel(const QString& name, LogLevel level);
 
     void addConsumer(LogConsumer* consumer);
@@ -134,6 +134,7 @@ KANOOP_EXPORT void disableOutputFlags(OutputFlags flags);
 
 KANOOP_EXPORT LogCategory registerCategory(const QString& name);
 KANOOP_EXPORT LogCategory registerCategory(const QString &name, LogLevel level);
+KANOOP_EXPORT QList<LogCategory> categories();
 KANOOP_EXPORT void setCategoryLevel(const QString& name, LogLevel level);
 
 KANOOP_EXPORT void addConsumer(LogConsumer* consumer);

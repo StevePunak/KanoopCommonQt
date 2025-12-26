@@ -220,6 +220,15 @@ LogCategory Logger::registerCategory(const LogCategory &category)
     return newCategory;
 }
 
+QList<LogCategory> Logger::categories() const
+{
+    QList<LogCategory> result;
+    for(LogCategoryPrivate* category : _categories) {
+        result.append(*category);
+    }
+    return result;
+}
+
 //LogCategory Logger::registerCategory(const LogCategory &category, LogLevel level)
 //{
 //    return registerCategory(category.name(), level);
@@ -453,6 +462,11 @@ LogCategory Log::registerCategory(const QString& name)
     return systemLog()->registerCategory(name);
 }
 
+QList<LogCategory> Log::categories()
+{
+    return systemLog()->categories();
+}
+
 void Log::setCategoryLevel(const QString &name, LogLevel level)
 {
     systemLog()->setCategoryLevel(name, level);
@@ -561,3 +575,4 @@ QDateTime Log::getLogEndTime(const QString& filename)
     }
     return result;
 }
+
