@@ -35,6 +35,7 @@ public:
     bool success() const { return _success; }
     QString completionMessage() const { return _message; }
 
+    void setBlockingStart(bool value) { _blockingStart = value; }
 
 protected:
     virtual void threadStarted() = 0;
@@ -54,6 +55,7 @@ private:
     QString _message;
 
     bool _stopping = false;
+    bool _blockingStart = false;
 
     QThread _thread;
     QTextStream _stdout;

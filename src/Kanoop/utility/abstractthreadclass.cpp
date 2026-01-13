@@ -60,7 +60,7 @@ bool AbstractThreadClass::start(const TimeSpan &timeout)
     }
     else {
         _thread.start();
-        if(timeout != TimeSpan::zero() && _startEvent.wait(timeout) == false) {
+        if((_blockingStart || timeout != TimeSpan::zero()) && _startEvent.wait(timeout) == false) {
             logText(LVL_ERROR, QString("%1: Thread start never completed").arg(objectName()));
             result = false;
         }
