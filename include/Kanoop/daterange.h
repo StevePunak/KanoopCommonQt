@@ -3,8 +3,9 @@
 #include <QDateTime>
 
 #include <Kanoop/timespan.h>
+#include "kanoopcommon.h"
 
-class DateRange
+class KANOOP_EXPORT DateRange
 {
 public:
     DateRange() {}
