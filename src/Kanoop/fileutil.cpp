@@ -4,6 +4,7 @@
 
 #include <QCryptographicHash>
 #include <QFile>
+#include <QTemporaryFile>
 #include <QTextStream>
 
 #include <sys/time.h>
@@ -106,6 +107,25 @@ bool FileUtil::appendAllBytes(const QString& filename, const QByteArray& data)
     return false;
 }
 
+int FileUtil::lineCount(const QString& filename)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Could not open file for reading:" << file.errorString();
+        return -1;
+    }
+
+    QTextStream in(&file);
+    int lineCount = 0;
+    while (!in.atEnd()) {
+        in.readLine();
+        lineCount++;
+    }
+
+    file.close();
+    return lineCount;
+}
+
 bool FileUtil::exists(const QString &filename)
 {
     QFile file(filename);
@@ -173,4 +193,14 @@ bool FileUtil::setModifyTime(const QString &filename, const QDateTime &value)
 
     return utimes(filename.toStdString().c_str(), times) == 0;
 #endif
+}
+
+QString FileUtil::getTempFilename()
+{
+    QString tempFilename;
+    QTemporaryFile tempFile;
+    (void)tempFile.open();
+    tempFilename = tempFile.fileName();
+    tempFile.close();
+    return tempFilename;
 }

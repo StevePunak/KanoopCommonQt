@@ -90,6 +90,7 @@ TimeSpan& TimeSpan::operator =(const timespec& other)
 TimeSpan& TimeSpan::operator =(const TimeSpan& other)
 {
     _nanoseconds = other._nanoseconds;
+    _valid = other._valid;
     return *this;
 }
 
@@ -133,6 +134,8 @@ double TimeSpan::totalNanoseconds() const
 {
     return (double)_nanoseconds;
 }
+
+
 
 TimeSpan TimeSpan::operator +(const TimeSpan& other) const
 {
@@ -402,6 +405,13 @@ TimeSpan TimeSpan::fromString(const QString &timeString, bool* parsed)
     return TimeSpan::zero();
 }
 
+TimeSpan TimeSpan::invalid()
+{
+    TimeSpan result;
+    result._valid = false;
+    return result;
+}
+
 TimeSpan TimeSpan::parseAbbreviatedString(const QString &timeString, bool* parsed)
 {
     QString remaining = timeString.trimmed();
@@ -620,6 +630,15 @@ QString TimeSpan::toString(Format format, bool microseconds) const
     case Abbreviated:
         result = toAbbreviatedFormat(true);
         break;
+    case NoMilliseconds:
+    {
+        result = toString(false);
+        int index = result.lastIndexOf('.');
+        if(index > 0) {
+            result = result.mid(0, index);
+        }
+        break;
+    }
     case Auto:
     default:
         result = toString(microseconds);
@@ -631,27 +650,33 @@ QString TimeSpan::toString(Format format, bool microseconds) const
 QString TimeSpan::toString(bool microseconds) const
 {
     QString result;
+    // ensure we're dealing with a positive value
+    TimeSpan tmp = _nanoseconds >= 0 ? *this : TimeSpan::fromNanoseconds(std::abs(_nanoseconds));
+
     if(qAbs(_nanoseconds) >= 1000000)
     {
-        int smallValue = microseconds ? TimeSpan::microseconds() : milliseconds();
+        int smallValue = microseconds ? tmp.microseconds() : tmp.milliseconds();
         int smallValueFieldLength = microseconds ? 6 : 3;
         result = days() == 0
                 ? QString("%1:%2:%3.%4").
-                  arg(hours(), 2, 10, QChar('0')).
-                  arg(minutes(), 2, 10, QChar('0')).
-                  arg(seconds(), 2, 10, QChar('0')).
+                  arg(tmp.hours(), 2, 10, QChar('0')).
+                  arg(tmp.minutes(), 2, 10, QChar('0')).
+                  arg(tmp.seconds(), 2, 10, QChar('0')).
                   arg(smallValue, smallValueFieldLength, 10, QChar('0'))
                 : QString("%1.:%2:%3:%4.%5").
-                  arg(days()).
-                  arg(hours(), 2, 10, QChar('0')).
-                  arg(minutes(), 2, 10, QChar('0')).
-                  arg(seconds(), 2, 10, QChar('0')).
+                  arg(tmp.days()).
+                  arg(tmp.hours(), 2, 10, QChar('0')).
+                  arg(tmp.minutes(), 2, 10, QChar('0')).
+                  arg(tmp.seconds(), 2, 10, QChar('0')).
                   arg(smallValue, smallValueFieldLength, 10, QChar('0'));
     }
     else
     {
-        double microseconds = (double)_nanoseconds / (double)1000;
+        double microseconds = (double)tmp._nanoseconds / (double)1000;
         result = QString("%1us").arg(microseconds, 0, 'f', 3);
+    }
+    if(_nanoseconds < 0) {
+        result.prepend('-');
     }
     return result;
 }

@@ -25,12 +25,14 @@ public:
     static bool writeAllBytes(const QString& filename, const QByteArray& data, QStringConverter::Encoding encoding);
     static bool writeAllLines(const QString& filename, const QStringList& lines);
     static bool appendAllBytes(const QString& filename, const QByteArray& data);
+    static int lineCount(const QString& filename);
     static bool exists(const QString& filename);
     static bool remove(const QString& filename);
     static bool touch(const QString& filename);
     static bool move(const QString& source, const QString& destination);
     static bool moveToDirectory(const QString& sourceFilename, const QString& destinationDirectory);
     static bool setModifyTime(const QString& filename, const QDateTime& value);
+    static QString getTempFilename();
 };
 
 #endif // FILEUTIL_H

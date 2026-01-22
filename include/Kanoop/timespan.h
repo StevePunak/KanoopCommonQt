@@ -70,6 +70,7 @@ public:
     Milliseconds,
     MicroSeconds,
     Abbreviated,
+    NoMilliseconds,
   };
 
   /**
@@ -166,6 +167,8 @@ public:
   bool isNegative() const { return _nanoseconds < 0; }
   bool isPositive() const { return _nanoseconds > 0; }
 
+  bool isValid() const { return _valid; }
+
   void toTimeSpec(struct timespec& timespec) const;
   QString toString(Format format, bool microseconds = false) const;
   QString toString(bool microseconds = false) const;
@@ -192,6 +195,7 @@ public:
   static TimeSpan fromDays(double days);
   static TimeSpan fromString(const QString& timeString, bool* parsed = nullptr);
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
+  static TimeSpan invalid();
   static TimeSpan diff(const QDateTime& now, const QDateTime& then);
   static TimeSpan diff(std::chrono::system_clock::time_point now, std::chrono::system_clock::time_point then);
   static TimeSpan absDiff(const QDateTime& t1, const QDateTime& t2);
@@ -208,7 +212,8 @@ private:
   static QStringList getTokens(const QString &timeString);
   static int parseIntToToken(QString &remaining, const QString &until);
 
-  qint64    _nanoseconds;
+  qint64  _nanoseconds;
+  bool    _valid = true;
 
 // Constants
     static const double NanosecondsPerMicrosecond;
