@@ -166,6 +166,7 @@ public:
   bool isZero() const { return _nanoseconds == 0; }
   bool isNegative() const { return _nanoseconds < 0; }
   bool isPositive() const { return _nanoseconds > 0; }
+  TimeSpan absoluteValue() const;
 
   bool isValid() const { return _valid; }
 

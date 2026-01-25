@@ -135,7 +135,10 @@ double TimeSpan::totalNanoseconds() const
     return (double)_nanoseconds;
 }
 
-
+TimeSpan TimeSpan::absoluteValue() const
+{
+    return TimeSpan::fromNanoseconds(std::abs(_nanoseconds));
+}
 
 TimeSpan TimeSpan::operator +(const TimeSpan& other) const
 {
