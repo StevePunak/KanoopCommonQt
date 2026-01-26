@@ -11,6 +11,8 @@ public:
     DateRange() {}
     DateRange(const QDateTime& startTime, const QDateTime& endTime) :
         _startTime(startTime), _endTime(endTime) {}
+    DateRange(const QDateTime& startTime, const TimeSpan& duration) :
+        _startTime(startTime), _endTime(startTime.addMSecs(duration.totalMilliseconds())) {}
 
     DateRange(const DateRange& other);
 
