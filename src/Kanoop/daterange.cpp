@@ -68,8 +68,12 @@ DateRange DateRange::subRange(const DateRange& other) const
 
 DateRange DateRange::merged(const DateRange& other) const
 {
-    QDateTime min = std::min(_startTime, other._startTime);
-    QDateTime max = std::max(_endTime, other._endTime);
+    QDateTime min = _startTime.isValid()
+                    ? std::min(_startTime, other._startTime)
+                    : other._startTime;
+    QDateTime max = _endTime.isValid()
+                    ? std::max(_endTime, other._endTime)
+                    : other._endTime;
     return DateRange(min, max);
 }
 
