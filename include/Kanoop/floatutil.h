@@ -1,8 +1,9 @@
 #ifndef FLOATUTIL_H
 #define FLOATUTIL_H
 
+#include "kanoopcommon.h"
 
-class FloatUtil
+class KANOOP_EXPORT FloatUtil
 {
 public:
     static bool isEvenlyDivisible(double dividend, double divisor);
