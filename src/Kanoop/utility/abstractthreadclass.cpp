@@ -121,6 +121,7 @@ void AbstractThreadClass::onThreadStarted()
 {
     try
     {
+        emit started();
         threadStarted();
     }
     catch(const CommonException& e)
