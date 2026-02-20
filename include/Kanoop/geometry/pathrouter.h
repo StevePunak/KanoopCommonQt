@@ -11,6 +11,13 @@
 #include "rectangle.h"
 #include "Kanoop/kanoopcommon.h"
 
+/**
+ * @brief Orthogonal path-routing algorithm that navigates around rectangular obstacles.
+ *
+ * PathRouter computes a list of horizontal/vertical line segments connecting an origin
+ * point to a destination point while avoiding a set of rectangular obstacles on a canvas.
+ * Call calcluatePath() after configuration to obtain the routed Line::List.
+ */
 class KANOOP_EXPORT PathRouter
 {
 public:

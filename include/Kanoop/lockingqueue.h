@@ -12,10 +12,21 @@
 #include <QWaitCondition>
 #include <QMutex>
 
+/**
+ * @brief Thread-safe, blocking multi-producer multi-consumer queue.
+ *
+ * @tparam T Element type stored in the queue
+ */
 template <class T>
 class LockingQueue : public QList<T>
 {
 public:
+    /**
+     * @brief Remove and return the front element, blocking until one is available or timeout elapses.
+     * @param waitTimeMs Maximum time to wait in milliseconds
+     * @param success Output set to true if an element was dequeued, false on timeout
+     * @return Dequeued element, or a default-constructed T on timeout
+     */
     T dequeue(quint32 waitTimeMs, bool& success)
     {
         T result = T();
@@ -44,6 +55,10 @@ public:
         return result;
     }
 
+    /**
+     * @brief Append an element to the back of the queue and wake one waiting consumer.
+     * @param t Element to enqueue
+     */
     void enqueue(const T& t)
     {
         _queueLock.lock();
