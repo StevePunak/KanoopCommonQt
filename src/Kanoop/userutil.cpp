@@ -29,7 +29,7 @@ uid_t UserUtil::uidFromName(const QString &name)
 
 QString UserUtil::nameFromGid(gid_t gid)
 {
-    QString ret = 0;
+    QString ret;
     struct group* group;
     group = getgrgid(gid);
     if(group != nullptr)

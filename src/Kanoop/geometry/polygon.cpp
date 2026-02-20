@@ -92,8 +92,10 @@ Point Polygon::centroid() const
     centroid.ry() += (y0 + y1) * a;
 
     signedArea *= 0.5;
-    centroid.rx() /= (6 * signedArea);
-    centroid.ry() /= (6 * signedArea);
+    if(signedArea != 0) {
+        centroid.rx() /= (6 * signedArea);
+        centroid.ry() /= (6 * signedArea);
+    }
 
     return centroid;
 }

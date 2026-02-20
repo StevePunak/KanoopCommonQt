@@ -47,11 +47,11 @@ double Line::slope() const
     double	result = 0;
     double	y = _p2.y() - _p1.y();
     double	x = _p2.x() - _p1.x();
-    if(y == 0) {
+    if(x == 0) {
         result = DBL_MAX;
     }
-    else if(x == 0) {
-        result = DBL_MIN;
+    else if(y == 0) {
+        result = 0;
     }
     else {
         result = y / x;
@@ -66,7 +66,7 @@ double Line::intercept() const
     double theSlope = slope();
 
     /** not vertical */
-    if(ret != DBL_MIN) {
+    if(theSlope != DBL_MAX) {
         ret = _p1.y() - (_p1.x() * theSlope);
     }
     return ret;

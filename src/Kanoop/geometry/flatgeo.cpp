@@ -7,7 +7,7 @@
 using namespace Geo;
 double FlatGeo::vectorAngle(const Line &l1, const Line &l2)
 {
-    double		a = l1.p1().x() - l1.p1().x();
+    double		a = l1.p2().x() - l1.p1().x();
     double		b = l1.p2().y() - l1.p1().y();
     double		c = l2.p2().x() - l2.p1().x();
     double		d = l2.p2().y() - l2.p1().y();
@@ -122,7 +122,7 @@ QPointF FlatGeo::rotate(const QPointF &point, const QPointF &centroid, double an
     np.setX(((x * qCos(angle * (M_PI / 180))) - (y * qSin(angle * (M_PI / 180)))) + centroid.x());
     np.setY((qSin(angle * (M_PI / 180)) * x + qCos(angle * (M_PI / 180)) * y) + centroid.y());
 
-    return QPointF(x, y);
+    return np;
 }
 
 bool FlatGeo::arePointsEqual(const QPointF &p1, const QPointF &p2, int precision)

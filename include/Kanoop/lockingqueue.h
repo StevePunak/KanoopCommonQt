@@ -31,20 +31,15 @@ public:
         }
         else
         {
-            _queueLock.unlock();        // allow adding
-            QMutex mutex;
-            mutex.lock();
-            if(_condition.wait(&mutex, quint32(waitTimeMs)))
+            if(_condition.wait(&_queueLock, quint32(waitTimeMs)))
             {
-                _queueLock.lock();
                 if(this->count() > 0)
                 {
                     result = this->takeFirst();
                     success = true;
                 }
-                _queueLock.unlock();
             }
-            mutex.unlock();
+            _queueLock.unlock();
         }
         return result;
     }
