@@ -77,7 +77,7 @@ public:
     {
         typename EnumToStringMap<T>::const_iterator it = std::find_if(EnumToStringMap<T>::constBegin(), EnumToStringMap<T>::constEnd(), [name, cs](const QString& a)
         {
-            return a.compare(name, a, cs) == 0;
+            return a.compare(name, cs) == 0;
         });
         if(it != EnumToStringMap<T>::constEnd()) {
             return true;
