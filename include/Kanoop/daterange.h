@@ -125,6 +125,13 @@ public:
     bool contains(const DateRange& other) const { return contains(other.startTime()) && contains(other.endTime()); }
 
     /**
+     * @brief Test whether another DateRange is intersects with this one.
+     * @param other Range to test
+     * @return true if other is fully within this range
+     */
+    bool intersects(const DateRange& other) const;
+
+    /**
      * @brief Return the intersection of this range with another.
      * @param other Range to intersect with
      * @return Overlapping sub-range, or an invalid DateRange if no overlap
