@@ -11,9 +11,17 @@
 #include "rectangle.h"
 #include "Kanoop/kanoopcommon.h"
 
+/**
+ * @brief Orthogonal path-routing algorithm that navigates around rectangular obstacles.
+ *
+ * PathRouter computes a list of horizontal/vertical line segments connecting an origin
+ * point to a destination point while avoiding a set of rectangular obstacles on a canvas.
+ * Call calcluatePath() after configuration to obtain the routed Line::List.
+ */
 class KANOOP_EXPORT PathRouter
 {
 public:
+    /** @brief Default constructor — creates an unconfigured router with default margin settings. */
     PathRouter() :
         _direction(Geo::NoDirection),
         _forceDirection(Geo::NoDirection),
@@ -25,37 +33,134 @@ public:
         _routeAroundMargins(true),
         _verticalConstraint(-1),
         _debugLevel(0) {}
+
+    /**
+     * @brief Construct a PathRouter with full configuration.
+     * @param origin Starting point for the path
+     * @param destination Ending point for the path
+     * @param canvas Bounding rectangle for the entire routing area
+     * @param obstacles List of rectangular obstacles to route around (default empty)
+     */
     PathRouter(const Point& origin, const Point& destination, const QRectF &canvas, const QList<Rectangle> &obstacles = QList<Rectangle>());
 
+    /**
+     * @brief Compute the routed path from origin to destination avoiding all obstacles.
+     * @return Ordered list of line segments forming the routed path
+     */
     Line::List calcluatePath();
 
+    /**
+     * @brief Append a single obstacle rectangle to the routing obstacle set.
+     * @param value Obstacle rectangle to add
+     */
     void appendObstacle(const Rectangle& value) { _obstacles.append(value); }
+
+    /**
+     * @brief Replace the entire obstacle set.
+     * @param value New list of obstacle rectangles
+     */
     void setObstacles(const QList<Rectangle>& value) { _obstacles = value; }
 
+    /**
+     * @brief Return the origin point.
+     * @return Current origin Point
+     */
     Point originPoint() const { return _originPoint; }
+
+    /**
+     * @brief Set the origin point.
+     * @param value New origin Point
+     */
     void setOriginPoint(const Point& value) { _originPoint = value ; }
 
+    /**
+     * @brief Return the destination point.
+     * @return Current destination Point
+     */
     Point destinationPoint() const { return _destinationPoint; }
+
+    /**
+     * @brief Set the destination point.
+     * @param value New destination Point
+     */
     void setDestinationPoint(const Point& value) { _destinationPoint = value; }
 
+    /**
+     * @brief Return the routing margin applied around each obstacle.
+     * @return Margin in pixels/units
+     */
     int routingMargin() const { return _routingMargin; }
+
+    /**
+     * @brief Set the routing margin applied around each obstacle.
+     * @param value Margin in pixels/units
+     */
     void setRoutingMargin(int value) { _routingMargin = value; }
 
+    /**
+     * @brief Return whether empty (non-obstacle) rectangles are consolidated before routing.
+     * @return true if consolidation is enabled
+     */
     bool consolidateEmptyRectangles() const { return _consolidateEmptyRectangles; }
+
+    /**
+     * @brief Enable or disable consolidation of empty rectangles before routing.
+     * @param value true to enable consolidation
+     */
     void setConsolidateEmptyRectangles(bool value) { _consolidateEmptyRectangles = value; }
 
+    /**
+     * @brief Return whether the router routes around obstacle margins.
+     * @return true if margin-based routing is enabled
+     */
     bool routeAroundMargins() const { return _routeAroundMargins; }
+
+    /**
+     * @brief Enable or disable routing around obstacle margins.
+     * @param value true to route around margins
+     */
     void setRouteAroundMargins(bool value) { _routeAroundMargins = value; }
 
+    /**
+     * @brief Force the direction of the first routed segment.
+     * @param direction Preferred initial travel direction
+     */
     void setInitialDirection(Geo::Direction direction) { _forceDirection = direction; }
+
+    /**
+     * @brief Set the length of the first segment before obstacle avoidance begins.
+     * @param value Length in pixels/units
+     */
     void setFirstSegmentLength(double value) { _firstSegmentLength = value; }
 
+    /**
+     * @brief Return the vertical constraint (maximum Y coordinate the path may reach).
+     * @return Constraint Y value, or -1 if unconstrained
+     */
     int verticalConstraint() const { return _verticalConstraint; }
+
+    /**
+     * @brief Set the vertical constraint (maximum Y the path may reach).
+     * @param value Y constraint value, or -1 to disable
+     */
     void setVerticalConstraint(int value) { _verticalConstraint = value; }
 
+    /**
+     * @brief Return the debug verbosity level.
+     * @return Debug level (0 = silent)
+     */
     int debugLevel() const { return _debugLevel; }
+
+    /**
+     * @brief Set the debug verbosity level.
+     * @param value Debug level (0 = silent, higher = more verbose)
+     */
     void setDebugLevel(int value) { _debugLevel = value; }
 
+    /**
+     * @brief Merge adjacent collinear line segments in-place.
+     * @param lines Line list to process; merged in place
+     */
     static void mergeAdjacentLines(Line::List& lines);
 
 private:

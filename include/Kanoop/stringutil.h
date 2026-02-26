@@ -18,6 +18,13 @@
 #include <QUuid>
 #include "kanoopcommon.h"
 
+/**
+ * @brief Static helper methods for string conversion, manipulation, and fuzzy matching.
+ *
+ * Provides conversions between strings and common types (bool, double, QByteArray),
+ * trimming, splitting with quote awareness, and fuzzy matching via the BITAP and
+ * Levenshtein Distance algorithms.
+ */
 class KANOOP_EXPORT StringUtil
 {
 public:

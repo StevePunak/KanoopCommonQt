@@ -54,6 +54,14 @@ bool DateRange::operator!=(const DateRange& other) const
     return !(*this == other);
 }
 
+bool DateRange::intersects(const DateRange& other) const
+{
+    return contains(other._startTime) ||
+            contains(other._endTime) ||
+            other.contains(_startTime) ||
+            other.contains(_endTime);
+}
+
 DateRange DateRange::subRange(const DateRange& other) const
 {
     DateRange result = *this;

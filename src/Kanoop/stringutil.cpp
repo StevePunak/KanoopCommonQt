@@ -342,7 +342,7 @@ int StringUtil::Bitap::calculate(int maxDistance)
     if (_needle[0] == '\0') return 0;
     if (m > 31) return -1; //Error: The pattern is too long!
 
-    R = new unsigned long[(maxDistance + 1) * sizeof *R];
+    R = new unsigned long[maxDistance + 1];
     for (i = 0; i <= maxDistance; ++i)
         R[i] = ~1;
 

@@ -1,3 +1,7 @@
+/**
+ * @brief Preprocessor constants for time-unit conversions across nanoseconds, microseconds,
+ *        milliseconds, seconds, minutes, hours, and days.
+ */
 #ifndef __TIMECONSTANTS_H
 #define __TIMECONSTANTS_H
 

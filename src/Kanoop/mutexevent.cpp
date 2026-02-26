@@ -27,21 +27,14 @@ bool MutexEvent::wait(int msecs)
 
     if(_isset == false)
     {
-        QMutex mutex;
-        mutex.lock();
-        _checkMutex.unlock();
-
         if(msecs > 0)
-            result = _condition.wait(&mutex, msecs);
+            result = _condition.wait(&_checkMutex, msecs);
         else
-            result = _condition.wait(&mutex);
+            result = _condition.wait(&_checkMutex);
 
-        _checkMutex.lock();
         _isset = false;
         _isWaiting = false;
         _checkMutex.unlock();
-
-        mutex.unlock();
     }
     else
     {
