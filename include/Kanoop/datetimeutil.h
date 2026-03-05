@@ -97,6 +97,7 @@ public:
      * @return Formatted time string
      */
     static QString toStandardTimeString(const QDateTime& date) { return date.time().toString("HH:mm:ss.zzz"); }
+    static QString toStandardDateString(const QDateTime& date) { return date.toString("yyyy-MM-dd"); }
 
     /**
      * @brief Return the current UTC time as an ISO-8601 Zulu string.
