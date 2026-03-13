@@ -36,7 +36,8 @@ public:
     DateRange(const QDateTime& startTime, const TimeSpan& duration) :
         _startTime(startTime), _endTime(startTime.addMSecs(duration.totalMilliseconds())) {}
 
-    /** @brief Copy constructor. */
+    /** @brief Copy constructor.
+     * @param other DateRange to copy. */
     DateRange(const DateRange& other);
 
     /**
@@ -47,7 +48,9 @@ public:
      */
     static DateRange fromMidpoint(const QDateTime& midpoint, const TimeSpan& duration);
 
-    /** @brief Assignment operator. */
+    /** @brief Assignment operator.
+     * @param other DateRange to assign from.
+     * @return Reference to this. */
     DateRange& operator=(const DateRange& other);
 
     /**
@@ -64,14 +67,20 @@ public:
      */
     DateRange operator-(const TimeSpan& other) const;
 
-    /** @brief Shift both endpoints forward by a TimeSpan in place. */
+    /** @brief Shift both endpoints forward by a TimeSpan in place.
+     * @param other Amount to add. */
     void operator+=(const TimeSpan& other);
-    /** @brief Shift both endpoints backward by a TimeSpan in place. */
+    /** @brief Shift both endpoints backward by a TimeSpan in place.
+     * @param other Amount to subtract. */
     void operator-=(const TimeSpan& other);
 
-    /** @brief Equality comparison. */
+    /** @brief Equality comparison.
+     * @param other DateRange to compare.
+     * @return True if both endpoints are equal. */
     bool operator==(const DateRange& other) const;
-    /** @brief Inequality comparison. */
+    /** @brief Inequality comparison.
+     * @param other DateRange to compare.
+     * @return True if the ranges differ. */
     bool operator!=(const DateRange& other) const;
 
     /**

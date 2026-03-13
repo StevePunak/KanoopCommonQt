@@ -1,12 +1,5 @@
-
-KanoopCommon\.pro\.user\.4\.9-pre1
-
+KanoopCommon.pro.user.*
 *.user
-
 *.vpj
-
-*.10-pre1
-
-*.1ae53b0
-
 build/
+docs/html/

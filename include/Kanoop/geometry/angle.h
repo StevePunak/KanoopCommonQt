@@ -53,13 +53,17 @@ public:
      */
     Angle operator-(double degrees) const;
 
-    /** @brief Add another Angle in place. */
+    /** @brief Add another Angle in place.
+     * @param other Angle to add. */
     void operator+=(const Angle& other) { *this = *this + other; }
-    /** @brief Add a scalar degree value in place. */
+    /** @brief Add a scalar degree value in place.
+     * @param degrees Degrees to add. */
     void operator+=(double degrees) { *this = *this + degrees; }
-    /** @brief Subtract another Angle in place. */
+    /** @brief Subtract another Angle in place.
+     * @param other Angle to subtract. */
     void operator-=(const Angle& other) { *this = *this - other; }
-    /** @brief Subtract a scalar degree value in place. */
+    /** @brief Subtract a scalar degree value in place.
+     * @param degrees Degrees to subtract. */
     void operator-=(double degrees) { *this = *this - degrees; }
 
     /**

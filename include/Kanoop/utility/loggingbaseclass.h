@@ -42,13 +42,17 @@ public:
     Log::LogCategory logCategory() const { return _baseCategory; }
 
 protected:
-    /** @brief Return the base (level 0) log category. */
+    /** @brief Return the base (level 0) log category.
+     * @return Base log category. */
     Log::LogCategory LVL0() const { return _baseCategory; }
-    /** @brief Return the level-1 sub-category. */
+    /** @brief Return the level-1 sub-category.
+     * @return Level-1 log category. */
     Log::LogCategory LVL1() const { return _level1; }
-    /** @brief Return the level-2 sub-category. */
+    /** @brief Return the level-2 sub-category.
+     * @return Level-2 log category. */
     Log::LogCategory LVL2() const { return _level2; }
-    /** @brief Return the level-3 sub-category. */
+    /** @brief Return the level-3 sub-category.
+     * @return Level-3 log category. */
     Log::LogCategory LVL3() const { return _level3; }
 
     /**
