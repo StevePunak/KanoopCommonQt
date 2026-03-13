@@ -36,7 +36,9 @@ public:
         Cubed,              ///< Superscript three (³, U+00B3)
         Degrees,            ///< Degree sign (°, U+00B0)
         Delta,              ///< Greek capital Delta (Δ, U+0394)
+        EmDash,             ///< Em dash (—, U+2014)
         Micro,              ///< Micro sign (µ, U+00B5)
+        MusicNote,          ///< Beamed eighth notes (♫, U+266B)
         OneHalf,            ///< Vulgar fraction one half (½, U+00BD)
         OneQuarter,         ///< Vulgar fraction one quarter (¼, U+00BC)
         Paragraph,          ///< Pilcrow / paragraph sign (¶, U+00B6)
@@ -74,7 +76,9 @@ private:
             insert(Cubed,                   QChar(0x00b3));
             insert(Degrees,                 QChar(0x00b0));
             insert(Delta,                   QChar(0x0394));
+            insert(EmDash,                  QChar(0x2014));
             insert(Micro,                   QChar(0x00b5));
+            insert(MusicNote,               QChar(0x266b));
             insert(OneHalf,                 QChar(0x00bd));
             insert(OneQuarter,              QChar(0x00bc));
             insert(Paragraph,               QChar(0x00b6));
