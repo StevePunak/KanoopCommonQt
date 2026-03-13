@@ -64,6 +64,59 @@ QByteArray CryptoUtil::md5(const QStringList &of)
     return hash.result();
 }
 
+QByteArray CryptoUtil::fileSha256(const QString &filename)
+{
+    QFile file(filename);
+    QByteArray result;
+    if(file.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(QCryptographicHash::Sha256);
+        while(file.atEnd() == false) {
+            QByteArray fileData = file.read(0xffff);
+            hash.addData(fileData);
+        }
+        result = hash.result();
+    }
+    return result;
+}
+
+QString CryptoUtil::fileSha256String(const QString &filename)
+{
+    QByteArray hash = fileSha256(filename);
+    return toHashString(hash);
+}
+
+QByteArray CryptoUtil::sha256(const QByteArray &of)
+{
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    hash.addData(of);
+    return hash.result();
+}
+
+QString CryptoUtil::sha256String(const QString &of)
+{
+    QByteArray hash = sha256(of.toLatin1());
+    return toHashString(hash);
+}
+
+QString CryptoUtil::sha256String(const QByteArray &of)
+{
+    QByteArray hash = sha256(of);
+    return toHashString(hash);
+}
+
+QString CryptoUtil::sha256String(const QStringList &of)
+{
+    return toHashString(sha256(of));
+}
+
+QByteArray CryptoUtil::sha256(const QStringList &of)
+{
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    foreach(const QString& line, of)
+        hash.addData(line.toLatin1());
+    return hash.result();
+}
+
 QString CryptoUtil::toHashString(const QByteArray &buffer)
 {
     QString result;
