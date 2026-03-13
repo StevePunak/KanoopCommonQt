@@ -77,6 +77,55 @@ public:
      */
     static QByteArray md5(const QStringList& of);
 
+    /**
+     * @brief Compute the SHA-256 hash of a file's contents.
+     * @param filename Path to the file
+     * @return Raw SHA-256 hash bytes, or empty array on error
+     */
+    static QByteArray fileSha256(const QString& filename);
+
+    /**
+     * @brief Compute the SHA-256 hash of a file's contents as a hex string.
+     * @param filename Path to the file
+     * @return Hex-encoded SHA-256 string, or empty string on error
+     */
+    static QString fileSha256String(const QString& filename);
+
+    /**
+     * @brief Compute the SHA-256 hash of a byte array.
+     * @param of Input data
+     * @return Raw SHA-256 hash bytes
+     */
+    static QByteArray sha256(const QByteArray& of);
+
+    /**
+     * @brief Compute the SHA-256 hash of a string as a hex string.
+     * @param of Input string
+     * @return Hex-encoded SHA-256 string
+     */
+    static QString sha256String(const QString& of);
+
+    /**
+     * @brief Compute the SHA-256 hash of a byte array as a hex string.
+     * @param of Input data
+     * @return Hex-encoded SHA-256 string
+     */
+    static QString sha256String(const QByteArray& of);
+
+    /**
+     * @brief Compute the SHA-256 hash of a joined string list as a hex string.
+     * @param of List of strings to hash (concatenated)
+     * @return Hex-encoded SHA-256 string
+     */
+    static QString sha256String(const QStringList& of);
+
+    /**
+     * @brief Compute the SHA-256 hash of a string list as raw bytes.
+     * @param of List of strings to hash (concatenated)
+     * @return Raw SHA-256 hash bytes
+     */
+    static QByteArray sha256(const QStringList& of);
+
 private:
     /** @brief Convert a raw hash byte array to a lowercase hex string. */
     static QString toHashString(const QByteArray& buffer);
