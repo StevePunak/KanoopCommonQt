@@ -97,6 +97,12 @@ public:
      * @return Formatted time string
      */
     static QString toStandardTimeString(const QDateTime& date) { return date.time().toString("HH:mm:ss.zzz"); }
+
+    /**
+     * @brief Format the date portion of a QDateTime as "yyyy-MM-dd".
+     * @param date Date/time whose date portion to format
+     * @return Formatted date string
+     */
     static QString toStandardDateString(const QDateTime& date) { return date.toString("yyyy-MM-dd"); }
 
     /**

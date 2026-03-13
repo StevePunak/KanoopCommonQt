@@ -28,7 +28,8 @@ public:
     /** @brief Re-throw this exception. */
     void raise() const override { throw *this; }
 
-    /** @brief Create a heap-allocated copy of this exception. */
+    /** @brief Create a heap-allocated copy of this exception.
+     * @return New CommonException allocated on the heap. */
     CommonException *clone() const override { return new CommonException(*this); }
 
     /**

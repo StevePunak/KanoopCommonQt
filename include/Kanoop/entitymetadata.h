@@ -64,7 +64,9 @@ public:
      */
     EntityMetadata(int type, const QVariant& data, const QUuid& uuid, KANOOP::ModelRole role = KANOOP::DataRole);
 
-    /** @brief Equality comparison by type and UUID. */
+    /** @brief Equality comparison by type and UUID.
+     * @param other EntityMetadata to compare.
+     * @return True if type and UUID match. */
     bool operator==(const EntityMetadata& other) const;
 
     /**

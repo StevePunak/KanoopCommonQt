@@ -138,42 +138,66 @@ public:
      */
     static bool arePointsEqual(const QPointF& p1, const QPointF& p2, int precision = 0);
 
-    /** @brief Test whether point is to the left of other (smaller X). */
+    /** @brief Test whether point is to the left of other (smaller X).
+     * @param point Point to test.
+     * @param other Reference point.
+     * @return True if point.x < other.x. */
     static inline bool isPointLeftOf(const QPointF& point, const QPointF& other)
     {
         return point.x() < other.x();
     }
-    /** @brief Test whether point is to the right of other (larger X). */
+    /** @brief Test whether point is to the right of other (larger X).
+     * @param point Point to test.
+     * @param other Reference point.
+     * @return True if point.x > other.x. */
     static inline bool isPointRightOf(const QPointF& point, const QPointF& other)
     {
         return point.x() > other.x();
     }
-    /** @brief Test whether point is above other (smaller Y). */
+    /** @brief Test whether point is above other (smaller Y).
+     * @param point Point to test.
+     * @param other Reference point.
+     * @return True if point.y < other.y. */
     static inline bool isPointAbove(const QPointF& point, const QPointF& other)
     {
         return point.y() < other.y();
     }
-    /** @brief Test whether point is below other (larger Y). */
+    /** @brief Test whether point is below other (larger Y).
+     * @param point Point to test.
+     * @param other Reference point.
+     * @return True if point.y > other.y. */
     static inline bool isPointBelow(const QPointF& point, const QPointF& other)
     {
         return point.y() > other.y();
     }
-    /** @brief Test whether rect's right edge is left of other. */
+    /** @brief Test whether rect's right edge is left of other.
+     * @param rect Rectangle to test.
+     * @param other Reference point.
+     * @return True if rect's right edge < other.x. */
     static inline bool isRectLeftOf(const QRectF& rect, const QPointF& other)
     {
         return rect.x() + rect.width() < other.x();
     }
-    /** @brief Test whether rect's left edge is right of other. */
+    /** @brief Test whether rect's left edge is right of other.
+     * @param rect Rectangle to test.
+     * @param other Reference point.
+     * @return True if rect.x > other.x. */
     static inline bool isRectRightOf(const QRectF& rect, const QPointF& other)
     {
         return rect.x() > other.x();
     }
-    /** @brief Test whether rect's bottom edge is above other. */
+    /** @brief Test whether rect's bottom edge is above other.
+     * @param rect Rectangle to test.
+     * @param other Reference point.
+     * @return True if rect's bottom < other.y. */
     static inline bool isRectAbove(const QRectF& rect, const QPointF& other)
     {
         return rect.y() + rect.height() < other.y();
     }
-    /** @brief Test whether rect's top edge is below other. */
+    /** @brief Test whether rect's top edge is below other.
+     * @param rect Rectangle to test.
+     * @param other Reference point.
+     * @return True if rect.y > other.y. */
     static inline bool isRectBelow(const QRectF& rect, const QPointF& other)
     {
         return rect.y() > other.y();

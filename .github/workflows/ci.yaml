@@ -10,6 +10,11 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 env:
   QT_VERSION: "6.10.1"
 
@@ -25,7 +30,7 @@ jobs:
         run: |
           sudo apt update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-            cmake ninja-build build-essential doxygen \
+            cmake ninja-build build-essential doxygen graphviz \
             libgl1-mesa-dev libglu1-mesa-dev
 
       - name: Install Qt6
@@ -44,3 +49,24 @@ jobs:
 
       - name: Generate Doxygen documentation
         run: cmake --build build --target doc_KanoopCommonQt
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/html
+
+  deploy-docs:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
