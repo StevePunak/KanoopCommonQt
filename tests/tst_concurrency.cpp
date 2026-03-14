@@ -286,9 +286,13 @@ private slots:
 
         auto makeConsumer = [&]() {
             return QThread::create([&]() {
-                for (int i = 0; i < itemCount / 3; ++i) {
+                while (true) {
+                    {
+                        QMutexLocker locker(&receivedLock);
+                        if (received.count() >= itemCount) break;
+                    }
                     bool ok = false;
-                    int val = queue.dequeue(2000, ok);
+                    int val = queue.dequeue(500, ok);
                     if (ok) {
                         QMutexLocker locker(&receivedLock);
                         received.append(val);
