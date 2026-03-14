@@ -30,9 +30,13 @@ public:
         _center(center),
         _radius(radius) {}
 
-    /** @brief Equality comparison. */
+    /** @brief Equality comparison.
+     * @param other Circle to compare against
+     * @return true if centre and radius are equal */
     bool operator==(const GeoCircle& other) const;
-    /** @brief Inequality comparison. */
+    /** @brief Inequality comparison.
+     * @param other Circle to compare against
+     * @return true if circles are not equal */
     bool operator!=(const GeoCircle& other) const { return !(*this == other); }
 
     /**

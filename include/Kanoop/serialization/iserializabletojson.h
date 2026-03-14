@@ -35,23 +35,61 @@ public:
     virtual QJsonObject serializeToJsonObject() const = 0;
 
 protected:
-    /** @brief Return a UUID as a JSON string, or null if uuid is null. */
+    /**
+     * @brief Return a UUID as a JSON string, or null if uuid is null.
+     * @param uuid UUID to convert
+     * @return JSON string value, or QJsonValue::Null
+     */
     static QJsonValue uuidOrNull(const QUuid& uuid);
-    /** @brief Return a string as a JSON string, or null if value is empty. */
+    /**
+     * @brief Return a string as a JSON string, or null if value is empty.
+     * @param value String to convert
+     * @return JSON string value, or QJsonValue::Null
+     */
     static QJsonValue stringOrNull(const QString& value);
-    /** @brief Return a QVariant integer as a JSON integer, or null if variant is null. */
+    /**
+     * @brief Return a QVariant integer as a JSON integer, or null if variant is null.
+     * @param value Variant containing an integer
+     * @return JSON integer value, or QJsonValue::Null
+     */
     static QJsonValue intOrNull(const QVariant& value);
-    /** @brief Return a QVariant double as a JSON double, or null if variant is null. */
+    /**
+     * @brief Return a QVariant double as a JSON double, or null if variant is null.
+     * @param value Variant containing a double
+     * @return JSON double value, or QJsonValue::Null
+     */
     static QJsonValue doubleOrNull(const QVariant& value);
-    /** @brief Return a QVariant double formatted as a JSON string, or null if variant is null. */
+    /**
+     * @brief Return a QVariant double formatted as a JSON string, or null if variant is null.
+     * @param value Variant containing a double
+     * @param precision Number of decimal places (default 6)
+     * @return JSON string value, or QJsonValue::Null
+     */
     static QJsonValue doubleStringOrNull(const QVariant& value, int precision = 6);
-    /** @brief Return a string list as a JSON array, or null if list is empty. */
+    /**
+     * @brief Return a string list as a JSON array, or null if list is empty.
+     * @param value String list to convert
+     * @return JSON array value, or QJsonValue::Null
+     */
     static QJsonValue arrayOrNull(const QStringList& value);
-    /** @brief Extract an integer QVariant from a JSON value, or invalid QVariant if null. */
+    /**
+     * @brief Extract an integer QVariant from a JSON value, or invalid QVariant if null.
+     * @param value JSON value to extract from
+     * @return QVariant containing an integer, or an invalid QVariant
+     */
     static QVariant intOrNull(const QJsonValue& value);
-    /** @brief Extract a double QVariant from a JSON value, or invalid QVariant if null. */
+    /**
+     * @brief Extract a double QVariant from a JSON value, or invalid QVariant if null.
+     * @param value JSON value to extract from
+     * @return QVariant containing a double, or an invalid QVariant
+     */
     static QVariant doubleOrNull(const QJsonValue& value);
-    /** @brief Parse a double from a JSON string value, or invalid QVariant if null. */
+    /**
+     * @brief Parse a double from a JSON string value, or invalid QVariant if null.
+     * @param value JSON value to parse
+     * @param precision Number of decimal places (default 6)
+     * @return QVariant containing a double, or an invalid QVariant
+     */
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
 
@@ -68,23 +106,61 @@ public:
     virtual void serializeIntoJsonObject(QJsonObject& object) const = 0;
 
 protected:
-    /** @brief Return a UUID as a JSON string, or null if uuid is null. */
+    /**
+     * @brief Return a UUID as a JSON string, or null if uuid is null.
+     * @param uuid UUID to convert
+     * @return JSON string value, or QJsonValue::Null
+     */
     static QJsonValue uuidOrNull(const QUuid& uuid);
-    /** @brief Return a string as a JSON string, or null if value is empty. */
+    /**
+     * @brief Return a string as a JSON string, or null if value is empty.
+     * @param value String to convert
+     * @return JSON string value, or QJsonValue::Null
+     */
     static QJsonValue stringOrNull(const QString& value);
-    /** @brief Return a QVariant integer as a JSON integer, or null if variant is null. */
+    /**
+     * @brief Return a QVariant integer as a JSON integer, or null if variant is null.
+     * @param value Variant containing an integer
+     * @return JSON integer value, or QJsonValue::Null
+     */
     static QJsonValue intOrNull(const QVariant& value);
-    /** @brief Return a QVariant double as a JSON double, or null if variant is null. */
+    /**
+     * @brief Return a QVariant double as a JSON double, or null if variant is null.
+     * @param value Variant containing a double
+     * @return JSON double value, or QJsonValue::Null
+     */
     static QJsonValue doubleOrNull(const QVariant& value);
-    /** @brief Return a QVariant double formatted as a JSON string, or null if variant is null. */
+    /**
+     * @brief Return a QVariant double formatted as a JSON string, or null if variant is null.
+     * @param value Variant containing a double
+     * @param precision Number of decimal places (default 6)
+     * @return JSON string value, or QJsonValue::Null
+     */
     static QJsonValue doubleStringOrNull(const QVariant& value, int precision = 6);
-    /** @brief Return a string list as a JSON array, or null if list is empty. */
+    /**
+     * @brief Return a string list as a JSON array, or null if list is empty.
+     * @param value String list to convert
+     * @return JSON array value, or QJsonValue::Null
+     */
     static QJsonValue arrayOrNull(const QStringList& value);
-    /** @brief Extract an integer QVariant from a JSON value, or invalid QVariant if null. */
+    /**
+     * @brief Extract an integer QVariant from a JSON value, or invalid QVariant if null.
+     * @param value JSON value to extract from
+     * @return QVariant containing an integer, or an invalid QVariant
+     */
     static QVariant intOrNull(const QJsonValue& value);
-    /** @brief Extract a double QVariant from a JSON value, or invalid QVariant if null. */
+    /**
+     * @brief Extract a double QVariant from a JSON value, or invalid QVariant if null.
+     * @param value JSON value to extract from
+     * @return QVariant containing a double, or an invalid QVariant
+     */
     static QVariant doubleOrNull(const QJsonValue& value);
-    /** @brief Parse a double from a JSON string value, or invalid QVariant if null. */
+    /**
+     * @brief Parse a double from a JSON string value, or invalid QVariant if null.
+     * @param value JSON value to parse
+     * @param precision Number of decimal places (default 6)
+     * @return QVariant containing a double, or an invalid QVariant
+     */
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
 

@@ -19,7 +19,9 @@ template <typename T>
 class SerializableXmlList : public QList<T>
 {
 public:
-    /** @brief Equality comparison — lists are equal if they have the same elements in the same order. */
+    /** @brief Equality comparison — lists are equal if they have the same elements in the same order.
+     * @param other List to compare against
+     * @return true if both lists have identical elements in the same order */
     bool operator==(const SerializableXmlList<T>& other) const
     {
         bool result = SerializableXmlList<T>::count() == other.count();
@@ -28,7 +30,9 @@ public:
         }
         return result;
     }
-    /** @brief Inequality comparison. */
+    /** @brief Inequality comparison.
+     * @param other List to compare against
+     * @return true if the lists differ */
     bool operator!=(const SerializableXmlList<T>& other) const { return !(*this == other); }
 
     /**

@@ -87,9 +87,13 @@ public:
         Parsable,   ///< Format suitable for round-trip parsing by fromString()
     };
 
-    /** @brief Equality comparison at the configured precision. */
+    /** @brief Equality comparison at the configured precision.
+     * @param other Coordinate to compare against
+     * @return true if coordinates are equal within the configured precision */
     bool operator==(const GeoCoordinate& other) const;
-    /** @brief Inequality comparison. */
+    /** @brief Inequality comparison.
+     * @param other Coordinate to compare against
+     * @return true if coordinates are not equal */
     bool operator!=(const GeoCoordinate& other) const { return !(*this == other); }
 
     /**

@@ -17,9 +17,11 @@ class KANOOP_EXPORT Point : public QPointF
 public:
     /** @brief Default constructor — creates a point at the origin. */
     Point() : QPointF() {}
-    /** @brief Construct from a QPointF. */
+    /** @brief Construct from a QPointF.
+     * @param other Source QPointF */
     Point(const QPointF& other) : QPointF(other) {}
-    /** @brief Construct from a QPoint (integer coordinates). */
+    /** @brief Construct from a QPoint (integer coordinates).
+     * @param other Source QPoint */
     Point(const QPoint& other) : QPointF(other) {}
     /**
      * @brief Construct from explicit X and Y coordinates.
@@ -28,13 +30,21 @@ public:
      */
     Point(double x, double y) : QPointF(x, y) {}
 
-    /** @brief Test whether this point is to the left of other (smaller X). */
+    /** @brief Test whether this point is to the left of other (smaller X).
+     * @param other Reference point
+     * @return true if this point's X is less than other's X */
     bool isLeftOf(const QPointF& other) const { return x() < other.x(); }
-    /** @brief Test whether this point is to the right of other (larger X). */
+    /** @brief Test whether this point is to the right of other (larger X).
+     * @param other Reference point
+     * @return true if this point's X is greater than other's X */
     bool isRightOf(const QPointF& other) const { return x() > other.x(); }
-    /** @brief Test whether this point is above other (smaller Y). */
+    /** @brief Test whether this point is above other (smaller Y).
+     * @param other Reference point
+     * @return true if this point's Y is less than other's Y */
     bool isAbove(const QPointF& other) const { return y() < other.y(); }
-    /** @brief Test whether this point is below other (larger Y). */
+    /** @brief Test whether this point is below other (larger Y).
+     * @param other Reference point
+     * @return true if this point's Y is greater than other's Y */
     bool isBelow(const QPointF& other) const { return y() > other.y(); }
 
     /**
@@ -61,7 +71,8 @@ public:
      */
     Point& moveDelta(double dx, double dy);
 
-    /** @brief Round both coordinates to the nearest integer in place. */
+    /** @brief Round both coordinates to the nearest integer in place.
+     * @return Reference to this point */
     Point& round();
 
     /**
@@ -101,7 +112,8 @@ public:
         /** @brief Default constructor. */
         List() {}
 
-        /** @brief Construct from a QList<Point>. */
+        /** @brief Construct from a QList<Point>.
+         * @param other Source list of Points */
         List(const QList<Point>& other)
         {
             for(const Point& p : other) {
@@ -109,16 +121,21 @@ public:
             }
         }
 
-        /** @brief Return the top-left point (minimum X and Y). */
+        /** @brief Return the top-left point (minimum X and Y).
+         * @return Top-left Point */
         Point topLeft() const;
-        /** @brief Return the top-right point (maximum X, minimum Y). */
+        /** @brief Return the top-right point (maximum X, minimum Y).
+         * @return Top-right Point */
         Point topRight() const;
-        /** @brief Return the bottom-left point (minimum X, maximum Y). */
+        /** @brief Return the bottom-left point (minimum X, maximum Y).
+         * @return Bottom-left Point */
         Point bottomLeft() const;
-        /** @brief Return the bottom-right point (maximum X and Y). */
+        /** @brief Return the bottom-right point (maximum X and Y).
+         * @return Bottom-right Point */
         Point bottomRight() const;
 
-        /** @brief Convert to a list of integer QPoint objects. */
+        /** @brief Convert to a list of integer QPoint objects.
+         * @return QList of QPoint values */
         QList<QPoint> toPointList() const
         {
             QList<QPoint> result;

@@ -58,8 +58,11 @@ public:
     class List : public QList<TreePathVertice*>
     {
     public:
+        /** @brief Default constructor. */
         List() :
             QList<TreePathVertice*>() {}
+        /** @brief Construct from a QList of TreePathVertice pointers.
+         * @param source Source list to copy */
         List(const QList<TreePathVertice*> source) {
             append(source);
         }
@@ -150,7 +153,8 @@ public:
      */
     QString hashName() const { return _hashName; }
 
-    /** @brief Return the human-readable name (alias for name()). */
+    /** @brief Return the human-readable name (alias for name()).
+     * @return Name string */
     QString toString() const { return _name; }
 
     /**

@@ -99,7 +99,9 @@ public:
     static LogLevel DefaultLogLevel;
 
 protected:
+    /** @brief Category name string. */
     QString _name;
+    /** @brief Minimum log level threshold for this category. */
     LogLevel _level;
 };
 

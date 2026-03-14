@@ -67,7 +67,11 @@ public:
      */
     static TimeSpanRange fromStartAndDuration(const TimeSpan& startOffset, const TimeSpan& duration);
 
-    /** @brief Copy assignment. */
+    /**
+     * @brief Copy assignment.
+     * @param other Range to copy
+     * @return Reference to this range
+     */
     TimeSpanRange& operator=(const TimeSpanRange& other);
 
     /**
@@ -84,14 +88,28 @@ public:
      */
     TimeSpanRange operator-(const TimeSpan& other) const;
 
-    /** @brief Add-assign a TimeSpan delta to both endpoints. */
+    /**
+     * @brief Add-assign a TimeSpan delta to both endpoints.
+     * @param other Amount to add
+     */
     void operator+=(const TimeSpan& other);
-    /** @brief Subtract-assign a TimeSpan delta from both endpoints. */
+    /**
+     * @brief Subtract-assign a TimeSpan delta from both endpoints.
+     * @param other Amount to subtract
+     */
     void operator-=(const TimeSpan& other);
 
-    /** @brief Equality comparison. */
+    /**
+     * @brief Equality comparison.
+     * @param other Range to compare with
+     * @return true if both ranges are equal
+     */
     bool operator==(const TimeSpanRange& other) const;
-    /** @brief Inequality comparison. */
+    /**
+     * @brief Inequality comparison.
+     * @param other Range to compare with
+     * @return true if both ranges differ
+     */
     bool operator!=(const TimeSpanRange& other) const;
 
     /**

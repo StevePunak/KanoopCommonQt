@@ -62,17 +62,31 @@ public:
      */
     Line(const QPointF& origin, Geo::Direction direction, double distance);
 
-    /** @brief Construct from a QLineF. */
+    /**
+     * @brief Construct from a QLineF.
+     * @param other Source QLineF to copy endpoints from
+     */
     Line(const QLineF& other) :
         Line(other.p1(), other.p2()) {}
 
-    /** @brief Construct from a QLine. */
+    /**
+     * @brief Construct from a QLine.
+     * @param other Source QLine to copy endpoints from
+     */
     Line(const QLine& other) :
         Line(other.p1(), other.p2()) {}
 
-    /** @brief Equality comparison — endpoints must match exactly. */
+    /**
+     * @brief Equality comparison — endpoints must match exactly.
+     * @param other Line to compare against
+     * @return true if both endpoints match
+     */
     bool operator ==(const Line& other) const { return _p1 == other._p1 && _p2 == other._p2; }
-    /** @brief Inequality comparison. */
+    /**
+     * @brief Inequality comparison.
+     * @param other Line to compare against
+     * @return true if the lines differ
+     */
     bool operator !=(const Line& other) const { return (*this == other) == false; }
 
     /**
@@ -115,7 +129,10 @@ public:
         /** @brief Default constructor. */
         List() : QList<Line>() {}
 
-        /** @brief Construct from a QList<Line>. */
+        /**
+         * @brief Construct from a QList<Line>.
+         * @param other Source list to copy lines from
+         */
         List(const QList<Line>& other) {
             for(const Line& line : other) {
                 append(line);
@@ -143,9 +160,11 @@ public:
          */
         static List fromString(const QString& value);
 
-        /** @brief Return the longest horizontal line in the list. */
+        /** @brief Return the longest horizontal line in the list.
+         * @return Longest horizontal Line */
         Line longestHorizontalLine();
-        /** @brief Return the longest vertical line in the list. */
+        /** @brief Return the longest vertical line in the list.
+         * @return Longest vertical Line */
         Line longestVerticalLine();
 
         /**
@@ -155,13 +174,17 @@ public:
          */
         bool containsLineWithSameEndpoints(const Line& line) const;
 
-        /** @brief Return the line with the smallest Y start or end coordinate. */
+        /** @brief Return the line with the smallest Y start or end coordinate.
+         * @return Highest Line */
         Line highest() const;
-        /** @brief Return the line with the largest Y start or end coordinate. */
+        /** @brief Return the line with the largest Y start or end coordinate.
+         * @return Lowest Line */
         Line lowest() const;
-        /** @brief Return the shortest line in the list. */
+        /** @brief Return the shortest line in the list.
+         * @return Shortest Line */
         Line shortest() const;
-        /** @brief Return the longest line in the list. */
+        /** @brief Return the longest line in the list.
+         * @return Longest Line */
         Line longest() const;
 
         /**
@@ -180,16 +203,21 @@ public:
          */
         QPointF closestPointTo(const QPointF& other, Line& closestLine, double &closestDistance);
 
-        /** @brief Return the minimum X coordinate across all line endpoints. */
+        /** @brief Return the minimum X coordinate across all line endpoints.
+         * @return Minimum X value */
         double minX() const;
-        /** @brief Return the maximum X coordinate across all line endpoints. */
+        /** @brief Return the maximum X coordinate across all line endpoints.
+         * @return Maximum X value */
         double maxX() const;
-        /** @brief Return the minimum Y coordinate across all line endpoints. */
+        /** @brief Return the minimum Y coordinate across all line endpoints.
+         * @return Minimum Y value */
         double minY() const;
-        /** @brief Return the maximum Y coordinate across all line endpoints. */
+        /** @brief Return the maximum Y coordinate across all line endpoints.
+         * @return Maximum Y value */
         double maxY() const;
 
-        /** @brief Return the bounding rectangle of all lines in the list. */
+        /** @brief Return the bounding rectangle of all lines in the list.
+         * @return Bounding Rectangle */
         Rectangle boundingRectangle() const;
 
         /**
@@ -207,7 +235,8 @@ public:
          */
         Line lineNearPoint(const Point& point, int margin) const;
 
-        /** @brief Return the total combined length of all lines. */
+        /** @brief Return the total combined length of all lines.
+         * @return Sum of all line lengths */
         double totalLength() const;
 
         /**
@@ -218,30 +247,41 @@ public:
          */
         List &moveDelta(double dx, double dy);
 
-        /** @brief Convert all lines to a list of QLineF objects. */
+        /** @brief Convert all lines to a list of QLineF objects.
+         * @return QList of QLineF */
         QList<QLineF> toQLineFList() const;
-        /** @brief Convert all lines to a list of QLine objects. */
+        /** @brief Convert all lines to a list of QLine objects.
+         * @return QList of QLine */
         QList<QLine> toQLineList() const;
 
-        /** @brief Format the list as a human-readable string. */
+        /** @brief Format the list as a human-readable string.
+         * @return String representation */
         QString toString() const;
     };
 
-    /** @brief Return the midpoint of this line. */
+    /** @brief Return the midpoint of this line.
+     * @return Midpoint */
     Point midpoint() const;
-    /** @brief Return the length (Euclidean distance between endpoints). */
+    /** @brief Return the length (Euclidean distance between endpoints).
+     * @return Length of the line */
     double length() const;
-    /** @brief Return the slope (rise/run), or infinity for vertical lines. */
+    /** @brief Return the slope (rise/run), or infinity for vertical lines.
+     * @return Slope value */
     double slope() const;
-    /** @brief Return the Y-intercept of the line's equation. */
+    /** @brief Return the Y-intercept of the line's equation.
+     * @return Y-intercept */
     double intercept() const;
-    /** @brief Test whether this line is exactly vertical. */
+    /** @brief Test whether this line is exactly vertical.
+     * @return true if vertical */
     bool isVertical() const;
-    /** @brief Test whether this line is exactly horizontal. */
+    /** @brief Test whether this line is exactly horizontal.
+     * @return true if horizontal */
     bool isHorizontal() const;
-    /** @brief Return the compass bearing from p1 to p2, in degrees. */
+    /** @brief Return the compass bearing from p1 to p2, in degrees.
+     * @return Bearing in degrees */
     double bearing() const;
-    /** @brief Return the angle of this line as an Angle object. */
+    /** @brief Return the angle of this line as an Angle object.
+     * @return Angle of the line */
     Angle angle() const;
 
     /**
@@ -273,13 +313,17 @@ public:
      */
     Point furthestPointFrom(const QPointF& point) const;
 
-    /** @brief Return the endpoint with the smallest Y coordinate. */
+    /** @brief Return the endpoint with the smallest Y coordinate.
+     * @return Top-most Point */
     Point topMostPoint() const;
-    /** @brief Return the endpoint with the largest Y coordinate. */
+    /** @brief Return the endpoint with the largest Y coordinate.
+     * @return Bottom-most Point */
     Point bottomMostPoint() const;
-    /** @brief Return the endpoint with the smallest X coordinate. */
+    /** @brief Return the endpoint with the smallest X coordinate.
+     * @return Left-most Point */
     Point leftMostPoint() const;
-    /** @brief Return the endpoint with the largest X coordinate. */
+    /** @brief Return the endpoint with the largest X coordinate.
+     * @return Right-most Point */
     Point rightMostPoint() const;
 
     /**
@@ -348,17 +392,38 @@ public:
      */
     Point intersection(const Line& other) const;
 
-    /** @brief Test whether this line is entirely to the left of other. */
+    /**
+     * @brief Test whether this line is entirely to the left of other.
+     * @param other Line to compare against
+     * @return true if this line is entirely to the left
+     */
     bool isLeftOf(const Line& other) const;
-    /** @brief Test whether this line is entirely to the right of other. */
+    /**
+     * @brief Test whether this line is entirely to the right of other.
+     * @param other Line to compare against
+     * @return true if this line is entirely to the right
+     */
     bool isRightOf(const Line& other) const;
-    /** @brief Test whether this line is entirely above other. */
+    /**
+     * @brief Test whether this line is entirely above other.
+     * @param other Line to compare against
+     * @return true if this line is entirely above
+     */
     bool isAbove(const Line& other) const;
-    /** @brief Test whether this line is entirely below other. */
+    /**
+     * @brief Test whether this line is entirely below other.
+     * @param other Line to compare against
+     * @return true if this line is entirely below
+     */
     bool isBelow(const Line& other) const;
-    /** @brief Test whether this line is perpendicular (horizontal or vertical). */
+    /** @brief Test whether this line is perpendicular (horizontal or vertical).
+     * @return true if the line is horizontal or vertical */
     bool isPerpendicular() const;
-    /** @brief Test whether this line shares an axis with other (both horizontal or both vertical). */
+    /**
+     * @brief Test whether this line shares an axis with other (both horizontal or both vertical).
+     * @param other Line to compare against
+     * @return true if both lines share the same axis
+     */
     bool sharesAxisWith(const Line& other) const;
 
     /**
@@ -369,7 +434,11 @@ public:
      */
     bool sharesEndpointWith(const Line& other, double maxDistance = 0) const;
 
-    /** @brief Test whether this line has exactly the same two endpoints as other. */
+    /**
+     * @brief Test whether this line has exactly the same two endpoints as other.
+     * @param other Line to compare against
+     * @return true if both endpoints match in either order
+     */
     bool sharesSameEndpoints(const Line& other) const;
 
     /**
@@ -408,22 +477,29 @@ public:
      */
     Line& grow(double howMuch);
 
-    /** @brief Return the cardinal direction of this line. */
+    /** @brief Return the cardinal direction of this line.
+     * @return Cardinal direction */
     Geo::Direction direction() const;
 
-    /** @brief Return the minimum X coordinate of the two endpoints. */
+    /** @brief Return the minimum X coordinate of the two endpoints.
+     * @return Minimum X value */
     double minX() const;
-    /** @brief Return the maximum X coordinate of the two endpoints. */
+    /** @brief Return the maximum X coordinate of the two endpoints.
+     * @return Maximum X value */
     double maxX() const;
-    /** @brief Return the minimum Y coordinate of the two endpoints. */
+    /** @brief Return the minimum Y coordinate of the two endpoints.
+     * @return Minimum Y value */
     double minY() const;
-    /** @brief Return the maximum Y coordinate of the two endpoints. */
+    /** @brief Return the maximum Y coordinate of the two endpoints.
+     * @return Maximum Y value */
     double maxY() const;
 
-    /** @brief Return a list containing both endpoints. */
+    /** @brief Return a list containing both endpoints.
+     * @return Point::List with p1 and p2 */
     Point::List points() const;
 
-    /** @brief Round both endpoints to integer coordinates in place. */
+    /** @brief Round both endpoints to integer coordinates in place.
+     * @return Reference to this line */
     Line& round();
 
     /**
@@ -479,12 +555,15 @@ public:
      */
     Line &rotate(const Point& centroid, double angle);
 
-    /** @brief Convert to a QLine (integer endpoints). */
+    /** @brief Convert to a QLine (integer endpoints).
+     * @return QLine equivalent */
     QLine toQLine() const;
-    /** @brief Convert to a QLineF (floating-point endpoints). */
+    /** @brief Convert to a QLineF (floating-point endpoints).
+     * @return QLineF equivalent */
     QLineF toQLineF() const;
 
-    /** @brief Format this line as a human-readable string. */
+    /** @brief Format this line as a human-readable string.
+     * @return String representation */
     QString toString() const;
 
     /**

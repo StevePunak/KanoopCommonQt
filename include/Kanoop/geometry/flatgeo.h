@@ -202,22 +202,34 @@ public:
     {
         return rect.y() > other.y();
     }
-    /** @brief Test whether other is to the left of rect. */
+    /** @brief Test whether other is to the left of rect.
+     * @param rect Reference rectangle
+     * @param other Rectangle to compare
+     * @return true if other.x < rect.x */
     static inline bool isRectLeftOf(const QRectF& rect, const QRectF& other)
     {
         return other.x() < rect.x();
     }
-    /** @brief Test whether other is to the right of rect. */
+    /** @brief Test whether other is to the right of rect.
+     * @param rect Reference rectangle
+     * @param other Rectangle to compare
+     * @return true if other.x > rect's right edge */
     static inline bool isRectRightOf(const QRectF& rect, const QRectF& other)
     {
         return other.x() > rect.x() + rect.width();
     }
-    /** @brief Test whether other is above rect. */
+    /** @brief Test whether other is above rect.
+     * @param rect Reference rectangle
+     * @param other Rectangle to compare
+     * @return true if other.y < rect.y */
     static inline bool isRectAbove(const QRectF& rect, const QRectF& other)
     {
         return other.y() < rect.y();
     }
-    /** @brief Test whether other is below rect. */
+    /** @brief Test whether other is below rect.
+     * @param rect Reference rectangle
+     * @param other Rectangle to compare
+     * @return true if other.y > rect's bottom edge */
     static inline bool isRectBelow(const QRectF& rect, const QRectF& other)
     {
         return other.y() > rect.y() + rect.height();

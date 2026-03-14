@@ -68,13 +68,17 @@ public:
     /** @brief Stop the server and close all active client connections. */
     void stop();
 
-    /** @brief Return the server's private key (SSL mode only). */
+    /** @brief Return the server's private key (SSL mode only).
+     * @return Server private key */
     QSslKey privateKey() const { return _privateKey; }
-    /** @brief Return the server's local certificate (SSL mode only). */
+    /** @brief Return the server's local certificate (SSL mode only).
+     * @return Server certificate */
     QSslCertificate localCertificate() const { return _localCertificate; }
-    /** @brief Return the list of CA certificates (SSL mode only). */
+    /** @brief Return the list of CA certificates (SSL mode only).
+     * @return List of CA certificates */
     QList<QSslCertificate> caCerts() const { return _caCerts; }
-    /** @brief Return whether peer certificate verification is enabled. */
+    /** @brief Return whether peer certificate verification is enabled.
+     * @return true if peer verification is enabled */
     bool verifyPeer() const { return _verifyPeer; }
 
     /**
@@ -92,7 +96,8 @@ protected:
      */
     virtual TcpServerClientObject* createClient(TcpServer* server, qintptr fd) = 0;
 
-    /** @brief Handle a new incoming connection by delegating to createClient(). */
+    /** @brief Handle a new incoming connection by delegating to createClient().
+     * @param handle Native socket descriptor for the incoming connection */
     virtual void incomingConnection(qintptr handle) override;
 
 private:

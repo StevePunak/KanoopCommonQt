@@ -69,47 +69,121 @@ public:
    */
   TimeSpan(const timespec& other);
 
-  /** @brief Copy-assign from another TimeSpan. */
+  /**
+   * @brief Copy-assign from another TimeSpan.
+   * @param other TimeSpan to copy
+   * @return Reference to this TimeSpan
+   */
   TimeSpan& operator=(const TimeSpan& other);
-  /** @brief Assign from a POSIX timespec. */
+  /**
+   * @brief Assign from a POSIX timespec.
+   * @param other timespec to assign from
+   * @return Reference to this TimeSpan
+   */
   TimeSpan& operator=(const timespec& other);
 
-  /** @brief Add two time spans. @return Sum */
+  /**
+   * @brief Add two time spans.
+   * @param other TimeSpan to add
+   * @return Sum of both time spans
+   */
   TimeSpan operator+(const TimeSpan& other) const;
-  /** @brief Subtract a time span. @return Difference */
+  /**
+   * @brief Subtract a time span.
+   * @param other TimeSpan to subtract
+   * @return Difference of both time spans
+   */
   TimeSpan operator-(const TimeSpan& other) const;
-  /** @brief Multiply two time spans component-wise. @return Product */
+  /**
+   * @brief Multiply two time spans component-wise.
+   * @param other TimeSpan to multiply by
+   * @return Product
+   */
   TimeSpan operator*(const TimeSpan& other) const;
-  /** @brief Scale by a scalar factor. @return Scaled span */
+  /**
+   * @brief Scale by a scalar factor.
+   * @param value Scalar multiplier
+   * @return Scaled time span
+   */
   TimeSpan operator*(double value) const;
-  /** @brief Divide two time spans component-wise. @return Quotient */
+  /**
+   * @brief Divide two time spans component-wise.
+   * @param other TimeSpan divisor
+   * @return Quotient
+   */
   TimeSpan operator/(const TimeSpan& other) const;
-  /** @brief Divide by a scalar factor. @return Scaled span */
+  /**
+   * @brief Divide by a scalar factor.
+   * @param value Scalar divisor
+   * @return Scaled time span
+   */
   TimeSpan operator/(double value) const;
-  /** @brief Add-assign a TimeSpan. */
+  /**
+   * @brief Add-assign a TimeSpan.
+   * @param other TimeSpan to add
+   */
   void operator+=(const TimeSpan& other);
-  /** @brief Subtract-assign a TimeSpan. */
+  /**
+   * @brief Subtract-assign a TimeSpan.
+   * @param other TimeSpan to subtract
+   */
   void operator-=(const TimeSpan& other);
-  /** @brief Multiply-assign by a TimeSpan. */
+  /**
+   * @brief Multiply-assign by a TimeSpan.
+   * @param other TimeSpan to multiply by
+   */
   void operator*=(const TimeSpan& other);
-  /** @brief Divide-assign by a TimeSpan. */
+  /**
+   * @brief Divide-assign by a TimeSpan.
+   * @param other TimeSpan divisor
+   */
   void operator/=(const TimeSpan& other);
-  /** @brief Multiply-assign by a scalar. */
+  /**
+   * @brief Multiply-assign by a scalar.
+   * @param value Scalar multiplier
+   */
   void operator*=(double value);
-  /** @brief Divide-assign by a scalar. */
+  /**
+   * @brief Divide-assign by a scalar.
+   * @param value Scalar divisor
+   */
   void operator/=(double value);
 
-  /** @brief Equality comparison. */
+  /**
+   * @brief Equality comparison.
+   * @param other TimeSpan to compare with
+   * @return true if both time spans are equal
+   */
   bool operator==(const TimeSpan& other) const;
-  /** @brief Inequality comparison. */
+  /**
+   * @brief Inequality comparison.
+   * @param other TimeSpan to compare with
+   * @return true if both time spans differ
+   */
   bool operator!=(const TimeSpan& other) const;
-  /** @brief Greater-than comparison. */
+  /**
+   * @brief Greater-than comparison.
+   * @param other TimeSpan to compare with
+   * @return true if this time span is greater
+   */
   bool operator>(const TimeSpan& other) const;
-  /** @brief Less-than comparison. */
+  /**
+   * @brief Less-than comparison.
+   * @param other TimeSpan to compare with
+   * @return true if this time span is less
+   */
   bool operator<(const TimeSpan& other) const;
-  /** @brief Greater-than-or-equal comparison. */
+  /**
+   * @brief Greater-than-or-equal comparison.
+   * @param other TimeSpan to compare with
+   * @return true if this time span is greater or equal
+   */
   bool operator>=(const TimeSpan& other) const;
-  /** @brief Less-than-or-equal comparison. */
+  /**
+   * @brief Less-than-or-equal comparison.
+   * @param other TimeSpan to compare with
+   * @return true if this time span is less or equal
+   */
   bool operator<=(const TimeSpan& other) const;
 
   /**
@@ -124,10 +198,8 @@ public:
   };
 
   /**
-   * Number of days represented in the days field of this super TimeSpan
-   * when printed.
-   *
-   * @return Number of whole days represented in the days field of this TimeSpan when printed
+   * @brief Return the number of whole days in the days field of this TimeSpan when printed.
+   * @return Number of whole days
    */
   qint64 days() const;
 
@@ -214,9 +286,15 @@ public:
    * @return true if this timespan is zero
    */
   bool isZero() const { return _nanoseconds == 0; }
-  /** @brief Return true if this time span represents a negative duration. */
+  /**
+   * @brief Return true if this time span represents a negative duration.
+   * @return true if negative
+   */
   bool isNegative() const { return _nanoseconds < 0; }
-  /** @brief Return true if this time span represents a positive (non-zero) duration. */
+  /**
+   * @brief Return true if this time span represents a positive (non-zero) duration.
+   * @return true if positive
+   */
   bool isPositive() const { return _nanoseconds > 0; }
   /**
    * @brief Return the absolute value of this time span.
@@ -224,7 +302,10 @@ public:
    */
   TimeSpan absoluteValue() const;
 
-  /** @brief Return true if this time span was successfully constructed or parsed. */
+  /**
+   * @brief Return true if this time span was successfully constructed or parsed.
+   * @return true if valid
+   */
   bool isValid() const { return _valid; }
 
   /**
@@ -380,10 +461,16 @@ public:
    */
   static TimeSpan fromString(const QString& timeString, bool* parsed = nullptr);
 
-  /** @brief Return a zero-length TimeSpan. */
+  /**
+   * @brief Return a zero-length TimeSpan.
+   * @return Zero-length TimeSpan
+   */
   static TimeSpan zero() { return TimeSpan::fromSeconds(0); }
 
-  /** @brief Return an invalid (sentinel) TimeSpan whose isValid() returns false. */
+  /**
+   * @brief Return an invalid (sentinel) TimeSpan whose isValid() returns false.
+   * @return Invalid TimeSpan
+   */
   static TimeSpan invalid();
 
   /**

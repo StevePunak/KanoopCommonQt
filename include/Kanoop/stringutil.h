@@ -29,151 +29,215 @@ class KANOOP_EXPORT StringUtil
 {
 public:
     /**
-     * @brief Convert the give string to a boolean:
-     *   1 or 'true'   = true
-     *   other         = false
+     * @brief Convert the given string to a boolean.
+     *
+     * "true" (case-insensitive) or "1" yields true; everything else yields false.
+     * @param value String to convert
+     * @return Resulting boolean
      */
     static bool toBool(const QString& value) { return value.toLower() == "true" || value == "1"; }
     /**
-     * Convert the integer to a boolean
+     * @brief Convert an integer to a boolean.
+     * @param value Integer to convert (0 = false, non-zero = true)
+     * @return Resulting boolean
      */
     static bool toBool(int value) { return value != 0; }
     /**
-     * Convert the string to a byte array
+     * @brief Convert a string to a byte array.
+     * @param value String to convert
+     * @return Resulting QByteArray
      */
     static QByteArray toByteArray(const QString& value);
     /**
-     * Convert a boolean to a string (true or false)
+     * @brief Convert a boolean to a string ("true" or "false").
+     * @param value Boolean to convert
+     * @return "true" or "false"
      */
     static QString toString(bool value) { return value ? "true" : "false"; }
     /**
-     * Convert a double to string, trimming trailing zeros
+     * @brief Convert a double to a string, trimming trailing zeros.
+     * @param value Double to convert
+     * @param precision Maximum number of decimal places
+     * @return Formatted string
      */
     static QString toString(double value, int precision = 6);
     /**
-     * Convert a byte array to a hex string
+     * @brief Convert a byte array to a hex string.
+     * @param value Byte array to convert
+     * @param delimiter Separator between hex bytes
+     * @return Hex string representation
      */
     static QString toString(const QByteArray& value, const QString& delimiter = QString(" "));
     /**
-     * Convert a byte array to a hexadecimal table
+     * @brief Convert a byte array to a hexadecimal table.
+     * @param buffer Byte array to display
+     * @param showOffset Whether to show byte offsets
+     * @param showText Whether to show ASCII text column
+     * @param tableWidth Number of bytes per row
+     * @return Formatted hex table string
      */
     static QString toHexTable(const QByteArray& buffer, bool showOffset = true, bool showText = true, int tableWidth = 16);
     /**
-     * Convert a list of QUuids to a string
+     * @brief Convert a list of QUuids to a string.
+     * @param value List of UUIDs
+     * @param delimiter Separator between UUIDs
+     * @return Delimited string of UUIDs
      */
     static QString toString(const QList<QUuid>& value, const QString& delimiter = QString(" "));
     /**
-     * Convert a delimited string to a list of UUIDs
+     * @brief Convert a delimited string to a list of UUIDs.
+     * @param value Delimited string containing UUIDs
+     * @param delimiter Separator between UUIDs
+     * @return List of parsed QUuids
      */
     static QList<QUuid> uuidsFromString(const QString& value, const QString& delimiter = QString(" "));
     /**
-     * Convert a list of strings to a single string delimited by the supplied character
+     * @brief Convert a list of strings to a single delimited string.
+     * @param list String list to join
+     * @param delimiter Separator character
+     * @return Joined string
      */
     static QString toDelimitedString(const QStringList& list, char delimiter = ' ');
     /**
-     * Convert a list of ints to a single string delimited by the supplied character
+     * @brief Convert a list of ints to a single delimited string.
+     * @param list Integer list to join
+     * @param delimiter Separator character
+     * @return Joined string
      */
     static QString toDelimitedString(const QList<int>& list, char delimiter = ' ');
+    /**
+     * @brief Convert a list of uint8_t values to a single delimited string.
+     * @param list Byte list to join
+     * @param delimiter Separator character
+     * @return Joined string
+     */
     static QString toDelimitedString(const QList<uint8_t>& list, char delimiter = ' ');
     /**
-     * Format value as abbreviated byte count (K = kilobytes, M = megabytes, G=gigabytes)
+     * @brief Format a byte count as an abbreviated string (K, M, G).
+     * @param byteCount Number of bytes
+     * @return Abbreviated string (e.g. "1.5 M")
      */
     static QString toKMG(qint64 byteCount);
     /**
-     * @brief trimFront
-     * Trim the given characters from the front of the string
+     * @brief Trim the given characters from the front of the string.
+     * @param value Source string
+     * @param chars Characters to trim
+     * @return Trimmed string
      */
     static QString trimFront(const QString& value, const QList<QChar> &chars);
 
     /**
-     * @brief trimEnd
-     * @param value
+     * @brief Trim trailing whitespace from the string.
+     * @param value Source string
      * @return String with trailing whitespace removed
      */
     static QString trimEnd(const QString& value);
     /**
-     * @brief trimEnd
-     * Trim the given characters from the end of the string
+     * @brief Trim the given characters from the end of the string.
+     * @param value Source string
+     * @param chars Characters to trim
+     * @return Trimmed string
      */
     static QString trimEnd(const QString& value, const QList<QChar> &chars);
     /**
-     * @brief trimBothEnds
-     * Trim the given characters from both ends of the string
+     * @brief Trim the given characters from both ends of the string.
+     * @param value Source string
+     * @param chars Characters to trim
+     * @return Trimmed string
      */
     static QString trimBothEnds(const QString& value, const QList<QChar> &chars);
 
     /**
-     * @brief unquoted
-     * @param value
-     * @return The region between the quotes
+     * @brief Return the region between the outermost quotes.
+     * @param value Quoted string
+     * @return Unquoted content
      */
     static QString unquoted(const QString& value);
+    /**
+     * @brief Wrap a string in double quotes.
+     * @param value String to quote
+     * @return Quoted string
+     */
     static QString quoted(const QString& value) { return QString("\"%1\"").arg(value); }
 
     /**
-     * @brief trimmed
-     * @param value
-     * @param behavior
-     * @return A list of all the strings trimmed
+     * @brief Return a list of all the strings trimmed.
+     * @param value String list to trim
+     * @param behavior Whether to keep or skip empty parts
+     * @return List of trimmed strings
      */
     static QStringList trimmed(const QStringList& value, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
 
     /**
-     * @brief splitWithQuotes
-     * Split the string respecting quoted strings within
-     * @param value
-     * @param separator
-     * @param behavior
-     * @return
+     * @brief Split the string respecting quoted substrings.
+     * @param value String to split
+     * @param separator Separator character
+     * @param behavior Whether to keep or skip empty parts
+     * @return Split string list
      */
     static QStringList splitWithQuotes(const QString& value, QChar separator, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
+    /**
+     * @brief Split the string respecting quoted substrings, using multiple separators.
+     * @param value String to split
+     * @param separators List of separator characters
+     * @param behavior Whether to keep or skip empty parts
+     * @return Split string list
+     */
     static QStringList splitWithQuotes(const QString& value, QList<QChar> separators, Qt::SplitBehavior behavior = Qt::KeepEmptyParts);
 
     /**
-     * @brief combineToEol
-     * Combine strings from the list until hitting the string with an EOL at the end
-     * @param lines
-     * @param index
-     * @param eolCharacter
-     * @return
+     * @brief Combine strings from the list until hitting one that ends with an EOL character.
+     * @param lines Source string list
+     * @param index Starting index
+     * @param eolCharacter End-of-line character to look for
+     * @param consumed Output set to the number of lines consumed (may be nullptr)
+     * @return Combined string
      */
     static QString combineToEol(const QStringList& lines, int index, const QChar& eolCharacter = ';', int* consumed = nullptr);
 
     /**
-     * @brief indexOfWord
-     * @param wordNumber
-     * @return the index of the give word number (1, 2, 3 etc...)
+     * @brief Return the character index of a given word number (1-based) in the string.
+     * @param value Source string
+     * @param wordNumber 1-based word ordinal
+     * @return Character index of the word, or -1 if not found
      */
     static int indexOfWord(const QString &value, int wordNumber);
 
     /**
-     * @brief fuzzyIndexOf
-     * Calculate the index of a fuzzy match of 'needle' into 'haystack' using BITAP algorithm.
-     * Distance is the max Levenshtein distance to obtain a match.
-     * @param needle
-     * @param haystack
-     * @param maxDistance
-     * @return
+     * @brief Calculate the index of a fuzzy match using the BITAP algorithm.
+     * @param needle Pattern to search for
+     * @param haystack String to search in
+     * @param maxDistance Maximum Levenshtein distance for a match
+     * @return Index of the match, or -1 if not found
      */
     static int fuzzyIndexOf(const QString& needle, const QString& haystack, int maxDistance = 1);
 
     /**
-     * @brief levenshteinDistance
-     * Calculate the Levenshtein distance between two strings
-     * @param s1
-     * @param s2
-     * @return
+     * @brief Calculate the Levenshtein distance between two strings.
+     * @param s1 First string
+     * @param s2 Second string
+     * @return Edit distance between the strings
      */
     static int levenshteinDistance(const QString& s1, const QString& s2);
 
     /**
-     * @brief Implements BITAP algorithm for fuzzy search
+     * @brief Implements BITAP algorithm for fuzzy search.
      */
     class Bitap
     {
     public:
+        /**
+         * @brief Construct a Bitap fuzzy search and compute the result.
+         * @param haystack String to search in
+         * @param needle Pattern to search for
+         * @param maxDistance Maximum allowed Levenshtein distance
+         */
         Bitap(const QString& haystack, const QString& needle, int maxDistance = 1);
 
+        /**
+         * @brief Return the index of the fuzzy match.
+         * @return Match index, or -1 if no match was found
+         */
         int index() const { return _index; }
 
     private:
@@ -187,13 +251,22 @@ public:
 
     /**
      * @brief Implements the Levenshtein algorithm to determine the distance
-     * between two strings
+     * between two strings.
      */
     class Levenshtein
     {
     public:
+        /**
+         * @brief Construct a Levenshtein calculator and compute the distance.
+         * @param s1 First string
+         * @param s2 Second string
+         */
         Levenshtein(const QString& s1, const QString& s2);
 
+        /**
+         * @brief Return the computed Levenshtein distance.
+         * @return Edit distance
+         */
         int distance() const { return _distance; }
 
     private:

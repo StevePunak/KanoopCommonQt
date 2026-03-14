@@ -17,9 +17,11 @@ class KANOOP_EXPORT Rectangle : public QRectF
 public:
     /** @brief Default constructor — creates a null rectangle. */
     Rectangle() : QRectF() {}
-    /** @brief Construct from a QRectF. */
+    /** @brief Construct from a QRectF.
+     * @param other Source QRectF */
     Rectangle(const QRectF& other) : QRectF(other) {}
-    /** @brief Construct from a QRect (integer coordinates). */
+    /** @brief Construct from a QRect (integer coordinates).
+     * @param other Source QRect */
     Rectangle(const QRect& other) : QRectF(other) {}
     /**
      * @brief Construct from a top-left point and size.
@@ -99,18 +101,24 @@ public:
      */
     QMap<Geo::Side, Line> edgeMap() const;
 
-    /** @brief Return the two vertical edges. */
+    /** @brief Return the two vertical edges.
+     * @return Line list containing the left and right edges */
     Line::List verticalLines() const;
-    /** @brief Return the two horizontal edges. */
+    /** @brief Return the two horizontal edges.
+     * @return Line list containing the top and bottom edges */
     Line::List horizontalLines() const;
 
-    /** @brief Return the top edge as a Line. */
+    /** @brief Return the top edge as a Line.
+     * @return Top edge Line */
     Line topEdge() const;
-    /** @brief Return the bottom edge as a Line. */
+    /** @brief Return the bottom edge as a Line.
+     * @return Bottom edge Line */
     Line bottomEdge() const;
-    /** @brief Return the left edge as a Line. */
+    /** @brief Return the left edge as a Line.
+     * @return Left edge Line */
     Line leftEdge() const;
-    /** @brief Return the right edge as a Line. */
+    /** @brief Return the right edge as a Line.
+     * @return Right edge Line */
     Line rightEdge() const;
 
     /**
@@ -142,7 +150,8 @@ public:
      */
     bool containsAnyPoint(const Line& line) const;
 
-    /** @brief Return the geometric centre point of the rectangle. */
+    /** @brief Return the geometric centre point of the rectangle.
+     * @return Centre Point */
     Point centerPoint() const;
 
     /**
@@ -194,7 +203,8 @@ public:
      */
     Rectangle shrunk(double amount) const { return grown(-amount); }
 
-    /** @brief Format this rectangle as a human-readable string. */
+    /** @brief Format this rectangle as a human-readable string.
+     * @return String representation */
     QString toString() const;
 
     /** @brief A simple list type for Rectangle objects. */

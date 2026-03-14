@@ -16,9 +16,11 @@ class KANOOP_EXPORT Size : public QSizeF
 public:
     /** @brief Default constructor — creates a null (0x0) size. */
     Size() : QSizeF() {}
-    /** @brief Construct from a QSizeF. */
+    /** @brief Construct from a QSizeF.
+     * @param other Source QSizeF */
     Size(const QSizeF& other) : QSizeF(other) {}
-    /** @brief Construct from a QSize (integer dimensions). */
+    /** @brief Construct from a QSize (integer dimensions).
+     * @param other Source QSize */
     Size(const QSize& other) : QSizeF(other) {}
     /**
      * @brief Construct from explicit width and height.
