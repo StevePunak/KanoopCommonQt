@@ -51,7 +51,7 @@ void TimeSpanRange::operator+=(const TimeSpan& other)
 void TimeSpanRange::operator-=(const TimeSpan& other)
 {
     _startOffset -= other;
-    _endOffset == other;
+    _endOffset -= other;
 }
 
 bool TimeSpanRange::operator==(const TimeSpanRange& other) const

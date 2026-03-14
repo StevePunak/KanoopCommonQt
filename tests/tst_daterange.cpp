@@ -131,9 +131,11 @@ private slots:
 
     void shiftBackwardInPlace()
     {
-        // BUG: DateRange::operator-= adds instead of subtracting.
-        // This test documents the intended behavior — skip until fixed.
-        QSKIP("DateRange::operator-= has a known bug (adds instead of subtracting)");
+        DateRange r(utc(2025, 4, 2, 0, 0), utc(2025, 4, 2, 6, 0));
+        r -= TimeSpan::fromDays(1);
+
+        QCOMPARE(r.startTime(), utc(2025, 4, 1, 0, 0));
+        QCOMPARE(r.endTime(),   utc(2025, 4, 1, 6, 0));
     }
 
     // ========== Duration / midpoint ==========

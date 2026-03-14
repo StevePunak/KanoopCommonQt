@@ -590,6 +590,14 @@ private slots:
         QCOMPARE(range.endOffset().totalSeconds(), 25.0);
     }
 
+    void rangeCompoundSubtractAssign()
+    {
+        TimeSpanRange range(TimeSpan::fromSeconds(10), TimeSpan::fromSeconds(20));
+        range -= TimeSpan::fromSeconds(3);
+        QCOMPARE(range.startOffset().totalSeconds(), 7.0);
+        QCOMPARE(range.endOffset().totalSeconds(), 17.0);
+    }
+
     void rangeEquality()
     {
         TimeSpanRange a(TimeSpan::fromSeconds(10), TimeSpan::fromSeconds(20));

@@ -40,8 +40,8 @@ void DateRange::operator+=(const TimeSpan& other)
 
 void DateRange::operator-=(const TimeSpan& other)
 {
-    _startTime = _startTime.addMSecs(other.totalMilliseconds());
-    _endTime = _endTime.addMSecs(other.totalMilliseconds());
+    _startTime = _startTime.addMSecs(-other.totalMilliseconds());
+    _endTime = _endTime.addMSecs(-other.totalMilliseconds());
 }
 
 bool DateRange::operator==(const DateRange& other) const
