@@ -1,10 +1,10 @@
 /* KanoopCommonQt custom Doxygen overrides */
 
-/* Accent color — teal to match Qt branding */
+/* Accent color — darker green for readability on white */
 html {
-    --primary-color: #41cd52;
-    --primary-dark-color: #36b348;
-    --primary-light-color: #8ee09a;
+    --primary-color: #1a8a2e;
+    --primary-dark-color: #146b23;
+    --primary-light-color: #41cd52;
 }
 
 /* Slightly rounder corners */
