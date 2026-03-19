@@ -106,7 +106,7 @@ public:
     /**
      * @brief A list of Point objects with corner-finding helpers.
      */
-    class List : public QList<Point>
+    class KANOOP_EXPORT List : public QList<Point>
     {
     public:
         /** @brief Default constructor. */
