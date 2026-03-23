@@ -94,11 +94,15 @@ private:
         qint64 _count;
     };
 
+    void pruneOldEvents(qint64 now);
+
     int _evaluationMsecs = 1000;
     QVariant _data;
 
     QList<RateEvent> _events;
     QMutex _lock;
+    qint64 _lastPruneTime = 0;
+    static const qint64 PruneIntervalMsecs = 1000;
 };
 
 #endif // RATEMONITOR_H
