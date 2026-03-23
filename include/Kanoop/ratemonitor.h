@@ -30,13 +30,15 @@ class KANOOP_EXPORT RateMonitor
 {
 public:
     /** @brief Construct a RateMonitor with a default 1-second evaluation window. */
-    RateMonitor();
+    RateMonitor() :
+        _evaluationMsecs(1000) {}
 
     /**
      * @brief Construct a RateMonitor with a custom evaluation window.
      * @param evaluationMsecs Sliding window duration in milliseconds
      */
-    RateMonitor(int evaluationMsecs);
+    RateMonitor(int evaluationMsecs) :
+        _evaluationMsecs(evaluationMsecs) {}
 
 public slots:
     /**

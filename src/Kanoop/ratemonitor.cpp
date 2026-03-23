@@ -1,17 +1,4 @@
 #include "Kanoop/ratemonitor.h"
-#include <Kanoop/log.h>
-
-RateMonitor::RateMonitor() :
-    _evaluationMsecs(1000)
-{
-    Log::logText(LVL_DEBUG, QString("RateMonitor created (eval: %1ms, pruneInterval: %2ms)").arg(_evaluationMsecs).arg(PruneIntervalMsecs));
-}
-
-RateMonitor::RateMonitor(int evaluationMsecs) :
-    _evaluationMsecs(evaluationMsecs)
-{
-    Log::logText(LVL_DEBUG, QString("RateMonitor created (eval: %1ms, pruneInterval: %2ms)").arg(_evaluationMsecs).arg(PruneIntervalMsecs));
-}
 
 void RateMonitor::addEvent(int count)
 {
