@@ -67,7 +67,7 @@ public:
      * @param timeout Maximum wait duration (zero = wait indefinitely)
      * @return true if the thread finished within the timeout
      */
-    bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
+    virtual bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
 
     /**
      * @brief Test whether the worker thread is currently running.
