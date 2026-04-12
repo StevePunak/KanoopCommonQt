@@ -33,7 +33,7 @@ public:
      * @param category Log category for this class (default: uncategorized)
      * @param parent Optional QObject parent
      */
-    AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory(), QObject* parent = nullptr);
+    AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory());
 
     /**
      * @brief Construct with a category name string and optional parent.
