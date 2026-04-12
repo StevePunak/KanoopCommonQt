@@ -1,8 +1,8 @@
 #include "utility/abstractthreadclass.h"
 #include "commonexception.h"
 
-AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category, QObject *parent) :
-    QObject(parent),
+AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category) :
+    QObject(),
     LoggingBaseClass(category),
     _success(false),
     _stdout(stdout), _stderr(stderr)

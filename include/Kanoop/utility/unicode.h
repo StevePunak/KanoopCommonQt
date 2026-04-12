@@ -53,6 +53,14 @@ public:
         RightsReserved,     ///< Registered sign (®, U+00AE)
         Squared,            ///< Superscript two (², U+00B2)
         ThreeQuarters,      ///< Vulgar fraction three quarters (¾, U+00BE)
+
+        // Media transport
+        PlayRight,          ///< Black right-pointing triangle (▶, U+25B6)
+        Pause,              ///< Double vertical bar (⏸, U+23F8)
+        SkipBack,           ///< Black left-pointing double triangle with bar (⏮, U+23EE)
+        SkipForward,        ///< Black right-pointing double triangle with bar (⏭, U+23ED)
+        Shuffle,            ///< Twisted rightwards arrows (⇄, U+21C4)
+        Repeat,             ///< Clockwise open circle arrow (↻, U+21BB)
     };
 
     /**
@@ -100,6 +108,14 @@ private:
             insert(RightsReserved,          QChar(0x00ae));
             insert(Squared,                 QChar(0x00b2));
             insert(ThreeQuarters,           QChar(0x00be));
+
+            // Media transport
+            insert(PlayRight,               QChar(0x25b6));
+            insert(Pause,                   QChar(0x23f8));
+            insert(SkipBack,                QChar(0x23ee));
+            insert(SkipForward,             QChar(0x23ed));
+            insert(Shuffle,                 QChar(0x21c4));
+            insert(Repeat,                  QChar(0x21bb));
         }
     };
     static const SpecialCharacterMap _SpecialCharacterMap;
