@@ -36,16 +36,31 @@ public:
         Cubed,              ///< Superscript three (³, U+00B3)
         Degrees,            ///< Degree sign (°, U+00B0)
         Delta,              ///< Greek capital Delta (Δ, U+0394)
+        Ellipsis,           ///< Horizontal ellipsis (…, U+2026)
         EmDash,             ///< Em dash (—, U+2014)
+        EmSpace,            ///< Em space ( , U+2003)
+        EnDash,             ///< En dash (–, U+2013)
+        LeftDoubleQuote,    ///< Left double quotation mark (", U+201C)
+        LeftSingleQuote,    ///< Left single quotation mark (', U+2018)
         Micro,              ///< Micro sign (µ, U+00B5)
         MusicNote,          ///< Beamed eighth notes (♫, U+266B)
         OneHalf,            ///< Vulgar fraction one half (½, U+00BD)
         OneQuarter,         ///< Vulgar fraction one quarter (¼, U+00BC)
         Paragraph,          ///< Pilcrow / paragraph sign (¶, U+00B6)
         PlusOrMinus,        ///< Plus-minus sign (±, U+00B1)
+        RightDoubleQuote,   ///< Right double quotation mark (", U+201D)
+        RightSingleQuote,   ///< Right single quotation mark (', U+2019)
         RightsReserved,     ///< Registered sign (®, U+00AE)
         Squared,            ///< Superscript two (², U+00B2)
         ThreeQuarters,      ///< Vulgar fraction three quarters (¾, U+00BE)
+
+        // Media transport
+        PlayRight,          ///< Black right-pointing triangle (▶, U+25B6)
+        Pause,              ///< Double vertical bar (⏸, U+23F8)
+        SkipBack,           ///< Black left-pointing double triangle with bar (⏮, U+23EE)
+        SkipForward,        ///< Black right-pointing double triangle with bar (⏭, U+23ED)
+        Shuffle,            ///< Twisted rightwards arrows (⇄, U+21C4)
+        Repeat,             ///< Clockwise open circle arrow (↻, U+21BB)
     };
 
     /**
@@ -76,16 +91,31 @@ private:
             insert(Cubed,                   QChar(0x00b3));
             insert(Degrees,                 QChar(0x00b0));
             insert(Delta,                   QChar(0x0394));
+            insert(Ellipsis,                QChar(0x2026));
             insert(EmDash,                  QChar(0x2014));
+            insert(EmSpace,                 QChar(0x2003));
+            insert(EnDash,                  QChar(0x2013));
+            insert(LeftDoubleQuote,         QChar(0x201c));
+            insert(LeftSingleQuote,         QChar(0x2018));
             insert(Micro,                   QChar(0x00b5));
             insert(MusicNote,               QChar(0x266b));
             insert(OneHalf,                 QChar(0x00bd));
             insert(OneQuarter,              QChar(0x00bc));
             insert(Paragraph,               QChar(0x00b6));
             insert(PlusOrMinus,             QChar(0x00b1));
+            insert(RightDoubleQuote,        QChar(0x201d));
+            insert(RightSingleQuote,        QChar(0x2019));
             insert(RightsReserved,          QChar(0x00ae));
             insert(Squared,                 QChar(0x00b2));
             insert(ThreeQuarters,           QChar(0x00be));
+
+            // Media transport
+            insert(PlayRight,               QChar(0x25b6));
+            insert(Pause,                   QChar(0x23f8));
+            insert(SkipBack,                QChar(0x23ee));
+            insert(SkipForward,             QChar(0x23ed));
+            insert(Shuffle,                 QChar(0x21c4));
+            insert(Repeat,                  QChar(0x21bb));
         }
     };
     static const SpecialCharacterMap _SpecialCharacterMap;

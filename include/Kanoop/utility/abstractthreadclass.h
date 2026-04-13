@@ -33,7 +33,7 @@ public:
      * @param category Log category for this class (default: uncategorized)
      * @param parent Optional QObject parent
      */
-    AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory(), QObject* parent = nullptr);
+    AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory());
 
     /**
      * @brief Construct with a category name string and optional parent.
@@ -67,7 +67,7 @@ public:
      * @param timeout Maximum wait duration (zero = wait indefinitely)
      * @return true if the thread finished within the timeout
      */
-    bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
+    virtual bool waitForCompletion(const TimeSpan& timeout = TimeSpan::zero());
 
     /**
      * @brief Test whether the worker thread is currently running.
