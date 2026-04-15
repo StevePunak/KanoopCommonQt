@@ -58,6 +58,7 @@ public:
      * @brief Convert a double to a string, trimming trailing zeros.
      * @param value Double to convert
      * @param precision Maximum number of decimal places
+     * @param forcePadding When true, retain trailing zeros to the full precision
      * @return Formatted string
      */
     static QString toString(double value, int precision = 6, bool forcePadding = false);

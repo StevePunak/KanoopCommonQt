@@ -66,6 +66,22 @@ private slots:
         QCOMPARE(result, QStringLiteral("-42.5"));
     }
 
+    void toString_double_forcePadding()
+    {
+        // With forcePadding, trailing zeros out to the full precision are retained
+        QCOMPARE(StringUtil::toString(1.0, 6, true), QStringLiteral("1.000000"));
+        QCOMPARE(StringUtil::toString(3.14, 4, true), QStringLiteral("3.1400"));
+        QCOMPARE(StringUtil::toString(0.0, 3, true), QStringLiteral("0.000"));
+        QCOMPARE(StringUtil::toString(-42.5, 2, true), QStringLiteral("-42.50"));
+    }
+
+    void toString_double_forcePadding_zeroPrecision()
+    {
+        // With precision 0, there is no decimal portion regardless of forcePadding
+        QCOMPARE(StringUtil::toString(1.0, 0, true), QStringLiteral("1"));
+        QCOMPARE(StringUtil::toString(1.0, 0, false), QStringLiteral("1"));
+    }
+
     // ---- toByteArray ----
 
     void toByteArray_hexString()
