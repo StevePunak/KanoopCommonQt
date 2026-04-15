@@ -309,7 +309,7 @@ StringUtil::Levenshtein::Levenshtein(const QString &s1, const QString &s2)
     unsigned int x, y, s1len, s2len;
     s1len = s1.length();
     s2len = s2.length();
-    unsigned int matrix[s2len+1][s1len+1];
+    QList<QList<unsigned int>> matrix(s2len + 1, QList<unsigned int>(s1len + 1, 0));
     matrix[0][0] = 0;
     for (x = 1; x <= s2len; x++) {
         matrix[x][0] = matrix[x-1][0] + 1;

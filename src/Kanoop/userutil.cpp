@@ -1,5 +1,7 @@
 #include "Kanoop/userutil.h"
 
+#include <QList>
+
 #ifndef __WIN32
 #include "unistd.h"
 #else
@@ -71,9 +73,9 @@ bool UserUtil::isUserMemberOfGroup(uid_t uid, gid_t gid)
     int ngroups = 0;
     getgrouplist(pw->pw_name, pw->pw_gid, nullptr, &ngroups);
 
-    gid_t groups[ngroups];
+    QList<gid_t> groups(ngroups);
 
-    getgrouplist(pw->pw_name, pw->pw_gid, groups, &ngroups);
+    getgrouplist(pw->pw_name, pw->pw_gid, groups.data(), &ngroups);
 
     for(int i = 0;i < ngroups;i++)
         if(groups[i] == gid)
