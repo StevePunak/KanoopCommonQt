@@ -60,7 +60,7 @@ public:
      * @param precision Maximum number of decimal places
      * @return Formatted string
      */
-    static QString toString(double value, int precision = 6);
+    static QString toString(double value, int precision = 6, bool forcePadding = false);
     /**
      * @brief Convert a byte array to a hex string.
      * @param value Byte array to convert

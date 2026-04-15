@@ -22,12 +22,15 @@ QByteArray StringUtil::toByteArray(const QString &value)
     return result;
 }
 
-QString StringUtil::toString(double value, int precision)
+QString StringUtil::toString(double value, int precision, bool forcePadding)
 {
     QString result = QString("%1").arg(value, 0, 'f', precision);
-    result = trimEnd(result, QList<QChar>() << '0');
+    if(!forcePadding) {
+        result = trimEnd(result, { '0' });
+    }
+
     if(result.endsWith('.')) {
-        result = trimEnd(result, QList<QChar>() << '.');
+        result = trimEnd(result, { '.' });
     }
     return result;
 }
