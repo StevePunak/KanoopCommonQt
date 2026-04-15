@@ -25,9 +25,11 @@ QByteArray StringUtil::toByteArray(const QString &value)
 QString StringUtil::toString(double value, int precision)
 {
     QString result = QString("%1").arg(value, 0, 'f', precision);
-    result = trimEnd(result, QList<QChar>() << '0');
-    if(result.endsWith('.')) {
-        result = trimEnd(result, QList<QChar>() << '.');
+    if(result.contains('.')) {
+        result = trimEnd(result, QList<QChar>() << '0');
+        if(result.endsWith('.')) {
+            result = trimEnd(result, QList<QChar>() << '.');
+        }
     }
     return result;
 }
