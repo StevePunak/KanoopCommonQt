@@ -25,7 +25,7 @@ QByteArray StringUtil::toByteArray(const QString &value)
 QString StringUtil::toString(double value, int precision, bool forcePadding)
 {
     QString result = QString("%1").arg(value, 0, 'f', precision);
-    if(forcePadding && result.contains('.') == false) {
+    if(forcePadding == false && result.contains('.')) {
         result = trimEnd(result, { '0' });
     }
 
