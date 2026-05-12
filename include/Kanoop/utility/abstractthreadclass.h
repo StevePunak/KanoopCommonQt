@@ -108,6 +108,26 @@ protected:
      */
     virtual void threadStarted() = 0;
 
+    /**
+     * @brief Called on the worker thread, with the event loop still alive,
+     *        just before the thread is asked to quit.
+     *
+     * Override to perform thread-affine cleanup that must complete while the
+     * event loop is still pumping — for example, disconnecting QObject-based
+     * devices (QCanBusDevice, QModbusClient) whose thread affinity is the
+     * worker thread.
+     *
+     * This is also the right place to call deleteLater() on any QObjects
+     * owned by the worker thread. Three properties line up here that don't
+     * line up at any other lifecycle point: the call runs on the owning
+     * thread, the event loop is still pumping so DeferredDelete events get
+     * processed, and the marshalled call is synchronous from the caller's
+     * perspective so the deletions are queued before quit() is issued.
+     *
+     * The default implementation does nothing.
+     */
+    virtual void threadAboutToFinish() {}
+
     /** @brief Called on the worker thread just before it exits. */
     virtual void threadFinished() {}
 
@@ -140,6 +160,9 @@ protected:
 private:
     /** @brief Shared initialisation for all constructors. */
     void commonInit();
+
+    /** @brief Helper that calls threadAboutToFinish() with exception handling. */
+    void invokeThreadAboutToFinish();
 
     bool _success = false;
     QString _message;

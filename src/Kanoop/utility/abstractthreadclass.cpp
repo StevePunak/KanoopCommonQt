@@ -76,6 +76,12 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
     }
     else {
         _stopping = true;
+        if(QThread::currentThread() == &_thread) {
+            invokeThreadAboutToFinish();
+        }
+        else {
+            QMetaObject::invokeMethod(this, &AbstractThreadClass::invokeThreadAboutToFinish, Qt::BlockingQueuedConnection);
+        }
         _thread.quit();
         if(_stopEvent.wait(timeout) == false) {
             logText(LVL_ERROR, QString("%1: Thread stop never completed. Aborting thread!").arg(objectName()));
@@ -114,6 +120,7 @@ void AbstractThreadClass::finishAndStop(bool success, const QString &message)
     _success = success;
     _message = message;
     _stopping = true;
+    invokeThreadAboutToFinish();
     _thread.quit();
 }
 
@@ -144,5 +151,17 @@ void AbstractThreadClass::onThreadFinished()
     _stopEvent.set();
     emit finished();
     _stopping = false;
+}
+
+void AbstractThreadClass::invokeThreadAboutToFinish()
+{
+    try
+    {
+        threadAboutToFinish();
+    }
+    catch(const CommonException& e)
+    {
+        logText(LVL_ERROR, QString("%1: threadAboutToFinish exception: %2").arg(objectName()).arg(e.message()));
+    }
 }
 
