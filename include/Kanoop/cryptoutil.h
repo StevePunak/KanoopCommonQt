@@ -11,6 +11,7 @@
 #define CRYPTOUTIL_H
 
 #include <QByteArray>
+#include <QCryptographicHash>
 #include <QString>
 #include <QStringList>
 #include <Kanoop/kanoopcommon.h>
@@ -21,6 +22,9 @@
 class KANOOP_EXPORT CryptoUtil
 {
 public:
+    /** @brief Hash algorithms supported by CryptoUtil. */
+    enum Algorithm { Md5, Sha256 };
+
     /**
      * @brief Compute the MD5 hash of a file's contents.
      * @param filename Path to the file
@@ -125,6 +129,41 @@ public:
      * @return Raw SHA-256 hash bytes
      */
     static QByteArray sha256(const QStringList& of);
+
+    /**
+     * @brief Stateful incremental hasher for streamed input.
+     *
+     * For cases where the full input isn't available up front (e.g. streaming
+     * network downloads). Hex output matches the static md5String/sha256String
+     * helpers in this class.
+     */
+    class KANOOP_EXPORT Hasher
+    {
+    public:
+        /**
+         * @brief Construct a hasher for the given algorithm.
+         * @param algorithm Which digest to compute.
+         */
+        explicit Hasher(Algorithm algorithm);
+
+        /**
+         * @brief Append data to the running hash.
+         * @param data Bytes to fold into the digest.
+         */
+        void addData(const QByteArray& data);
+
+        /** @brief Reset the hash state so the instance can be reused. */
+        void reset();
+
+        /** @brief Return the current digest as raw bytes. */
+        QByteArray result() const;
+
+        /** @brief Return the current digest as a lowercase hex string. */
+        QString resultString() const;
+
+    private:
+        QCryptographicHash _hash;
+    };
 
 private:
     /** @brief Convert a raw hash byte array to a lowercase hex string. */
