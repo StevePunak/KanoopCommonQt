@@ -117,6 +117,31 @@ QByteArray CryptoUtil::sha256(const QStringList &of)
     return hash.result();
 }
 
+CryptoUtil::Hasher::Hasher(Algorithm algorithm) :
+    _hash(algorithm == Sha256 ? QCryptographicHash::Sha256 : QCryptographicHash::Md5)
+{
+}
+
+void CryptoUtil::Hasher::addData(const QByteArray &data)
+{
+    _hash.addData(data);
+}
+
+void CryptoUtil::Hasher::reset()
+{
+    _hash.reset();
+}
+
+QByteArray CryptoUtil::Hasher::result() const
+{
+    return _hash.result();
+}
+
+QString CryptoUtil::Hasher::resultString() const
+{
+    return toHashString(result());
+}
+
 QString CryptoUtil::toHashString(const QByteArray &buffer)
 {
     QString result;
