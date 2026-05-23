@@ -1,6 +1,8 @@
 #include "utility/abstractthreadclass.h"
 #include "commonexception.h"
 
+#include <QCoreApplication>
+
 AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category) :
     QObject(),
     LoggingBaseClass(category),
@@ -163,5 +165,11 @@ void AbstractThreadClass::invokeThreadAboutToFinish()
     {
         logText(LVL_ERROR, QString("%1: threadAboutToFinish exception: %2").arg(objectName()).arg(e.message()));
     }
+    // Drain any deleteLater() events posted from the hook before returning.
+    // QThread emits finished() *before* its own DeferredDelete drain in
+    // QThreadPrivate::finish(), and the upcoming quit() event outranks the
+    // low-priority DeferredDelete in the worker's queue — so without this
+    // call, threadFinished() runs before the deletions are processed.
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
 }
 
