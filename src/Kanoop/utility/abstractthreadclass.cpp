@@ -155,6 +155,14 @@ void AbstractThreadClass::finishAndStop(bool success, const QString &message)
 {
     logText(LVL_DEBUG, QString("TEARDOWN %1: finishAndStop — quitting own thread (success=%2)")
             .arg(objectName()).arg(success));
+    // First completion wins. A second call lands when a signal carrying a
+    // result is already queued behind a self-initiated quit (e.g. an HTTP
+    // reply's finished signal after a status-driven finishAndStop, or a late
+    // success racing a timeout failure) — don't stomp the recorded result or
+    // re-run the about-to-finish hook.
+    if(_stopping == true) {
+        return;
+    }
     _success = success;
     _message = message;
     _stopping = true;
