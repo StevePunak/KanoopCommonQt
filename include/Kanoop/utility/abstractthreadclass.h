@@ -136,14 +136,14 @@ protected:
      * @param timeout Maximum wait duration
      * @return true if the thread started within the timeout
      */
-    bool waitForStart(const TimeSpan& timeout);
+    virtual bool waitForStart(const TimeSpan& timeout);
 
     /**
      * @brief Signal that the worker has finished, recording success and a message.
      * @param success Whether the work completed successfully
      * @param message Optional human-readable completion message
      */
-    void finishAndStop(bool success, const QString& message = QString());
+    virtual void finishAndStop(bool success, const QString& message = QString());
 
     /**
      * @brief Write a line to the standard output stream.
@@ -163,6 +163,11 @@ private:
 
     /** @brief Helper that calls threadAboutToFinish() with exception handling. */
     void invokeThreadAboutToFinish();
+
+    /** @brief Worker-side helper queued by stop(): runs the about-to-finish hook, then
+     *  quits the worker's event loop. Sequencing both on the worker guarantees the hook
+     *  executes before the loop exits without the caller having to block. */
+    void invokeThreadAboutToFinishAndQuit();
 
     bool _success = false;
     QString _message;

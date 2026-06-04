@@ -33,6 +33,14 @@ void AbstractThreadClass::commonInit()
 
 AbstractThreadClass::~AbstractThreadClass()
 {
+    logText(LVL_DEBUG, QString("TEARDOWN %1: dtor enter — running=%2 onOwnThread=%3 caller=0x%4")
+            .arg(objectName())
+            .arg(_thread.isRunning())
+            .arg(QThread::currentThread() == &_thread)
+            .arg((quintptr)QThread::currentThread(), 0, 16));
+    if(_thread.isRunning() && QThread::currentThread() == &_thread) {
+        logText(LVL_ERROR, QString("TEARDOWN %1: dtor on own running thread — ~QThread will self-join and hang").arg(objectName()));
+    }
     if(_thread.isRunning()) {
         try
         {
@@ -52,6 +60,7 @@ AbstractThreadClass::~AbstractThreadClass()
     else {
         _stopEvent.set();
     }
+    logText(LVL_DEBUG, QString("TEARDOWN %1: dtor exit").arg(objectName()));
 }
 
 bool AbstractThreadClass::start(const TimeSpan &timeout)
@@ -77,14 +86,28 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
         logText(LVL_WARNING, QString("%1: Tried to stop while not running").arg(objectName()));
     }
     else {
-        _stopping = true;
         if(QThread::currentThread() == &_thread) {
+            _stopping = true;
             invokeThreadAboutToFinish();
+            _thread.quit();
+        }
+        else if(_stopping == false) {
+            _stopping = true;
+            // Queue the about-to-finish hook + quit as a single worker-side call. A
+            // blocking invoke here deadlocks the caller forever when the worker has
+            // already quit its event loop via finishAndStop() — the invoke is never
+            // serviced. Queuing hook-then-quit together also guarantees a live loop
+            // runs the hook before exiting (a quit() posted from this thread would
+            // interrupt the loop without draining the queued hook). If the loop is
+            // already gone, the event is simply dropped — finishAndStop() has run
+            // the hook and quit already. _stopEvent.wait() below synchronizes.
+            QMetaObject::invokeMethod(this, &AbstractThreadClass::invokeThreadAboutToFinishAndQuit);
         }
         else {
-            QMetaObject::invokeMethod(this, &AbstractThreadClass::invokeThreadAboutToFinish, Qt::BlockingQueuedConnection);
+            // Worker is already shutting itself down (finishAndStop): the hook has
+            // run on the worker and quit() has been called. Just wait for the exit.
+            _thread.quit();
         }
-        _thread.quit();
         if(_stopEvent.wait(timeout) == false) {
             logText(LVL_ERROR, QString("%1: Thread stop never completed. Aborting thread!").arg(objectName()));
             _thread.terminate();
@@ -119,6 +142,8 @@ bool AbstractThreadClass::waitForStart(const TimeSpan& timeout)
 
 void AbstractThreadClass::finishAndStop(bool success, const QString &message)
 {
+    logText(LVL_DEBUG, QString("TEARDOWN %1: finishAndStop — quitting own thread (success=%2)")
+            .arg(objectName()).arg(success));
     _success = success;
     _message = message;
     _stopping = true;
@@ -171,5 +196,11 @@ void AbstractThreadClass::invokeThreadAboutToFinish()
     // low-priority DeferredDelete in the worker's queue — so without this
     // call, threadFinished() runs before the deletions are processed.
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+}
+
+void AbstractThreadClass::invokeThreadAboutToFinishAndQuit()
+{
+    invokeThreadAboutToFinish();
+    _thread.quit();
 }
 
