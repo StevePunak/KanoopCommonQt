@@ -58,6 +58,13 @@ AbstractThreadClass::~AbstractThreadClass()
         }
     }
     else {
+        // isRunning() reports false for the entire finish phase
+        // (QThreadPrivate::isInFinish) while onThreadFinished() is still
+        // executing member functions on the worker — deleting on that
+        // report alone is a use-after-free. Join unconditionally: wait()
+        // blocks until the finish phase fully completes, and returns
+        // immediately for a never-started or long-finished thread.
+        _thread.wait();
         _stopEvent.set();
     }
     logText(LVL_DEBUG, QString("TEARDOWN %1: dtor exit").arg(objectName()));
@@ -84,6 +91,10 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
     bool result = true;
     if(_thread.isRunning() == false) {
         logText(LVL_WARNING, QString("%1: Tried to stop while not running").arg(objectName()));
+        // Not-running includes the finish phase, where the worker is still
+        // executing onThreadFinished(). Join so the caller can safely delete
+        // this object on return.
+        _thread.wait();
     }
     else {
         if(QThread::currentThread() == &_thread) {
