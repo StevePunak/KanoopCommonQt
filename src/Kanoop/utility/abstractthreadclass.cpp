@@ -3,6 +3,9 @@
 
 #include <QCoreApplication>
 
+QAtomicInt AbstractThreadClass::_InstanceCount = 0;
+QAtomicInt AbstractThreadClass::_RunningThreadCount = 0;
+
 AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category) :
     QObject(),
     LoggingBaseClass(category),
@@ -23,6 +26,8 @@ AbstractThreadClass::AbstractThreadClass(const QString &category, QObject *paren
 
 void AbstractThreadClass::commonInit()
 {
+    _InstanceCount.fetchAndAddRelaxed(1);
+
     AbstractThreadClass::setObjectName(AbstractThreadClass::metaObject()->className());
 
     connect(&_thread, &QThread::started, this, &AbstractThreadClass::onThreadStarted);
@@ -67,6 +72,7 @@ AbstractThreadClass::~AbstractThreadClass()
         _thread.wait();
         _stopEvent.set();
     }
+    _InstanceCount.fetchAndSubRelaxed(1);
     logText(LVL_DEBUG, QString("TEARDOWN %1: dtor exit").arg(objectName()));
 }
 
@@ -98,15 +104,16 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
     }
     else {
         if(QThread::currentThread() == &_thread) {
-            _stopping = true;
+            _stopping.storeRelaxed(1);
             invokeThreadAboutToFinish();
             _thread.quit();
         }
-        else if(_stopping == false) {
-            _stopping = true;
-            // Queue the about-to-finish hook + quit as a single worker-side call. A
-            // blocking invoke here deadlocks the caller forever when the worker has
-            // already quit its event loop via finishAndStop() — the invoke is never
+        else if(_stopping.testAndSetOrdered(0, 1)) {
+            // We won the stop race (the atomic test-and-set closes the window where this
+            // and a concurrent finishAndStop() both pass a plain check before either sets
+            // the flag). Queue the about-to-finish hook + quit as a single worker-side
+            // call. A blocking invoke here deadlocks the caller forever when the worker
+            // has already quit its event loop via finishAndStop() — the invoke is never
             // serviced. Queuing hook-then-quit together also guarantees a live loop
             // runs the hook before exiting (a quit() posted from this thread would
             // interrupt the loop without draining the queued hook). If the loop is
@@ -125,7 +132,7 @@ bool AbstractThreadClass::stop(const TimeSpan& timeout)
             result = false;
         }
     }
-    _stopping = false;
+    _stopping.storeRelaxed(0);
     return result;
 }
 
@@ -159,19 +166,20 @@ void AbstractThreadClass::finishAndStop(bool success, const QString &message)
     // result is already queued behind a self-initiated quit (e.g. an HTTP
     // reply's finished signal after a status-driven finishAndStop, or a late
     // success racing a timeout failure) — don't stomp the recorded result or
-    // re-run the about-to-finish hook.
-    if(_stopping == true) {
+    // re-run the about-to-finish hook. The atomic test-and-set also closes the
+    // race against a concurrent cross-thread stop().
+    if(_stopping.testAndSetOrdered(0, 1) == false) {
         return;
     }
     _success = success;
     _message = message;
-    _stopping = true;
     invokeThreadAboutToFinish();
     _thread.quit();
 }
 
 void AbstractThreadClass::onThreadStarted()
 {
+    _RunningThreadCount.fetchAndAddRelaxed(1);
     try
     {
         emit started();
@@ -196,7 +204,8 @@ void AbstractThreadClass::onThreadFinished()
     }
     _stopEvent.set();
     emit finished();
-    _stopping = false;
+    _stopping.storeRelaxed(0);
+    _RunningThreadCount.fetchAndSubRelaxed(1);
 }
 
 void AbstractThreadClass::invokeThreadAboutToFinish()
