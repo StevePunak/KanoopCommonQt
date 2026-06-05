@@ -4,6 +4,7 @@
 #ifndef ABSTRACTTHREADCLASS_H
 #define ABSTRACTTHREADCLASS_H
 
+#include <QAtomicInt>
 #include <QMutex>
 #include <QObject>
 #include <QTextStream>
@@ -79,7 +80,7 @@ public:
      * @brief Test whether stop() has been called and the thread is winding down.
      * @return true if stopping is in progress
      */
-    bool isStopping() const { return _stopping; }
+    bool isStopping() const { return _stopping.loadRelaxed() != 0; }
 
     /**
      * @brief Return whether the last run completed successfully.
@@ -98,6 +99,21 @@ public:
      * @param value true to make start() blocking
      */
     void setBlockingStart(bool value) { _blockingStart = value; }
+
+    /**
+     * @brief Return the number of AbstractThreadClass instances currently alive.
+     *
+     * Diagnostic counter. Note that reading this together with runningThreadCount()
+     * is not atomic as a pair — the two values may be momentarily inconsistent.
+     * @return Count of live instances across all threads
+     */
+    static int instanceCount() { return _InstanceCount.loadRelaxed(); }
+
+    /**
+     * @brief Return the number of AbstractThreadClass worker threads currently running.
+     * @return Count of threads between onThreadStarted() and onThreadFinished()
+     */
+    static int runningThreadCount() { return _RunningThreadCount.loadRelaxed(); }
 
 protected:
     /**
@@ -136,14 +152,14 @@ protected:
      * @param timeout Maximum wait duration
      * @return true if the thread started within the timeout
      */
-    bool waitForStart(const TimeSpan& timeout);
+    virtual bool waitForStart(const TimeSpan& timeout);
 
     /**
      * @brief Signal that the worker has finished, recording success and a message.
      * @param success Whether the work completed successfully
      * @param message Optional human-readable completion message
      */
-    void finishAndStop(bool success, const QString& message = QString());
+    virtual void finishAndStop(bool success, const QString& message = QString());
 
     /**
      * @brief Write a line to the standard output stream.
@@ -164,10 +180,18 @@ private:
     /** @brief Helper that calls threadAboutToFinish() with exception handling. */
     void invokeThreadAboutToFinish();
 
+    /** @brief Worker-side helper queued by stop(): runs the about-to-finish hook, then
+     *  quits the worker's event loop. Sequencing both on the worker guarantees the hook
+     *  executes before the loop exits without the caller having to block. */
+    void invokeThreadAboutToFinishAndQuit();
+
     bool _success = false;
     QString _message;
 
-    bool _stopping = false;
+    /** Written by stop() on the caller's thread and by finishAndStop() on the worker —
+     *  atomic so the cross-thread first-completion-wins handoff is a real test-and-set
+     *  rather than a data race. 0 = not stopping, 1 = stopping. */
+    QAtomicInt _stopping;
     bool _blockingStart = false;
 
     QThread _thread;
@@ -176,6 +200,10 @@ private:
 
     MutexEvent _startEvent;
     MutexEvent _stopEvent;
+
+    // Diagnostic counters (relaxed ordering — sufficient for monotonic counting)
+    static QAtomicInt _InstanceCount;
+    static QAtomicInt _RunningThreadCount;
 
 signals:
     /** @brief Emitted when the worker thread has started. */
