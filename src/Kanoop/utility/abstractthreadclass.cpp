@@ -5,6 +5,8 @@
 
 QAtomicInt AbstractThreadClass::_InstanceCount = 0;
 QAtomicInt AbstractThreadClass::_RunningThreadCount = 0;
+QMutex AbstractThreadClass::_RunningThreadsLock;
+QList<AbstractThreadClass*> AbstractThreadClass::_RunningThreads;
 
 AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category) :
     QObject(),
@@ -177,9 +179,23 @@ void AbstractThreadClass::finishAndStop(bool success, const QString &message)
     _thread.quit();
 }
 
+QStringList AbstractThreadClass::runningThreadNames()
+{
+    QStringList result;
+    _RunningThreadsLock.lock();
+    for(const AbstractThreadClass* threadClass : _RunningThreads) {
+        result.append(threadClass->objectName());
+    }
+    _RunningThreadsLock.unlock();
+    return result;
+}
+
 void AbstractThreadClass::onThreadStarted()
 {
     _RunningThreadCount.fetchAndAddRelaxed(1);
+    _RunningThreadsLock.lock();
+    _RunningThreads.append(this);
+    _RunningThreadsLock.unlock();
     try
     {
         emit started();
@@ -206,6 +222,9 @@ void AbstractThreadClass::onThreadFinished()
     emit finished();
     _stopping.storeRelaxed(0);
     _RunningThreadCount.fetchAndSubRelaxed(1);
+    _RunningThreadsLock.lock();
+    _RunningThreads.removeOne(this);
+    _RunningThreadsLock.unlock();
 }
 
 void AbstractThreadClass::invokeThreadAboutToFinish()
