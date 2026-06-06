@@ -16,3 +16,5 @@ void LogConsumer::addLogEntry(const Log::LogEntry& entry)
 {
     emit logEntry(entry);
 }
+
+#include "Kanoop/moc_logconsumer.cpp"

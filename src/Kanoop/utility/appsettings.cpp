@@ -51,3 +51,5 @@ QString AppSettings::makeCompoundObjectKey(const QString& key, const QObject* ob
     QString objectKey = makeKey(key, makeObjectKey(object));
     return objectKey;
 }
+
+#include "Kanoop/utility/moc_appsettings.cpp"

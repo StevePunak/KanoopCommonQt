@@ -142,3 +142,5 @@ void TcpServerClientObject::onSslErrors(const QList<QSslError> errors)
         logText(LVL_WARNING, QString("%1 [SSL Error]: %2").arg(objectName()).arg(error.errorString()));
     }
 }
+
+#include "Kanoop/clientserver/moc_tcpserverclientobject.cpp"
