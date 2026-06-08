@@ -40,11 +40,6 @@ void AbstractThreadClass::commonInit()
 
 AbstractThreadClass::~AbstractThreadClass()
 {
-    logText(LVL_DEBUG, QString("TEARDOWN %1: dtor enter — running=%2 onOwnThread=%3 caller=0x%4")
-            .arg(objectName())
-            .arg(_thread.isRunning())
-            .arg(QThread::currentThread() == &_thread)
-            .arg((quintptr)QThread::currentThread(), 0, 16));
     if(_thread.isRunning() && QThread::currentThread() == &_thread) {
         logText(LVL_ERROR, QString("TEARDOWN %1: dtor on own running thread — ~QThread will self-join and hang").arg(objectName()));
     }
@@ -75,7 +70,6 @@ AbstractThreadClass::~AbstractThreadClass()
         _stopEvent.set();
     }
     _InstanceCount.fetchAndSubRelaxed(1);
-    logText(LVL_DEBUG, QString("TEARDOWN %1: dtor exit").arg(objectName()));
 }
 
 bool AbstractThreadClass::start(const TimeSpan &timeout)
@@ -162,8 +156,6 @@ bool AbstractThreadClass::waitForStart(const TimeSpan& timeout)
 
 void AbstractThreadClass::finishAndStop(bool success, const QString &message)
 {
-    logText(LVL_DEBUG, QString("TEARDOWN %1: finishAndStop — quitting own thread (success=%2)")
-            .arg(objectName()).arg(success));
     // First completion wins. A second call lands when a signal carrying a
     // result is already queued behind a self-initiated quit (e.g. an HTTP
     // reply's finished signal after a status-driven finishAndStop, or a late
