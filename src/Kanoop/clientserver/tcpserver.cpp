@@ -113,3 +113,5 @@ void TcpServer::onClientFinished()
     delete client;
 
 }
+
+#include "Kanoop/clientserver/moc_tcpserver.cpp"

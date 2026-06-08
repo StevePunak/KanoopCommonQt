@@ -243,3 +243,5 @@ void AbstractThreadClass::invokeThreadAboutToFinishAndQuit()
     _thread.quit();
 }
 
+
+#include "Kanoop/utility/moc_abstractthreadclass.cpp"

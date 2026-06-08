@@ -58,3 +58,5 @@ void UdpServer::serviceTransmitQueue()
         _socket->writeDatagram(datagram);
     }
 }
+
+#include "Kanoop/clientserver/moc_udpserver.cpp"

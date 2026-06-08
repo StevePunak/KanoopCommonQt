@@ -14,7 +14,7 @@ set(KANOOP_COMMON_VERSION "2.1.1")
 file(GLOB_RECURSE KANOOP_COMMON_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE KANOOP_COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 
-qt_add_library(${PROJ} ${KANOOP_COMMON_SOURCES} ${KANOOP_COMMON_HEADERS})
+qt_add_library(${PROJ} MANUAL_FINALIZATION ${KANOOP_COMMON_SOURCES} ${KANOOP_COMMON_HEADERS})
 
 target_compile_options(${PROJ} PRIVATE -Wextra -Wall -Werror)
 
@@ -39,6 +39,17 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x060000)  # Disables all t
 if (DEFINED $ENV{KYBER_OUTPUT_PREFIX})
     set(KANOOP_INSTALL_PREFIX "$ENV{KYBER_OUTPUT_PREFIX}/")
 endif()
+
+# Suppress Qt's metatype JSON generation. Nothing in this project consumes it
+# (no QML / qmltyperegistrar), and `moc --collect-json` fails on a clean build
+# for the path-prefixed manually-included moc files this library uses (split
+# include/ + src/ layout, SC-5673). Pointing INTERFACE_QT_META_TYPES_BUILD_FILE
+# at an empty file short-circuits qt6_extract_metatypes for this target and any
+# consumer that reads it. Paired with MANUAL_FINALIZATION + qt_finalize_target.
+set(_no_metatypes "${CMAKE_CURRENT_BINARY_DIR}/${PROJ}_no_metatypes.json")
+file(TOUCH "${_no_metatypes}")
+set_target_properties(${PROJ} PROPERTIES INTERFACE_QT_META_TYPES_BUILD_FILE "${_no_metatypes}")
+qt_finalize_target(${PROJ})
 
 install(TARGETS ${PROJ} LIBRARY DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/Kanoop" DESTINATION "${KANOOP_INSTALL_PREFIX}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}" FILES_MATCHING PATTERN "*.h")
