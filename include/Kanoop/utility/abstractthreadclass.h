@@ -7,6 +7,7 @@
 #include <QAtomicInt>
 #include <QMutex>
 #include <QObject>
+#include <QStringList>
 #include <QTextStream>
 #include <QThread>
 
@@ -115,6 +116,15 @@ public:
      */
     static int runningThreadCount() { return _RunningThreadCount.loadRelaxed(); }
 
+    /**
+     * @brief Return the objectName of every worker thread currently running.
+     *
+     * Diagnostic snapshot of the same set counted by runningThreadCount() —
+     * instances between onThreadStarted() and onThreadFinished().
+     * @return Object names of all running worker threads
+     */
+    static QStringList runningThreadNames();
+
 protected:
     /**
      * @brief Entry point called on the worker thread immediately after it starts.
@@ -204,6 +214,14 @@ private:
     // Diagnostic counters (relaxed ordering — sufficient for monotonic counting)
     static QAtomicInt _InstanceCount;
     static QAtomicInt _RunningThreadCount;
+
+    // Registry of running instances behind the counters, for diagnostic snapshots.
+    // Membership tracks _RunningThreadCount exactly: added in onThreadStarted(),
+    // removed in onThreadFinished(). An instance is always alive while registered —
+    // the destructor joins the thread, and onThreadFinished() runs before the join
+    // completes.
+    static QMutex _RunningThreadsLock;
+    static QList<AbstractThreadClass*> _RunningThreads;
 
 signals:
     /** @brief Emitted when the worker thread has started. */
