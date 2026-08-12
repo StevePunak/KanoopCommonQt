@@ -38,11 +38,15 @@ public:
     AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory());
 
     /**
-     * @brief Construct with a category name string and optional parent.
+     * @brief Construct with a category name string.
+     *
+     * Deliberately takes no parent. The constructor moves this object onto its own thread,
+     * and Qt refuses to move an object that has one - a parented instance would keep running
+     * every slot on whichever thread built it, silently, until something deadlocked. Owners
+     * hold one of these by raw pointer and delete it themselves.
      * @param category Category name string
-     * @param parent Optional QObject parent
      */
-    AbstractThreadClass(const QString& category, QObject* parent = nullptr);
+    AbstractThreadClass(const QString& category);
 
     /** @brief Destructor — stops the thread if still running. */
     virtual ~AbstractThreadClass();

@@ -17,8 +17,8 @@ AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category) :
     commonInit();
 }
 
-AbstractThreadClass::AbstractThreadClass(const QString &category, QObject *parent) :
-    QObject(parent),
+AbstractThreadClass::AbstractThreadClass(const QString &category) :
+    QObject(nullptr),
     LoggingBaseClass(category),
     _success(false),
     _stdout(stdout), _stderr(stderr)
