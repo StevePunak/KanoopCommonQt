@@ -1,4 +1,6 @@
 #include <QTest>
+#include <QDir>
+#include <QFile>
 #include <QThread>
 #include <QPointer>
 
@@ -117,6 +119,50 @@ class TstThreadLifecycle : public QObject
     Q_OBJECT
 
 private slots:
+    void startPath_theOsThreadCarriesTheLogTag()
+    {
+        // ⚠ Read from /proc rather than from QThread::objectName(). The whole point of this is what
+        // the OPERATING SYSTEM reports - a profiler, htop and /proc/<pid>/task are the readers, and
+        // asserting on the objectName we just set would pass whether or not Qt used it.
+        LifecycleProbe probe;
+        QVERIFY(probe.start(TimeSpan::fromSeconds(2)));
+
+        QStringList names;
+        QDir tasks("/proc/self/task");
+        const QStringList tids = tasks.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for(const QString& tid : tids) {
+            QFile file(QString("/proc/self/task/%1/comm").arg(tid));
+            if(file.open(QIODevice::ReadOnly)) {
+                names.append(QString::fromUtf8(file.readAll()).trimmed());
+            }
+        }
+        QVERIFY(probe.stop(TimeSpan::fromSeconds(2)));
+
+        // The control: without the fix every worker reports the class name and this list is all
+        // "QThread", so a test that only checked for the tag could not tell the two apart.
+        QVERIFY2(names.contains("lifecycle-probe"),
+                 qPrintable(QString("thread names were: %1").arg(names.join(", "))));
+        QVERIFY2(names.contains("QThread") == false,
+                 qPrintable(QString("a worker is still unnamed: %1").arg(names.join(", "))));
+    }
+
+    void threadName_keepsTheEndOfALongTag()
+    {
+        // ⚠ The tail, not the head. These tags end in the host or node that tells two workers
+        // apart, so a head truncation would render every inverter pool identical.
+        class LongTagProbe : public AbstractThreadClass
+        {
+        public:
+            LongTagProbe() : AbstractThreadClass("query-pool-inverter-ctrl-127.0.2.2") {}
+        protected:
+            virtual void threadStarted() override {}
+        };
+
+        LongTagProbe probe;
+        QCOMPARE(probe.threadName().length(), 15);
+        QCOMPARE(probe.threadName(), QString("-ctrl-127.0.2.2"));
+    }
+
     void stopPath_callbackOrder()
     {
         LifecycleProbe probe;

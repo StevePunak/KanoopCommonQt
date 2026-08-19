@@ -59,6 +59,13 @@ public:
     virtual bool start(const TimeSpan& timeout = TimeSpan::zero());
 
     /**
+     * @brief The name the operating system thread is given, from the log category.
+     *
+     * ⚠ Truncated to what Linux can hold in /proc/<pid>/task/<tid>/comm.
+     */
+    QString threadName() const;
+
+    /**
      * @brief Request the worker thread to stop and optionally wait for it to finish.
      * @param timeout How long to wait for the thread to finish (zero = don't wait)
      * @return true if the thread stopped within the timeout

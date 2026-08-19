@@ -72,6 +72,25 @@ AbstractThreadClass::~AbstractThreadClass()
     _InstanceCount.fetchAndSubRelaxed(1);
 }
 
+QString AbstractThreadClass::threadName() const
+{
+    // ⚠ Qt names the OS thread from the QThread's objectName, not from this object's. Left unset,
+    // every worker in the process reports comm=QThread, which is what /proc and any profiler show.
+    QString result = logCategory().name();
+    if(result.isEmpty()) {
+        result = objectName();
+    }
+
+    // ⚠ comm holds 16 bytes including the terminator, and prctl() truncates the END - which is
+    // exactly where these tags carry the host or node that tells two workers apart. Keeping the
+    // tail instead means "query-pool-inverter-ctrl-127.0.2.2" stays distinguishable from .2.1.
+    static const int MaximumThreadNameLength = 15;
+    if(result.length() > MaximumThreadNameLength) {
+        result = result.right(MaximumThreadNameLength);
+    }
+    return result;
+}
+
 bool AbstractThreadClass::start(const TimeSpan &timeout)
 {
     bool result = true;
@@ -79,6 +98,9 @@ bool AbstractThreadClass::start(const TimeSpan &timeout)
         logText(LVL_WARNING, QString("%1: Tried to start while already running").arg(objectName()));
     }
     else {
+        // ⚠ Named here rather than in the ctor: the log category and objectName are routinely set
+        // per instance after construction, and this is the last moment before the OS thread exists.
+        _thread.setObjectName(threadName());
         _thread.start();
         if((_blockingStart || timeout != TimeSpan::zero()) && _startEvent.wait(timeout) == false) {
             logText(LVL_ERROR, QString("%1: Thread start never completed").arg(objectName()));
