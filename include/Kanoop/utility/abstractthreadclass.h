@@ -31,19 +31,17 @@ class KANOOP_EXPORT AbstractThreadClass : public QObject,
 
 public:
     /**
-     * @brief Construct with an optional log category and parent.
+     * @brief Construct with an optional log category.
      * @param category Log category for this class (default: uncategorized)
-     * @param parent Optional QObject parent
      */
     AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory());
 
     /**
      * @brief Construct with a category name string.
      *
-     * Deliberately takes no parent. The constructor moves this object onto its own thread,
-     * and Qt refuses to move an object that has one - a parented instance would keep running
-     * every slot on whichever thread built it, silently, until something deadlocked. Owners
-     * hold one of these by raw pointer and delete it themselves.
+     * ⚠ Takes no parent, and must not be given one: the constructor moves this object onto
+     * its own thread, which Qt will not do for a parented object. Owners hold one of these
+     * by raw pointer and delete it themselves.
      * @param category Category name string
      */
     AbstractThreadClass(const QString& category);

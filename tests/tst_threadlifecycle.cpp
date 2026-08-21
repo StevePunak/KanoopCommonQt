@@ -201,10 +201,9 @@ private slots:
     }
 
     /**
-     * A subclass that passes no category still has a non-empty objectName - commonInit() defaults
-     * it to this base class's own name - so the OS thread used to answer to a truncation of
-     * "AbstractThreadClass". Every category-less worker in a process reported the identical string,
-     * which is exactly as much use as QThread was.
+     * ⚠ A subclass that passes no category still has a non-empty objectName - commonInit()
+     * defaults it to this base class's own name - so an emptiness check does not reach the
+     * fallback, and every category-less worker would otherwise answer to the same string.
      */
     void startPath_aSubclassWithNoCategoryIsNamedAfterItself()
     {
@@ -272,9 +271,8 @@ private slots:
 
         // ⚠ SWEPT over the TRAILING ASCII LENGTH, which is the only dimension that decides
         // whether the 15-byte cut lands on a lead byte or inside a sequence. Measured: with a
-        // two-byte character, an EVEN trailing length severs and an ODD one does not. Sweeping the
-        // accent count instead exercises one parity forever - the first two versions of this check
-        // did exactly that and passed with the sequence repair deleted.
+        // two-byte character, an EVEN trailing length severs and an ODD one does not. Sweeping
+        // the accent count instead exercises one parity forever and never severs at all.
         for(int trailing = 0;trailing <= 5;trailing++) {
             const QString tag = QString(QChar(0x00E9)).repeated(9) + QString("t").repeated(trailing);
             WideTagProbe wide(tag);
