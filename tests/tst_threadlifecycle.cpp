@@ -1,6 +1,7 @@
 #include <QTest>
 #include <QDir>
 #include <QFile>
+#include <QElapsedTimer>
 #include <QThread>
 #include <QPointer>
 
@@ -110,6 +111,34 @@ protected:
     void threadStarted() override
     {
         startedCalled = true;
+    }
+};
+
+
+/**
+ * @brief Holds the worker inside threadAboutToFinish() for a known interval.
+ *
+ * Lets a caller distinguish a stop() that waited for the wind-down from one that returned while
+ * the worker was still inside it.
+ */
+class SlowWindDownProbe : public AbstractThreadClass
+{
+    Q_OBJECT
+public:
+    static const int WindDownMs = 400;
+
+    SlowWindDownProbe() : AbstractThreadClass("slow-winddown") {}
+
+    bool insideWindDown = false;
+
+protected:
+    void threadStarted() override {}
+
+    void threadAboutToFinish() override
+    {
+        insideWindDown = true;
+        QThread::msleep(WindDownMs);
+        insideWindDown = false;
     }
 };
 
@@ -227,6 +256,55 @@ private slots:
 
         QVERIFY(probe.startedCalled);
     }
+    /**
+     * ⚠ Every destructor in this codebase calls the bare stop(), and its correctness rests entirely
+     * on the default TimeSpan::zero() meaning "wait indefinitely" - MutexEvent::wait() takes the
+     * no-timeout branch for any msecs <= 0. Subclass destructors delete the members their worker
+     * thread is still reading, so a stop() that returned early would be a use-after-free that only
+     * shows up under load, somewhere else, later.
+     *
+     * ⚠⚠ The Doxygen on stop() says "zero = don't wait". THE DOCUMENTATION IS WRONG, and this test
+     * exists because the plausible edit is someone believing it and making the code agree.
+     */
+    void stopPath_theDefaultTimeoutWaitsForTheWindDownRatherThanNotWaitingAtAll()
+    {
+        SlowWindDownProbe probe;
+        QVERIFY(probe.start(TimeSpan::fromSeconds(2)));
+
+        QElapsedTimer elapsed;
+        elapsed.start();
+        const bool stopped = probe.stop();          // no argument - the destructors' call
+        const qint64 waited = elapsed.elapsed();
+
+        QVERIFY2(stopped, "the bare stop() reported failure");
+        QVERIFY2(waited >= SlowWindDownProbe::WindDownMs,
+                 qPrintable(QString("stop() returned after %1 ms while the wind-down takes %2 ms - "
+                                    "zero timeout is no longer waiting, and every subclass "
+                                    "destructor now races its own members")
+                            .arg(waited).arg(SlowWindDownProbe::WindDownMs)));
+        QVERIFY2(probe.insideWindDown == false, "stop() returned while the worker was still winding down");
+        QVERIFY2(probe.isRunning() == false, "stop() returned with the thread still running");
+    }
+
+    /**
+     * ⚠ The control. Without it, an implementation where stop() simply blocked for a fixed age -
+     * or where the probe never ran its wind-down at all - would satisfy the check above.
+     */
+    void stopPath_aProbeWithNoWindDownReturnsPromptly()
+    {
+        MinimalProbe probe;
+        QVERIFY(probe.start(TimeSpan::fromSeconds(2)));
+
+        QElapsedTimer elapsed;
+        elapsed.start();
+        QVERIFY(probe.stop());
+        const qint64 waited = elapsed.elapsed();
+
+        QVERIFY2(waited < SlowWindDownProbe::WindDownMs,
+                 qPrintable(QString("a probe with nothing to wind down took %1 ms to stop, so the "
+                                    "test above cannot tell waiting from stalling").arg(waited)));
+    }
+
 };
 
 QTEST_MAIN(TstThreadLifecycle)
