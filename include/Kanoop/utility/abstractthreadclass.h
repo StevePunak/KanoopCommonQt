@@ -67,7 +67,11 @@ public:
 
     /**
      * @brief Request the worker thread to stop and optionally wait for it to finish.
-     * @param timeout How long to wait for the thread to finish (zero = don't wait)
+     * @param timeout How long to wait for the thread to finish. ⚠ Zero (the default)
+     *                waits INDEFINITELY, not "don't wait" — subclass destructors call
+     *                the bare stop() and then delete members the worker may still be
+     *                reading, which is only safe because the default blocks until the
+     *                wind-down completes.
      * @return true if the thread stopped within the timeout
      */
     virtual bool stop(const TimeSpan &timeout = TimeSpan::zero());
