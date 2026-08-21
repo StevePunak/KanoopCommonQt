@@ -81,12 +81,29 @@ QString AbstractThreadClass::threadName() const
         result = objectName();
     }
 
+    // ⚠ commonInit() defaults objectName to this base class's own name, so an untouched objectName
+    // is not empty - it carries no more information than QThread did. Reached only from start(),
+    // where the subclass is fully constructed and metaObject() resolves to it.
+    if(result.isEmpty() || result == AbstractThreadClass::staticMetaObject.className()) {
+        result = metaObject()->className();
+    }
+
     // ⚠ comm holds 16 bytes including the terminator, and prctl() truncates the END - which is
     // exactly where these tags carry the host or node that tells two workers apart. Keeping the
     // tail instead means "query-pool-inverter-ctrl-127.0.2.2" stays distinguishable from .2.1.
-    static const int MaximumThreadNameLength = 15;
-    if(result.length() > MaximumThreadNameLength) {
-        result = result.right(MaximumThreadNameLength);
+    // The budget is BYTES, not characters, and it is applied on every platform so a worker answers
+    // to one name everywhere.
+    static const int MaximumThreadNameBytes = 15;
+    QByteArray utf8 = result.toUtf8();
+    if(utf8.length() > MaximumThreadNameBytes) {
+        utf8 = utf8.right(MaximumThreadNameBytes);
+
+        // ⚠ Taking the last N bytes can land inside a multi-byte sequence. A continuation byte is
+        // 10xxxxxx; dropping the partial head keeps comm valid UTF-8.
+        while(utf8.isEmpty() == false && (utf8.at(0) & 0xC0) == 0x80) {
+            utf8.remove(0, 1);
+        }
+        result = QString::fromUtf8(utf8);
     }
     return result;
 }

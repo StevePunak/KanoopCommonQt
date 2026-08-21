@@ -143,6 +143,25 @@ protected:
 };
 
 
+/**
+ * @brief Subclass that passes no log category at all.
+ *
+ * ⚠ Q_OBJECT is load-bearing, not boilerplate: without it metaObject() resolves to the nearest
+ * base that has one, which is AbstractThreadClass, and this probe would report the base name and
+ * appear to prove the fallback does nothing. All three no-category subclasses in the field
+ * declare it.
+ */
+class NoCategoryProbe : public AbstractThreadClass
+{
+    Q_OBJECT
+public:
+    NoCategoryProbe() : AbstractThreadClass() {}
+
+protected:
+    void threadStarted() override {}
+};
+
+
 class TstThreadLifecycle : public QObject
 {
     Q_OBJECT
@@ -150,6 +169,11 @@ class TstThreadLifecycle : public QObject
 private slots:
     void startPath_theOsThreadCarriesTheLogTag()
     {
+#ifndef Q_OS_LINUX
+        QSKIP("/proc/<pid>/task/<tid>/comm is the only way to read back what the OS was told, and "
+              "it exists on Linux only. The naming itself is not platform-specific - this is the "
+              "observation method going missing, not the feature.");
+#else
         // ⚠ Read from /proc rather than from QThread::objectName(). The whole point of this is what
         // the OPERATING SYSTEM reports - a profiler, htop and /proc/<pid>/task are the readers, and
         // asserting on the objectName we just set would pass whether or not Qt used it.
@@ -167,12 +191,56 @@ private slots:
         }
         QVERIFY(probe.stop(TimeSpan::fromSeconds(2)));
 
-        // The control: without the fix every worker reports the class name and this list is all
-        // "QThread", so a test that only checked for the tag could not tell the two apart.
+        // The control: without the naming, every worker in the process answers to the same thing
+        // and a test that only looked for the tag could not tell the two apart.
         QVERIFY2(names.contains("lifecycle-probe"),
                  qPrintable(QString("thread names were: %1").arg(names.join(", "))));
         QVERIFY2(names.contains("QThread") == false,
                  qPrintable(QString("a worker is still unnamed: %1").arg(names.join(", "))));
+#endif
+    }
+
+    /**
+     * A subclass that passes no category still has a non-empty objectName - commonInit() defaults
+     * it to this base class's own name - so the OS thread used to answer to a truncation of
+     * "AbstractThreadClass". Every category-less worker in a process reported the identical string,
+     * which is exactly as much use as QThread was.
+     */
+    void startPath_aSubclassWithNoCategoryIsNamedAfterItself()
+    {
+#ifndef Q_OS_LINUX
+        QSKIP("reads /proc/<pid>/task/<tid>/comm, which is Linux-only - the observation method, "
+              "not the feature.");
+#else
+        NoCategoryProbe probe;
+
+        // ⚠ The precondition the fallback exists for. If this ever reads empty the fallback is
+        // being reached for the wrong reason and the assertion below stops meaning anything.
+        QCOMPARE(probe.objectName(), QString(AbstractThreadClass::staticMetaObject.className()));
+
+        const QString expected = QString(probe.metaObject()->className()).right(15);
+        QCOMPARE(probe.threadName(), expected);
+
+        QVERIFY(probe.start(TimeSpan::fromSeconds(2)));
+        QStringList names;
+        QDir tasks("/proc/self/task");
+        for(const QString& tid : tasks.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+            QFile file(QString("/proc/self/task/%1/comm").arg(tid));
+            if(file.open(QIODevice::ReadOnly)) {
+                names.append(QString::fromUtf8(file.readAll()).trimmed());
+            }
+        }
+        QVERIFY(probe.stop(TimeSpan::fromSeconds(2)));
+
+        QVERIFY2(names.contains(expected),
+                 qPrintable(QString("expected '%1' among: %2").arg(expected, names.join(", "))));
+
+        // ⚠ The discriminator. The old chain stopped at the defaulted objectName, so this is the
+        // string that used to be there - and it names the base class, not the worker.
+        QVERIFY2(names.contains(QString(AbstractThreadClass::staticMetaObject.className()).right(15)) == false,
+                 qPrintable(QString("a worker is still answering to the base class name: %1")
+                            .arg(names.join(", "))));
+#endif
     }
 
     void threadName_keepsTheEndOfALongTag()
@@ -190,6 +258,38 @@ private slots:
         LongTagProbe probe;
         QCOMPARE(probe.threadName().length(), 15);
         QCOMPARE(probe.threadName(), QString("-ctrl-127.0.2.2"));
+
+        // ⚠ The budget is 15 BYTES, because that is what comm holds. A multi-byte tag that fits in
+        // 15 characters does not fit in comm, and the truncation must not leave a half sequence
+        // behind either - fromUtf8 on a severed sequence yields a replacement character.
+        class WideTagProbe : public AbstractThreadClass
+        {
+        public:
+            explicit WideTagProbe(const QString& tag) : AbstractThreadClass(tag) {}
+        protected:
+            virtual void threadStarted() override {}
+        };
+
+        // ⚠ SWEPT over the TRAILING ASCII LENGTH, which is the only dimension that decides
+        // whether the 15-byte cut lands on a lead byte or inside a sequence. Measured: with a
+        // two-byte character, an EVEN trailing length severs and an ODD one does not. Sweeping the
+        // accent count instead exercises one parity forever - the first two versions of this check
+        // did exactly that and passed with the sequence repair deleted.
+        for(int trailing = 0;trailing <= 5;trailing++) {
+            const QString tag = QString(QChar(0x00E9)).repeated(9) + QString("t").repeated(trailing);
+            WideTagProbe wide(tag);
+            const QString name = wide.threadName();
+
+            QVERIFY2(name.toUtf8().length() <= 15,
+                     qPrintable(QString("trailing %1 produced %2 bytes, which comm cannot hold")
+                                .arg(trailing).arg(name.toUtf8().length())));
+            QVERIFY2(name.contains(QChar(QChar::ReplacementCharacter)) == false,
+                     qPrintable(QString("trailing %1 severed a multi-byte sequence: '%2'")
+                                .arg(trailing).arg(name)));
+            QVERIFY2(tag.endsWith(name),
+                     qPrintable(QString("trailing %1 kept the head instead of the tail: '%2'")
+                                .arg(trailing).arg(name)));
+            }
     }
 
     void stopPath_callbackOrder()
@@ -263,8 +363,9 @@ private slots:
      * thread is still reading, so a stop() that returned early would be a use-after-free that only
      * shows up under load, somewhere else, later.
      *
-     * ⚠⚠ The Doxygen on stop() says "zero = don't wait". THE DOCUMENTATION IS WRONG, and this test
-     * exists because the plausible edit is someone believing it and making the code agree.
+     * ⚠⚠ "Zero" reads like "don't wait" to anyone who has not followed it down into MutexEvent, and
+     * this test exists because the plausible edit is re-documenting it that way and then making the
+     * code agree.
      */
     void stopPath_theDefaultTimeoutWaitsForTheWindDownRatherThanNotWaitingAtAll()
     {
