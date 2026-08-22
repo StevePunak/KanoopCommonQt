@@ -2,7 +2,9 @@
 #define PROCFSUTIL_H
 #include <Qt>
 
-class ProcFsUtil
+#include <Kanoop/kanoopcommon.h>
+
+class KANOOP_EXPORT ProcFsUtil
 {
 public:
     static QList<int> runningPids();
