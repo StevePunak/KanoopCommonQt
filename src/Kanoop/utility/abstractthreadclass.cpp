@@ -17,8 +17,8 @@ AbstractThreadClass::AbstractThreadClass(const Log::LogCategory &category) :
     commonInit();
 }
 
-AbstractThreadClass::AbstractThreadClass(const QString &category, QObject *parent) :
-    QObject(parent),
+AbstractThreadClass::AbstractThreadClass(const QString &category) :
+    QObject(nullptr),
     LoggingBaseClass(category),
     _success(false),
     _stdout(stdout), _stderr(stderr)
@@ -72,6 +72,42 @@ AbstractThreadClass::~AbstractThreadClass()
     _InstanceCount.fetchAndSubRelaxed(1);
 }
 
+QString AbstractThreadClass::threadName() const
+{
+    // ⚠ Qt names the OS thread from the QThread's objectName, not from this object's. Left unset,
+    // every worker in the process reports comm=QThread, which is what /proc and any profiler show.
+    QString result = logCategory().name();
+    if(result.isEmpty()) {
+        result = objectName();
+    }
+
+    // ⚠ commonInit() defaults objectName to this base class's own name, so an untouched objectName
+    // is not empty - it carries no more information than QThread did. Reached only from start(),
+    // where the subclass is fully constructed and metaObject() resolves to it.
+    if(result.isEmpty() || result == AbstractThreadClass::staticMetaObject.className()) {
+        result = metaObject()->className();
+    }
+
+    // ⚠ comm holds 16 bytes including the terminator, and prctl() truncates the END - which is
+    // exactly where these tags carry the host or node that tells two workers apart. Keeping the
+    // tail instead means "query-pool-inverter-ctrl-127.0.2.2" stays distinguishable from .2.1.
+    // The budget is BYTES, not characters, and it is applied on every platform so a worker answers
+    // to one name everywhere.
+    static const int MaximumThreadNameBytes = 15;
+    QByteArray utf8 = result.toUtf8();
+    if(utf8.length() > MaximumThreadNameBytes) {
+        utf8 = utf8.right(MaximumThreadNameBytes);
+
+        // ⚠ Taking the last N bytes can land inside a multi-byte sequence. A continuation byte is
+        // 10xxxxxx; dropping the partial head keeps comm valid UTF-8.
+        while(utf8.isEmpty() == false && (utf8.at(0) & 0xC0) == 0x80) {
+            utf8.remove(0, 1);
+        }
+        result = QString::fromUtf8(utf8);
+    }
+    return result;
+}
+
 bool AbstractThreadClass::start(const TimeSpan &timeout)
 {
     bool result = true;
@@ -79,6 +115,9 @@ bool AbstractThreadClass::start(const TimeSpan &timeout)
         logText(LVL_WARNING, QString("%1: Tried to start while already running").arg(objectName()));
     }
     else {
+        // ⚠ Named here rather than in the ctor: the log category and objectName are routinely set
+        // per instance after construction, and this is the last moment before the OS thread exists.
+        _thread.setObjectName(threadName());
         _thread.start();
         if((_blockingStart || timeout != TimeSpan::zero()) && _startEvent.wait(timeout) == false) {
             logText(LVL_ERROR, QString("%1: Thread start never completed").arg(objectName()));

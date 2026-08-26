@@ -31,18 +31,20 @@ class KANOOP_EXPORT AbstractThreadClass : public QObject,
 
 public:
     /**
-     * @brief Construct with an optional log category and parent.
+     * @brief Construct with an optional log category.
      * @param category Log category for this class (default: uncategorized)
-     * @param parent Optional QObject parent
      */
     AbstractThreadClass(const Log::LogCategory& category = Log::LogCategory());
 
     /**
-     * @brief Construct with a category name string and optional parent.
+     * @brief Construct with a category name string.
+     *
+     * ⚠ Takes no parent, and must not be given one: the constructor moves this object onto
+     * its own thread, which Qt will not do for a parented object. Owners hold one of these
+     * by raw pointer and delete it themselves.
      * @param category Category name string
-     * @param parent Optional QObject parent
      */
-    AbstractThreadClass(const QString& category, QObject* parent = nullptr);
+    AbstractThreadClass(const QString& category);
 
     /** @brief Destructor — stops the thread if still running. */
     virtual ~AbstractThreadClass();
@@ -55,8 +57,19 @@ public:
     virtual bool start(const TimeSpan& timeout = TimeSpan::zero());
 
     /**
+     * @brief The name the operating system thread is given, from the log category.
+     *
+     * ⚠ Truncated to what Linux can hold in /proc/<pid>/task/<tid>/comm.
+     */
+    QString threadName() const;
+
+    /**
      * @brief Request the worker thread to stop and optionally wait for it to finish.
-     * @param timeout How long to wait for the thread to finish (zero = don't wait)
+     * @param timeout How long to wait for the thread to finish. ⚠ Zero (the default)
+     *                waits INDEFINITELY, not "don't wait" — subclass destructors call
+     *                the bare stop() and then delete members the worker may still be
+     *                reading, which is only safe because the default blocks until the
+     *                wind-down completes.
      * @return true if the thread stopped within the timeout
      */
     virtual bool stop(const TimeSpan &timeout = TimeSpan::zero());
