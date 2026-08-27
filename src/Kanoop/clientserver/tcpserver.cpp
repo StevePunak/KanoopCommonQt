@@ -68,6 +68,13 @@ bool TcpServer::start()
 
 void TcpServer::stop()
 {
+    if(_thread.isRunning() == false) {
+        // Not-running includes the finish phase, where the thread is still executing
+        // onThreadFinished(). Join so the caller can safely delete this server on return.
+        _thread.wait();
+        return;
+    }
+
     _thread.quit();
     if(_stopEvent.wait(TimeSpan::fromSeconds(5)) == false) {
         logText(LVL_ERROR, QString("%1 failed to stop").arg(objectName()));
