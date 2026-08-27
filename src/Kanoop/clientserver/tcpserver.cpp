@@ -68,15 +68,20 @@ bool TcpServer::start()
 
 void TcpServer::stop()
 {
+    _thread.quit();
+    if(_stopEvent.wait(TimeSpan::fromSeconds(5)) == false) {
+        logText(LVL_ERROR, QString("%1 failed to stop").arg(objectName()));
+    }
+    _thread.wait();
+
+    // ⚠ Clients are reaped only after the join. Each client's finished() is connected to
+    // onClientFinished, which deletes it — reap while the server thread still has an event
+    // loop and every client is deleted twice, with _clients mutated from two threads.
     for(TcpServerClientObject* client : _clients) {
         client->stop();
         delete client;
     }
     _clients.clear();
-    _thread.quit();
-    if(_stopEvent.wait(TimeSpan::fromSeconds(5)) == false) {
-        logText(LVL_ERROR, QString("%1 failed to stop").arg(objectName()));
-    }
 }
 
 void TcpServer::incomingConnection(qintptr handle)
