@@ -4,6 +4,7 @@
 #ifndef TCPSERVER_H
 #define TCPSERVER_H
 
+#include <QMutex>
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QTcpServer>
@@ -104,12 +105,29 @@ private:
     /** @brief Shared initialisation for all constructors. */
     void commonInit();
 
+    /**
+     * @brief Empties the client roster and returns what was on it.
+     *
+     * ⚠ Reaping a client re-enters onClientFinished(), which mutates the roster. Taking the
+     * list first means the reap loop is never iterating the container being modified, and
+     * leaves a re-entrant onClientFinished() looking at an empty roster -- which is how it
+     * knows the client is already being dealt with.
+     */
+    QList<TcpServerClientObject*> takeClients();
+
+    /** @brief Disconnects, stops and deletes each client. Must be called with no lock held. */
+    void reapClients(const QList<TcpServerClientObject*>& clients);
+
     QHostAddress _serverAddress;
     int _serverPort;
 
     bool _startSuccess;
 
+    // ⚠ _clients is guarded by _clientsLock. The roster is reached from two threads:
+    // incomingConnection() and onClientFinished() run on _thread, while stop() and the
+    // destructor run on whichever thread owns this server.
     QList<TcpServerClientObject*> _clients;
+    mutable QMutex _clientsLock;
 
     QSslKey _privateKey;
     QSslCertificate _localCertificate;
