@@ -63,15 +63,15 @@ QList<TcpServerClientObject*> TcpServer::takeClients()
 void TcpServer::reapClients(const QList<TcpServerClientObject*>& clients)
 {
     for(TcpServerClientObject* client : clients) {
-        // ⚠ Disconnect BEFORE stopping, not after. stop() joins the client's thread, and the
-        // join runs the client's onThreadFinished(), which emits finished() -- a QUEUED
-        // delivery, because a client lives on its own thread while this server lives on
-        // _thread. Severing first keeps that emit from being posted at all.
-        //
-        // It does not close the window on its own: a finished() already posted before this
-        // point is still delivered, because destroying a sender purges nothing from a live
-        // receiver's queue. The roster guard in onClientFinished() is what covers that one.
+        // ⚠ Disconnect before stop(): stop() joins the client's thread, and that join emits
+        // finished() -- a queued delivery that would arrive with the client already deleted.
         disconnect(client, nullptr, this, nullptr);
+
+        // ⚠ Subclasses wire this server to the client in createClient(). That signal is
+        // delivered during the join below, in a slot that may reach back through server() --
+        // already part-destroyed when the reap runs from ~TcpServer.
+        disconnect(this, nullptr, client, nullptr);
+
         client->stop();
         delete client;
     }
