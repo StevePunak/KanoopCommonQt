@@ -106,12 +106,11 @@ private:
     void commonInit();
 
     /**
-     * @brief Empties the client roster and returns what was on it.
+     * @brief Empties the client roster under the lock and returns what was on it.
      *
-     * ⚠ Reaping a client re-enters onClientFinished(), which mutates the roster. Taking the
-     * list first means the reap loop is never iterating the container being modified, and
-     * leaves a re-entrant onClientFinished() looking at an empty roster -- which is how it
-     * knows the client is already being dealt with.
+     * onClientFinished() runs on _thread and mutates the roster, so a reap on the owning
+     * thread iterates a detached list. A client already taken is absent from the roster,
+     * which is how onClientFinished() knows not to delete it a second time.
      */
     QList<TcpServerClientObject*> takeClients();
 
@@ -123,7 +122,7 @@ private:
 
     bool _startSuccess;
 
-    // ⚠ _clients is guarded by _clientsLock. The roster is reached from two threads:
+    // _clients is guarded by _clientsLock. The roster is reached from two threads:
     // incomingConnection() and onClientFinished() run on _thread, while stop() and the
     // destructor run on whichever thread owns this server.
     QList<TcpServerClientObject*> _clients;

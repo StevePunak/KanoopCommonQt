@@ -63,13 +63,11 @@ QList<TcpServerClientObject*> TcpServer::takeClients()
 void TcpServer::reapClients(const QList<TcpServerClientObject*>& clients)
 {
     for(TcpServerClientObject* client : clients) {
-        // ⚠ Disconnect before stop(): stop() joins the client's thread, and that join emits
-        // finished() -- a queued delivery that would arrive with the client already deleted.
+        // Both directions, before stop(). The join inside stop() delivers whatever is
+        // already queued each way, and subclasses wire the server-to-client direction in
+        // createClient(). Reached from ~TcpServer, those land on a server whose derived
+        // sub-object is gone.
         disconnect(client, nullptr, this, nullptr);
-
-        // ⚠ Subclasses wire this server to the client in createClient(). That signal is
-        // delivered during the join below, in a slot that may reach back through server() --
-        // already part-destroyed when the reap runs from ~TcpServer.
         disconnect(this, nullptr, client, nullptr);
 
         client->stop();
@@ -90,7 +88,7 @@ bool TcpServer::start()
 
 void TcpServer::stop()
 {
-    // ⚠ The roster is only final once _thread's event loop is gone -- incomingConnection()
+    // The roster is only final once _thread's event loop is gone -- incomingConnection()
     // runs there and appends. Reaping first leaks a client accepted in the gap.
     _thread.quit();
     if(_stopEvent.wait(TimeSpan::fromSeconds(5)) == false) {
@@ -109,9 +107,8 @@ void TcpServer::incomingConnection(qintptr handle)
     logText(LVL_INFO, QString("%1: %2 on %3").arg(objectName()).arg(__FUNCTION__).arg(handle));
     TcpServerClientObject* client = createClient(this, handle);
     if(client != nullptr) {
-        // ⚠ On the roster, and connected, before it is started. A client that finishes
-        // immediately would otherwise emit finished() while absent from the roster, and the
-        // guard in onClientFinished() would read that as "already reaped" and leak it.
+        // Connected before it is started. A client that finishes between start() and a
+        // later connect() emits finished() into nothing, and nothing ever reaps it.
         _clientsLock.lock();
         _clients.append(client);
         _clientsLock.unlock();
@@ -140,12 +137,10 @@ void TcpServer::onClientFinished()
 {
     TcpServerClientObject* client = static_cast<TcpServerClientObject*>(sender());
 
-    // ⚠ The roster decides, and nothing here dereferences the pointer before it does.
+    // Test liveness by presence on the roster, without dereferencing sender().
     // finished() is queued from the client's own thread, so a delivery can outlive the
-    // client: stop() may already have disconnected, stopped and deleted it, and Qt still
-    // places this call with a DANGLING sender(). Deleting that a second time reads a freed
-    // vtable. Presence on the roster is the only trustworthy liveness test -- a pointer
-    // comparison, never a read.
+    // client: a reap from ~TcpServer disconnects, stops and deletes it while this call is
+    // already posted, and Qt still places it with a dangling sender().
     _clientsLock.lock();
     const bool wasOnRoster = _clients.removeAll(client) > 0;
     _clientsLock.unlock();
