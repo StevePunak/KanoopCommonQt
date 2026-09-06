@@ -146,10 +146,9 @@ protected:
 /**
  * @brief Subclass that passes no log category at all.
  *
- * ⚠ Q_OBJECT is load-bearing, not boilerplate: without it metaObject() resolves to the nearest
- * base that has one, which is AbstractThreadClass, and this probe would report the base name and
- * appear to prove the fallback does nothing. All three no-category subclasses in the field
- * declare it.
+ * ⚠ Q_OBJECT is load-bearing here: without it metaObject() resolves to the nearest base that has
+ * one, which is AbstractThreadClass, and this probe would report the base name and appear to
+ * prove the fallback does nothing.
  */
 class NoCategoryProbe : public AbstractThreadClass
 {
@@ -174,9 +173,8 @@ private slots:
               "it exists on Linux only. The naming itself is not platform-specific - this is the "
               "observation method going missing, not the feature.");
 #else
-        // ⚠ Read from /proc rather than from QThread::objectName(). The whole point of this is what
-        // the OPERATING SYSTEM reports - a profiler, htop and /proc/<pid>/task are the readers, and
-        // asserting on the objectName we just set would pass whether or not Qt used it.
+        // ⚠ Assert on what the OS reports. Asserting on the objectName we just set passes whether
+        // or not Qt used it.
         LifecycleProbe probe;
         QVERIFY(probe.start(TimeSpan::fromSeconds(2)));
 
@@ -191,8 +189,7 @@ private slots:
         }
         QVERIFY(probe.stop(TimeSpan::fromSeconds(2)));
 
-        // The control: without the naming, every worker in the process answers to the same thing
-        // and a test that only looked for the tag could not tell the two apart.
+        // Positive control for the assertion below.
         QVERIFY2(names.contains("lifecycle-probe"),
                  qPrintable(QString("thread names were: %1").arg(names.join(", "))));
         QVERIFY2(names.contains("QThread") == false,
@@ -234,8 +231,7 @@ private slots:
         QVERIFY2(names.contains(expected),
                  qPrintable(QString("expected '%1' among: %2").arg(expected, names.join(", "))));
 
-        // ⚠ The discriminator. The old chain stopped at the defaulted objectName, so this is the
-        // string that used to be there - and it names the base class, not the worker.
+        // ⚠ The discriminator: this string names the base class. A regressed fallback produces it.
         QVERIFY2(names.contains(QString(AbstractThreadClass::staticMetaObject.className()).right(15)) == false,
                  qPrintable(QString("a worker is still answering to the base class name: %1")
                             .arg(names.join(", "))));
@@ -244,8 +240,8 @@ private slots:
 
     void threadName_keepsTheEndOfALongTag()
     {
-        // ⚠ The tail, not the head. These tags end in the host or node that tells two workers
-        // apart, so a head truncation would render every inverter pool identical.
+        // ⚠ The tail. These tags end in the host or node that tells two workers apart, so a head
+        // truncation would render every inverter pool identical.
         class LongTagProbe : public AbstractThreadClass
         {
         public:
@@ -386,8 +382,7 @@ private slots:
     }
 
     /**
-     * ⚠ The control. Without it, an implementation where stop() simply blocked for a fixed age -
-     * or where the probe never ran its wind-down at all - would satisfy the check above.
+     * Positive control for the test above.
      */
     void stopPath_aProbeWithNoWindDownReturnsPromptly()
     {

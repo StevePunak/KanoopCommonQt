@@ -265,7 +265,7 @@ public:
     /** @brief Return the length (Euclidean distance between endpoints).
      * @return Length of the line */
     double length() const;
-    /** @brief Return the slope (rise/run), or infinity for vertical lines.
+    /** @brief Return the slope (rise/run), or DBL_MAX for vertical lines.
      * @return Slope value */
     double slope() const;
     /** @brief Return the Y-intercept of the line's equation.
@@ -327,7 +327,7 @@ public:
     Point rightMostPoint() const;
 
     /**
-     * @brief Test whether the line spans an X range.
+     * @brief Test whether either endpoint's X lies between x1 and x2.
      * @param x1 First X boundary
      * @param x2 Second X boundary
      * @return true if any part of the line falls between x1 and x2
@@ -342,7 +342,7 @@ public:
     bool crossesX(double x) const;
 
     /**
-     * @brief Test whether the line spans a Y range.
+     * @brief Test whether either endpoint's Y lies between y1 and y2.
      * @param y1 First Y boundary
      * @param y2 Second Y boundary
      * @return true if any part of the line falls between y1 and y2
@@ -395,7 +395,7 @@ public:
     /**
      * @brief Test whether this line is entirely to the left of other.
      * @param other Line to compare against
-     * @return true if this line is entirely to the left
+     * @return true when this line's smallest X is less than other's smallest X
      */
     bool isLeftOf(const Line& other) const;
     /**
@@ -450,9 +450,9 @@ public:
     bool isEndpoint(const QPointF& point, int precision = 0) const;
 
     /**
-     * @brief Test whether a point lies on this line segment.
+     * @brief Test whether a point lies exactly on this line segment.
      * @param point Point to test
-     * @return true if point lies on the segment
+     * @return true only when distance(p1,point) + distance(p2,point) compares exactly equal to length() as doubles. ⚠ No tolerance is applied; use isEndpoint(), which takes a precision, where float drift matters.
      */
     bool containsPoint(const QPointF& point) const;
 
@@ -503,8 +503,8 @@ public:
     Line& round();
 
     /**
-     * @brief Create a rectangle of the given width centred on this line.
-     * @param expandedWidth Width of the resulting rectangle
+     * @brief Create a rectangle enclosing this line, inset outward on every side.
+     * @param expandedWidth Distance the rectangle extends beyond the line on each side; the rectangle is 2 * expandedWidth across the line and length() + 2 * expandedWidth along it
      * @return Rectangle enclosing the line
      */
     Rectangle makeRectangle(int expandedWidth) const;

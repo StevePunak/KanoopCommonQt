@@ -59,7 +59,7 @@ public:
 
     /**
      * @brief Block the calling thread until the event is set or the timeout elapses.
-     * @param timeout Maximum wait duration
+     * @param timeout Maximum wait duration. A zero TimeSpan waits indefinitely.
      * @return true if the event was set, false if the timeout elapsed
      */
     bool wait(const TimeSpan& timeout)

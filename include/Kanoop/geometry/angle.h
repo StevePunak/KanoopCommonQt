@@ -10,8 +10,9 @@
 /**
  * @brief Represents an angle in degrees with wraparound-aware addition and subtraction.
  *
- * Angles are stored in degrees. Arithmetic operators automatically keep values
- * in the range [0, 360).
+ * Angles are stored in degrees. The arithmetic operators correct a single wrap past 360
+ * or below 0, so an operand of 360 or more leaves the result outside [0, 360).
+ * A default-constructed Angle holds -1.
  */
 class KANOOP_EXPORT Angle
 {
@@ -26,28 +27,28 @@ public:
     Angle(double degrees) : _degrees(degrees) {}
 
     /**
-     * @brief Add another Angle, wrapping around 360 degrees.
+     * @brief Add another Angle, correcting a single wrap past 360.
      * @param other Angle to add
      * @return Resulting angle
      */
     Angle operator+(const Angle& other) const { return *this + other._degrees; }
 
     /**
-     * @brief Add a scalar degree value, wrapping around 360 degrees.
+     * @brief Add a scalar degree value, correcting a single wrap past 360.
      * @param degrees Degrees to add
      * @return Resulting angle
      */
     Angle operator+(double degrees) const;
 
     /**
-     * @brief Subtract another Angle, wrapping around 360 degrees.
+     * @brief Subtract another Angle, correcting a single wrap below 0.
      * @param other Angle to subtract
      * @return Resulting angle
      */
     Angle operator-(const Angle& other) const { return *this - other._degrees; }
 
     /**
-     * @brief Subtract a scalar degree value, wrapping around 360 degrees.
+     * @brief Subtract a scalar degree value, correcting a single wrap below 0.
      * @param degrees Degrees to subtract
      * @return Resulting angle
      */

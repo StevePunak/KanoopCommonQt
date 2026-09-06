@@ -54,7 +54,7 @@ public:
 
     /**
      * @brief Return the pre-formatted message text.
-     * @return Message string including level, timestamp, and line number decorations
+     * @return The message string as formatted by the logger. Level, timestamp and line-number decorations each appear only when the logger's corresponding flag is set.
      */
     QString formattedText() const { return _formattedText; }
 

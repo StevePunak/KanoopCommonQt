@@ -40,7 +40,7 @@ public:
     /**
      * @brief Extract the file extension from a file path.
      * @param path File path string
-     * @return Extension string (without leading dot)
+     * @return The final dot and everything after it; the whole path unchanged when it contains no dot
      * @deprecated Prefer QFileInfo::suffix()
      */
     static QString extension(const QString& path);
@@ -49,7 +49,6 @@ public:
      * @brief Remove a trailing directory separator from a path.
      * @param path Path string to trim
      * @return Path without trailing separator
-     * @deprecated Prefer QFileInfo::suffix()
      */
     static QString trimTrailingSlash(const QString& path);
 

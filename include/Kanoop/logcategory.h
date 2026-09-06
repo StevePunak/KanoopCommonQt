@@ -51,8 +51,8 @@ public:
     QString name() const { return _name; }
 
     /**
-     * @brief Return the minimum log level for this category.
-     * @return Active LogLevel threshold for this category
+     * @brief Return the log level this category was constructed with.
+     * @return The LogLevel held by this object. ⚠ Not the threshold the logger filters on — that lives on the LogCategoryPrivate held in Logger::_categories. This value has no setter and never changes after construction.
      */
     LogLevel level() const { return _level; }
 
@@ -101,7 +101,7 @@ public:
 protected:
     /** @brief Category name string. */
     QString _name;
-    /** @brief Minimum log level threshold for this category. */
+    /** @brief Log level this category was constructed with. Has no setter. */
     LogLevel _level;
 };
 

@@ -1,7 +1,7 @@
 /**
  *  LockingQueue
  *
- *  Thread-safe Multi-producer Multi-consumer blocking queue
+ *  Blocking multi-producer multi-consumer queue
  *
  *  Stephen Punak, July 08 2019
  */
@@ -13,7 +13,7 @@
 #include <QMutex>
 
 /**
- * @brief Thread-safe, blocking multi-producer multi-consumer queue.
+ * @brief Blocking multi-producer multi-consumer queue. ⚠ The lock covers this class's own methods only; it derives publicly from QList<T>, so every inherited QList method reaches the container unlocked.
  *
  * @tparam T Element type stored in the queue
  */
