@@ -393,27 +393,27 @@ public:
     Point intersection(const Line& other) const;
 
     /**
-     * @brief Test whether this line is entirely to the left of other.
+     * @brief Test whether this line begins further left than other.
      * @param other Line to compare against
      * @return true when this line's smallest X is less than other's smallest X
      */
     bool isLeftOf(const Line& other) const;
     /**
-     * @brief Test whether this line is entirely to the right of other.
+     * @brief Test whether this line begins further right than other.
      * @param other Line to compare against
-     * @return true if this line is entirely to the right
+     * @return true when this line's largest X is greater than other's largest X
      */
     bool isRightOf(const Line& other) const;
     /**
-     * @brief Test whether this line is entirely above other.
+     * @brief Test whether this line begins higher than other.
      * @param other Line to compare against
-     * @return true if this line is entirely above
+     * @return true when this line's smallest Y is less than other's smallest Y
      */
     bool isAbove(const Line& other) const;
     /**
-     * @brief Test whether this line is entirely below other.
+     * @brief Test whether this line ends lower than other.
      * @param other Line to compare against
-     * @return true if this line is entirely below
+     * @return true when this line's largest Y is greater than other's largest Y
      */
     bool isBelow(const Line& other) const;
     /** @brief Test whether this line is perpendicular (horizontal or vertical).

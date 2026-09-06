@@ -53,7 +53,7 @@ public:
     /**
      * @brief Start the worker thread and optionally wait for it to signal readiness.
      * @param timeout How long to wait for the thread to start. A zero TimeSpan skips the wait unless setBlockingStart(true) was called, in which case it waits indefinitely.
-     * @return true if the thread started successfully
+     * @return false only when a blocking start times out; true otherwise, including when the thread was already running and nothing was started
      */
     virtual bool start(const TimeSpan& timeout = TimeSpan::zero());
 

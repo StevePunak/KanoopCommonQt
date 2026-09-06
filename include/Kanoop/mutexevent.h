@@ -25,8 +25,8 @@
  * @brief A mutex/condition-variable pair modelling the C# AutoResetEvent.
  *
  * One thread calls wait() and blocks until another thread calls set().
- * The event auto-resets after each wakeup unless wakeAllWaiters is enabled,
- * in which case all blocked waiters are woken simultaneously.
+ * The event auto-resets on every wakeup. wakeAllWaiters controls only how many
+ * blocked waiters set() releases — one, or all of them.
  */
 class KANOOP_EXPORT MutexEvent
 {

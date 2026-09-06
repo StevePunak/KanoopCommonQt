@@ -79,16 +79,16 @@ protected:
      */
     static QVariant intOrNull(const QJsonValue& value);
     /**
-     * @brief Extract a double QVariant from a JSON value, or invalid QVariant if null.
+     * @brief Extract a double QVariant from a JSON number, or from a JSON string by parsing it; invalid QVariant for a JSON null or an empty string.
      * @param value JSON value to extract from
      * @return QVariant containing a double, or an invalid QVariant
      */
     static QVariant doubleOrNull(const QJsonValue& value);
     /**
-     * @brief Parse a double from a JSON string value, or invalid QVariant if null.
+     * @brief Parse a double from a JSON string value and format it back to a string, or invalid QVariant if null.
      * @param value JSON value to parse
      * @param precision Number of decimal places (default 6)
-     * @return QVariant containing a double, or an invalid QVariant
+     * @return QVariant containing the formatted string, or an invalid QVariant
      */
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
@@ -150,16 +150,16 @@ protected:
      */
     static QVariant intOrNull(const QJsonValue& value);
     /**
-     * @brief Extract a double QVariant from a JSON value, or invalid QVariant if null.
+     * @brief Extract a double QVariant from a JSON number, or from a JSON string by parsing it; invalid QVariant for a JSON null or an empty string.
      * @param value JSON value to extract from
      * @return QVariant containing a double, or an invalid QVariant
      */
     static QVariant doubleOrNull(const QJsonValue& value);
     /**
-     * @brief Parse a double from a JSON string value, or invalid QVariant if null.
+     * @brief Parse a double from a JSON string value and format it back to a string, or invalid QVariant if null.
      * @param value JSON value to parse
      * @param precision Number of decimal places (default 6)
-     * @return QVariant containing a double, or an invalid QVariant
+     * @return QVariant containing the formatted string, or an invalid QVariant
      */
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };
