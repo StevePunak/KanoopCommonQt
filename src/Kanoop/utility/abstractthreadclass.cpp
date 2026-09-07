@@ -74,16 +74,17 @@ AbstractThreadClass::~AbstractThreadClass()
 
 QString AbstractThreadClass::threadName() const
 {
-    // ⚠ Qt names the OS thread from the QThread's objectName, not from this object's. Left unset,
-    // every worker in the process reports comm=QThread, which is what /proc and any profiler show.
+    // ⚠ Qt names the OS thread from the QThread's objectName. This object has an objectName of
+    // its own and Qt never reads it. Left unset, every worker in the process reports comm=QThread,
+    // which is what /proc and any profiler show.
     QString result = logCategory().name();
     if(result.isEmpty()) {
         result = objectName();
     }
 
     // ⚠ commonInit() defaults objectName to this base class's own name, so an untouched objectName
-    // is not empty - it carries no more information than QThread did. Reached only from start(),
-    // where the subclass is fully constructed and metaObject() resolves to it.
+    // is not empty - it carries no more information than QThread did. metaObject() resolves to the
+    // subclass only once the subclass is fully constructed.
     if(result.isEmpty() || result == AbstractThreadClass::staticMetaObject.className()) {
         result = metaObject()->className();
     }
@@ -115,8 +116,6 @@ bool AbstractThreadClass::start(const TimeSpan &timeout)
         logText(LVL_WARNING, QString("%1: Tried to start while already running").arg(objectName()));
     }
     else {
-        // ⚠ Named here rather than in the ctor: the log category and objectName are routinely set
-        // per instance after construction, and this is the last moment before the OS thread exists.
         _thread.setObjectName(threadName());
         _thread.start();
         if((_blockingStart || timeout != TimeSpan::zero()) && _startEvent.wait(timeout) == false) {
@@ -195,12 +194,9 @@ bool AbstractThreadClass::waitForStart(const TimeSpan& timeout)
 
 void AbstractThreadClass::finishAndStop(bool success, const QString &message)
 {
-    // First completion wins. A second call lands when a signal carrying a
-    // result is already queued behind a self-initiated quit (e.g. an HTTP
-    // reply's finished signal after a status-driven finishAndStop, or a late
-    // success racing a timeout failure) — don't stomp the recorded result or
-    // re-run the about-to-finish hook. The atomic test-and-set also closes the
-    // race against a concurrent cross-thread stop().
+    // First completion wins. A second call lands when a signal carrying a result is
+    // already queued behind a self-initiated quit — don't stomp the recorded result
+    // or re-run the about-to-finish hook.
     if(_stopping.testAndSetOrdered(0, 1) == false) {
         return;
     }

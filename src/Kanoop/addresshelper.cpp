@@ -65,7 +65,7 @@ QHostAddress AddressHelper::getLocalIP()
  * @brief AddressHelper::getLocalIP
  * @param allowedInterfaces
  * The list of allowed interface names to search (empty for all)
- * @return The first IPv4 address belonging to an interface in the list of allowed interfaces
+ * @return The last IPv4 address found on an interface in the list of allowed interfaces
  */
 QHostAddress AddressHelper::getLocalIP(const QStringList &allowedInterfaces)
 {

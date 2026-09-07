@@ -28,14 +28,14 @@ public:
     /**
      * @brief Look up the numeric GID for a group name.
      * @param name Group name string
-     * @return Group ID, or (gid_t)-1 if not found
+     * @return Group ID, or 0 if not found — the same value as the root group
      */
     static gid_t gidFromName(const QString& name);
 
     /**
      * @brief Look up the numeric UID for a user name.
      * @param name User name string
-     * @return User ID, or (uid_t)-1 if not found
+     * @return User ID, or 0 if not found — the same value as root
      */
     static uid_t uidFromName(const QString& name);
 

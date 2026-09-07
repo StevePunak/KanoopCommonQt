@@ -27,9 +27,9 @@ class KANOOP_EXPORT DateTimeUtil
 {
 public:
     /**
-     * @brief Parse an ISO-8601 string into a UTC QDateTime.
+     * @brief Parse an ISO-8601 string into a QDateTime.
      * @param date ISO-8601 date/time string with milliseconds
-     * @return Parsed UTC QDateTime, or invalid QDateTime on error
+     * @return The parsed QDateTime in whatever time spec the string carries, or an invalid QDateTime on error. ⚠ An offset in the string is preserved, not converted to UTC.
      */
     static QDateTime fromISOString(const QString& date)
     {
@@ -39,14 +39,14 @@ public:
     }
 
     /**
-     * @brief Parse a MySQL-style "yyyy-MM-dd hh:mm:ss.zzz" string into a QDateTime.
+     * @brief Parse a date/time string, trying "yyyy-MM-dd hh:mm:ss.zzz" first and then the shorter and alternate forms the body accepts.
      * @param date MySQL format date/time string
      * @return Parsed QDateTime, or invalid QDateTime on error
      */
     static QDateTime fromStandardString(const QString& date);
 
     /**
-     * @brief Parse a compact "yyyyMMddhhmmsszzz" string into a QDateTime.
+     * @brief Parse a compact date/time string, trying "yyyyMMddhhmmsszzz" first and then the shorter forms the body accepts.
      * @param date Squashed format date/time string
      * @return Parsed QDateTime, or invalid QDateTime on error
      */
@@ -78,7 +78,7 @@ public:
     }
 
     /**
-     * @brief Format a QDateTime as an ISO-8601 Zulu string.
+     * @brief Format a QDateTime with a literal trailing "Z". ⚠ The Z is a format literal; the fields are the QDateTime's own, so a non-UTC input is labelled Zulu without being converted.
      * @param date Date/time to format
      * @return Formatted string, e.g. "2021-09-17T05:30:00.123Z"
      */

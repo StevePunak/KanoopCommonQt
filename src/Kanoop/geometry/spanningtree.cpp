@@ -280,7 +280,7 @@ bool SpanningTree::cycle()
             }
         }
 
-        /** move this node from visited to unvisited */
+        /** move this node from unvisited to visited */
         current->setState(TreePathVertice::Visited);
 
         _unvisited.removeOne(current);

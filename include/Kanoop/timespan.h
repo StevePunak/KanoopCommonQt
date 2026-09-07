@@ -457,7 +457,7 @@ public:
    * @brief Parse a TimeSpan from a formatted duration string.
    * @param timeString String representation of a time span
    * @param parsed Optional output flag set to true if parsing succeeded
-   * @return Parsed TimeSpan, or an invalid sentinel on failure
+   * @return The parsed TimeSpan on success. On failure the returned TimeSpan reports isValid() == true; use the `parsed` output flag to detect failure.
    */
   static TimeSpan fromString(const QString& timeString, bool* parsed = nullptr);
 
@@ -474,7 +474,7 @@ public:
   static TimeSpan invalid();
 
   /**
-   * @brief Compute the signed difference between two QDateTime values (now − then).
+   * @brief Compute the signed difference between two QDateTime values (then − now).
    * @param now Minuend QDateTime
    * @param then Subtrahend QDateTime
    * @return Signed difference TimeSpan
@@ -482,7 +482,7 @@ public:
   static TimeSpan diff(const QDateTime& now, const QDateTime& then);
 
   /**
-   * @brief Compute the signed difference between two chrono time points (now − then).
+   * @brief Compute the signed difference between two chrono time points (then − now).
    * @param now Minuend time point
    * @param then Subtrahend time point
    * @return Signed difference TimeSpan
