@@ -103,9 +103,9 @@ KANOOP_EXPORT Direction sideToDirection(Side side);
 KANOOP_EXPORT double directionToBearing(Direction direction);
 
 /**
- * @brief Convert a compass bearing to the nearest cardinal Direction.
+ * @brief Convert an exact compass bearing of 0, 90, 180 or 270 to a cardinal Direction.
  * @param bearing Bearing in degrees
- * @return Nearest cardinal Direction
+ * @return Up, ToRight, Down or ToLeft for those four exact values; NoDirection for every other bearing
  */
 KANOOP_EXPORT Direction bearingToDirection(double bearing);
 

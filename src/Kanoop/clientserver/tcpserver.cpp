@@ -88,15 +88,20 @@ bool TcpServer::start()
 
 void TcpServer::stop()
 {
-    // The roster is only final once _thread's event loop is gone -- incomingConnection()
-    // runs there and appends. Reaping first leaks a client accepted in the gap.
+    if(_thread.isRunning() == false) {
+        // Not-running includes the finish phase, where the thread is still executing
+        // onThreadFinished(). Join so the caller can safely delete this server on return.
+        _thread.wait();
+        return;
+    }
+
     _thread.quit();
     if(_stopEvent.wait(TimeSpan::fromSeconds(5)) == false) {
         logText(LVL_ERROR, QString("%1 failed to stop").arg(objectName()));
     }
 
-    // _stopEvent fires from inside QThread::finished, before the thread is finished. Callers
-    // delete this server on return, and ~QThread on a running thread is fatal.
+    // _stopEvent fires from inside QThread::finished, so the thread is still running here.
+    // Dropping this join makes ~QThread fatal for a caller that deletes the server on return.
     _thread.wait();
 
     reapClients(takeClients());

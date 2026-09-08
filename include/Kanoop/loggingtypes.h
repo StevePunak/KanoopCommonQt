@@ -74,8 +74,8 @@ public:
 
 /**
  * @brief Look up a LogLevel by its name string.
- * @param levelName Name string (case-insensitive)
- * @return Matching LogLevel, or Debug as default
+ * @param levelName Name string, matched case-sensitively; a string that parses as an integer is cast directly to LogLevel
+ * @return The matching LogLevel, or a default-constructed LogLevel when nothing matches
  */
 KANOOP_EXPORT LogLevel getLogLevel(const QString& levelName);
 

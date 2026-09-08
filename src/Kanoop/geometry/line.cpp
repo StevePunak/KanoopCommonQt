@@ -674,7 +674,7 @@ double Line::List::maxY() const
 }
 
 /**
- * @brief Line::List::rectangle
+ * @brief Line::List::boundingRectangle
  * @return a rectangle containing all our lines
  */
 Rectangle Line::List::boundingRectangle() const

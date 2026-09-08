@@ -1,5 +1,5 @@
 /**
- * @brief Static utilities for querying running Linux processes via /proc.
+ * @brief Static utilities for querying running processes.
  */
 #ifndef PROCUTIL_H
 #define PROCUTIL_H
@@ -10,14 +10,14 @@
 /**
  * @brief Static helper methods for enumerating and inspecting running processes.
  *
- * Reads process information from the Linux /proc filesystem.
+ * Reads process information from /proc on Unix and from the Toolhelp32 snapshot API on Windows.
  */
 class KANOOP_EXPORT ProcUtil
 {
 public:
     /**
-     * @brief Return the names of all running processes.
-     * @return List of process name strings
+     * @brief Return the names of the running processes this process can read.
+     * @return List of process name strings; a process whose command line cannot be read, or that yields an empty name, is omitted
      */
     static QStringList runningProcessNames();
 

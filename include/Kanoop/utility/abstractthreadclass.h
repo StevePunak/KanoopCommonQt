@@ -21,7 +21,8 @@
  * @brief Manages the lifecycle of a QObject running in its own QThread.
  *
  * Subclass AbstractThreadClass and implement threadStarted() to perform work on the
- * worker thread. The thread is created and destroyed automatically by start() and stop().
+ * worker thread. start() starts the OS thread and stop() winds it down; the QThread is a
+ * member and lives as long as this object.
  * The started() and finished() signals notify the main thread of state changes.
  */
 class KANOOP_EXPORT AbstractThreadClass : public QObject,
@@ -51,8 +52,8 @@ public:
 
     /**
      * @brief Start the worker thread and optionally wait for it to signal readiness.
-     * @param timeout How long to wait for the thread to start (zero = don't wait)
-     * @return true if the thread started successfully
+     * @param timeout How long to wait for the thread to start. A zero TimeSpan skips the wait unless setBlockingStart(true) was called, in which case it waits indefinitely.
+     * @return false only when a blocking start times out; true otherwise, including when the thread was already running and nothing was started
      */
     virtual bool start(const TimeSpan& timeout = TimeSpan::zero());
 
@@ -66,10 +67,7 @@ public:
     /**
      * @brief Request the worker thread to stop and optionally wait for it to finish.
      * @param timeout How long to wait for the thread to finish. ⚠ Zero (the default)
-     *                waits INDEFINITELY, not "don't wait" — subclass destructors call
-     *                the bare stop() and then delete members the worker may still be
-     *                reading, which is only safe because the default blocks until the
-     *                wind-down completes.
+     *                waits indefinitely.
      * @return true if the thread stopped within the timeout
      */
     virtual bool stop(const TimeSpan &timeout = TimeSpan::zero());
@@ -142,8 +140,9 @@ protected:
     /**
      * @brief Entry point called on the worker thread immediately after it starts.
      *
-     * Subclasses must implement this method to perform their work. When done,
-     * call finishAndStop() to signal completion.
+     * Runs before the worker's event loop. Subclasses do their initialisation here.
+     * A subclass whose work is finite calls finishAndStop() when it completes; a
+     * long-lived subclass returns and continues in its own slots.
      */
     virtual void threadStarted() = 0;
 
@@ -204,16 +203,14 @@ private:
     void invokeThreadAboutToFinish();
 
     /** @brief Worker-side helper queued by stop(): runs the about-to-finish hook, then
-     *  quits the worker's event loop. Sequencing both on the worker guarantees the hook
-     *  executes before the loop exits without the caller having to block. */
+     *  quits the worker's event loop. */
     void invokeThreadAboutToFinishAndQuit();
 
     bool _success = false;
     QString _message;
 
-    /** Written by stop() on the caller's thread and by finishAndStop() on the worker —
-     *  atomic so the cross-thread first-completion-wins handoff is a real test-and-set
-     *  rather than a data race. 0 = not stopping, 1 = stopping. */
+    /** Set by stop() and by finishAndStop() as a test-and-set; cleared by stop() on return
+     *  and by onThreadFinished() during teardown. 0 = not stopping, 1 = stopping. */
     QAtomicInt _stopping;
     bool _blockingStart = false;
 
@@ -224,15 +221,17 @@ private:
     MutexEvent _startEvent;
     MutexEvent _stopEvent;
 
-    // Diagnostic counters (relaxed ordering — sufficient for monotonic counting)
+    // Diagnostic counters
     static QAtomicInt _InstanceCount;
     static QAtomicInt _RunningThreadCount;
 
     // Registry of running instances behind the counters, for diagnostic snapshots.
-    // Membership tracks _RunningThreadCount exactly: added in onThreadStarted(),
-    // removed in onThreadFinished(). An instance is always alive while registered —
-    // the destructor joins the thread, and onThreadFinished() runs before the join
-    // completes.
+    // Added in onThreadStarted(), removed in onThreadFinished().
+    // ⚠ A registered instance may already be destroyed: ~AbstractThreadClass() waits
+    // 500 ms for the join and for _stopEvent, logs on timeout and destructs anyway,
+    // while removal happens only in onThreadFinished(). _RunningThreadCount is also
+    // decremented outside _RunningThreadsLock, so a locked reader can see an entry
+    // whose count is already gone.
     static QMutex _RunningThreadsLock;
     static QList<AbstractThreadClass*> _RunningThreads;
 

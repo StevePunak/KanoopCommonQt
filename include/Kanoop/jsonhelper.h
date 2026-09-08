@@ -171,17 +171,17 @@ public:
     static QVariant intOrNull(const QJsonValue& value) {  QVariant result;  return value.isNull() ? result : value.toInt(); }
 
     /**
-     * @brief Extract a double QVariant from a JSON value, or an invalid QVariant if null.
+     * @brief Extract a double QVariant from a JSON number, or from a JSON string by parsing it; an invalid QVariant for a JSON null or an empty string.
      * @param value JSON value to read
      * @return QVariant holding the double, or invalid QVariant
      */
     static QVariant doubleOrNull(const QJsonValue& value);
 
     /**
-     * @brief Parse a double from a JSON string value, or return an invalid QVariant if null.
+     * @brief Parse a double from a JSON string value and format it back to a string, or return an invalid QVariant if null.
      * @param value JSON string value to parse
      * @param precision Precision hint (default 6)
-     * @return QVariant holding the double, or invalid QVariant
+     * @return QVariant holding the formatted string, or an invalid QVariant
      */
     static QVariant doubleStringOrNull(const QJsonValue& value, int precision = 6);
 };

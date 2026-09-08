@@ -1,5 +1,5 @@
 /**
- * @brief A vertex in a spanning-tree path graph used by PathRouter.
+ * @brief A vertex in the graph traversed by SpanningTree.
  */
 #ifndef TREEPATHVERTICE_H
 #define TREEPATHVERTICE_H
@@ -12,7 +12,7 @@
 class SpanningTree;
 
 /**
- * @brief Represents a single vertex in the spanning-tree graph used by PathRouter.
+ * @brief Represents a single vertex in the graph traversed by SpanningTree.
  *
  * Each vertice holds a 2D position, a type (standard, ad-hoc origin/destination, or proximal),
  * a visitation state for graph traversal, and a map of neighbouring vertices.
@@ -25,7 +25,7 @@ public:
      */
     enum VerticeType
     {
-        Standard,                  ///< Ordinary obstacle-corner vertex
+        Standard,                  ///< Vertex at a line endpoint in the input network
         AdHocOrigin,               ///< Synthetic origin vertex
         AdHocDestination,          ///< Synthetic destination vertex
         AdHocOriginProximal,       ///< Vertex proximal to the origin
@@ -160,7 +160,7 @@ public:
     /**
      * @brief Create a canonical hash name for a point.
      * @param point Point to hash
-     * @return String uniquely identifying the point's position
+     * @return String identifying the point, formatted to six significant digits per axis. ⚠ Points agreeing to six significant digits produce the same key and are treated as one vertex.
      */
     static QString makeHashName(const QPointF &point);
 

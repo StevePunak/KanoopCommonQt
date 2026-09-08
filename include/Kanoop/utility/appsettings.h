@@ -71,6 +71,16 @@ public:
     void setByteArrayValue(const QString& key, const QByteArray& value) { _settings.setValue(key, value); }
 
     /**
+     * @brief Remove a single key and its value.
+     * @param key Full key to remove
+     *
+     * ⚠ QSettings::remove() deletes the whole subtree when the key names a group, and a key
+     * built with an empty sub-key collapses onto its group name. Callers assembling a key from
+     * user or file data must reject an empty component before calling this.
+     */
+    void removeKey(const QString& key) { _settings.remove(key); }
+
+    /**
      * @brief Retrieve an arbitrary byte array value.
      * @param key Settings key
      * @return Saved byte array, or empty array if not found

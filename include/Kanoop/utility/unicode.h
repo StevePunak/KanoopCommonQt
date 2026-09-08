@@ -23,7 +23,7 @@ public:
     {
         ArrowDown,          ///< Downward arrow (↓, U+2193)
         ArrowDownToLeft,    ///< Down-left arrow (↙, U+2199)
-        ArrowDownToRight,   ///< Down-right arrow (↙, U+2199)
+        ArrowDownToRight,   ///< South west arrow (↙, U+2199)
         ArrowHorizontalBoth,///< Left-right arrow (↔, U+2194)
         ArrowLeft,          ///< Leftward arrow (←, U+2190)
         ArrowRight,         ///< Rightward arrow (→, U+2192)
@@ -40,16 +40,16 @@ public:
         EmDash,             ///< Em dash (—, U+2014)
         EmSpace,            ///< Em space ( , U+2003)
         EnDash,             ///< En dash (–, U+2013)
-        LeftDoubleQuote,    ///< Left double quotation mark (", U+201C)
-        LeftSingleQuote,    ///< Left single quotation mark (', U+2018)
+        LeftDoubleQuote,    ///< Left double quotation mark (“, U+201C)
+        LeftSingleQuote,    ///< Left single quotation mark (‘, U+2018)
         Micro,              ///< Micro sign (µ, U+00B5)
         MusicNote,          ///< Beamed eighth notes (♫, U+266B)
         OneHalf,            ///< Vulgar fraction one half (½, U+00BD)
         OneQuarter,         ///< Vulgar fraction one quarter (¼, U+00BC)
         Paragraph,          ///< Pilcrow / paragraph sign (¶, U+00B6)
         PlusOrMinus,        ///< Plus-minus sign (±, U+00B1)
-        RightDoubleQuote,   ///< Right double quotation mark (", U+201D)
-        RightSingleQuote,   ///< Right single quotation mark (', U+2019)
+        RightDoubleQuote,   ///< Right double quotation mark (”, U+201D)
+        RightSingleQuote,   ///< Right single quotation mark (’, U+2019)
         RightsReserved,     ///< Registered sign (®, U+00AE)
         Squared,            ///< Superscript two (², U+00B2)
         ThreeQuarters,      ///< Vulgar fraction three quarters (¾, U+00BE)
@@ -59,14 +59,14 @@ public:
         Pause,              ///< Double vertical bar (⏸, U+23F8)
         SkipBack,           ///< Black left-pointing double triangle with bar (⏮, U+23EE)
         SkipForward,        ///< Black right-pointing double triangle with bar (⏭, U+23ED)
-        Shuffle,            ///< Twisted rightwards arrows (⇄, U+21C4)
+        Shuffle,            ///< Rightwards arrow over leftwards arrow (⇄, U+21C4)
         Repeat,             ///< Clockwise open circle arrow (↻, U+21BB)
     };
 
     /**
      * @brief Return the QChar for a given special character identifier.
      * @param c Special character to look up
-     * @return Corresponding QChar, or a null QChar if not found
+     * @return The QChar for the given enumerator. Every declared enumerator is mapped, so a null QChar comes back only for a value cast in from outside the enumeration.
      */
     static QChar specialCharacter(SpecialCharacter c) { return _SpecialCharacterMap.value(c, QChar()); }
 
