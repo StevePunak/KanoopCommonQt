@@ -124,7 +124,7 @@ public:
      * @brief Move a file into a destination directory, preserving its basename.
      * @param sourceFilename Path to the source file
      * @param destinationDirectory Path to the target directory
-     * @return true on success, false on error. ⚠ Always false on Windows, where the function is not implemented.
+     * @return true on success, false on error.
      */
     static bool moveToDirectory(const QString& sourceFilename, const QString& destinationDirectory);
 
