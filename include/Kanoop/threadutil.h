@@ -34,7 +34,7 @@ public:
      * @brief Spin-wait (busy-loop) for the specified number of microseconds.
      * @param usecs Duration to wait in microseconds
      */
-    static inline void spinSleep(uint64_t usecs);
+    static void spinSleep(uint64_t usecs);
 };
 
 #endif // THREADUTIL_H
