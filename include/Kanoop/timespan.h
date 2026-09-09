@@ -475,16 +475,16 @@ public:
 
   /**
    * @brief Compute the signed difference between two QDateTime values (then − now).
-   * @param now Minuend QDateTime
-   * @param then Subtrahend QDateTime
+   * @param now Subtrahend QDateTime
+   * @param then Minuend QDateTime
    * @return Signed difference TimeSpan
    */
   static TimeSpan diff(const QDateTime& now, const QDateTime& then);
 
   /**
    * @brief Compute the signed difference between two chrono time points (then − now).
-   * @param now Minuend time point
-   * @param then Subtrahend time point
+   * @param now Subtrahend time point
+   * @param then Minuend time point
    * @return Signed difference TimeSpan
    */
   static TimeSpan diff(std::chrono::system_clock::time_point now, std::chrono::system_clock::time_point then);
