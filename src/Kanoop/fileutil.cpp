@@ -3,6 +3,7 @@
 #include "Kanoop/cryptoutil.h"
 #include "Kanoop/log.h"
 
+#include <QtGlobal>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QTemporaryFile>
@@ -173,7 +174,7 @@ bool FileUtil::moveToDirectory(const QString &sourceFilename, const QString &des
 
 bool FileUtil::setModifyTime(const QString &filename, const QDateTime &value)
 {
-#ifdef WIN32
+#ifdef Q_OS_WIN
     Q_UNUSED (filename)
     Q_UNUSED (value)
     return false;

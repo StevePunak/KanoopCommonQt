@@ -8,6 +8,8 @@
 ** Created: Wed Oct 4 13:25:38 2023
 **
 ******************************************************************************************/
+#include <QtGlobal>
+
 #include "log.h"
 #include "logcategoryprivate.h"
 #include <Kanoop/datetimeutil.h>
@@ -15,7 +17,7 @@
 #include <QFileInfo>
 #include <logcategory.h>
 #include <logconsumer.h>
-#ifndef WIN32
+#ifndef Q_OS_WIN
 #include <syslog.h>
 #endif
 
@@ -283,7 +285,7 @@ void Logger::closeFile()
 
 void Logger::openSyslog()
 {
-#ifndef WIN32
+#ifndef Q_OS_WIN
     closelog();
     openlog(_identity, LOG_CONS | LOG_NDELAY | LOG_PID, LOG_LOCAL1);
 #endif
@@ -291,7 +293,7 @@ void Logger::openSyslog()
 
 void Logger::closeSyslog()
 {
-#ifndef WIN32
+#ifndef Q_OS_WIN
     closelog();
 #endif
 }
@@ -326,7 +328,7 @@ void Logger::outputToDestinations(LogLevel level, const LogCategory &category, c
     }
 
     if(_flags & Syslog) {
-#ifndef WIN32
+#ifndef Q_OS_WIN
         syslog(level, "%s", formattedText.toLocal8Bit().constData());
 #endif
     }
