@@ -36,26 +36,12 @@ bool GeoCoordinate::operator==(const GeoCoordinate &other) const
 
 bool GeoCoordinate::isNorthOf(const GeoCoordinate &other) const
 {
-    bool result = false;
-    if(_cardinalLatitude == Geo::North && other._cardinalLatitude == Geo::North)
-        result = _latitude > other._latitude;
-    else if(_cardinalLatitude == Geo::South && other._cardinalLatitude == Geo::South)
-        result = _latitude < other._latitude;
-    else
-        result = _cardinalLatitude == Geo::North;
-    return result;
+    return _latitude > other._latitude;
 }
 
 bool GeoCoordinate::isWestOf(const GeoCoordinate &other) const
 {
-    bool result = false;
-    if(_cardinalLongitude == Geo::West && other._cardinalLongitude == Geo::West)
-        result = _longitude < other._longitude;
-    else if(_cardinalLongitude == Geo::East && other._cardinalLongitude == Geo::East)
-        result = _longitude > other._longitude;
-    else
-        result = _cardinalLongitude == Geo::West;
-    return result;
+    return _longitude < other._longitude;
 }
 
 QString GeoCoordinate::toString(CoordinateFormat format, int precision) const

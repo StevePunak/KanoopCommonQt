@@ -186,11 +186,11 @@ public:
     /**
      * @brief Test whether this coordinate is south of or at the same latitude as another.
      * @param other Coordinate to compare against
-     * @return true when this coordinate is south of the other, or when this latitude equals the other's cardinal-latitude enum at the configured precision and both cardinal latitudes match
+     * @return true if this latitude ≤ other's latitude (at configured precision)
      */
     bool isSouthOfOrEqualTo(const GeoCoordinate& other) const
     {
-        return isSouthOf(other) || (equalAtPrecision(_latitude, other._cardinalLatitude, _precision) && _cardinalLatitude == other._cardinalLatitude);
+        return isSouthOf(other) || (equalAtPrecision(_latitude, other._latitude, _precision) && _cardinalLatitude == other._cardinalLatitude);
     }
 
     /**

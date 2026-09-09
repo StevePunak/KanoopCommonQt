@@ -450,11 +450,17 @@ public:
     bool isEndpoint(const QPointF& point, int precision = 0) const;
 
     /**
-     * @brief Test whether a point lies exactly on this line segment.
+     * @brief Test whether a point lies on this line segment.
      * @param point Point to test
-     * @return true only when distance(p1,point) + distance(p2,point) compares exactly equal to length() as doubles. ⚠ No tolerance is applied; use isEndpoint(), which takes a precision, where float drift matters.
+     * @param tolerance Permitted error in distance(p1,point) + distance(p2,point) - length(),
+     * expressed as a fraction of length() (default 1e-12; pass 0 for an exact double comparison)
+     * @return true if the point lies on the segment within tolerance
+     *
+     * ⚠ The test compares a sum of distances, so the perpendicular offset it admits grows as the
+     * square root of tolerance: length() * sqrt(tolerance) / 2 at the midpoint. Changing the number
+     * moves the admitted offset far less than it appears to.
      */
-    bool containsPoint(const QPointF& point) const;
+    bool containsPoint(const QPointF& point, double tolerance = 1e-12) const;
 
     /**
      * @brief Shorten this line by removing length from the far end.

@@ -1,7 +1,9 @@
 #include "Kanoop/fileutil.h"
 #include "Kanoop/pathutil.h"
 #include "Kanoop/cryptoutil.h"
+#include "Kanoop/log.h"
 
+#include <QtGlobal>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QTemporaryFile>
@@ -111,7 +113,7 @@ int FileUtil::lineCount(const QString& filename)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Could not open file for reading:" << file.errorString();
+        Log::logText(LVL_DEBUG, QString("Could not open file for reading: %1").arg(file.errorString()));
         return -1;
     }
 
@@ -172,7 +174,7 @@ bool FileUtil::moveToDirectory(const QString &sourceFilename, const QString &des
 
 bool FileUtil::setModifyTime(const QString &filename, const QDateTime &value)
 {
-#ifdef WIN32
+#ifdef Q_OS_WIN
     Q_UNUSED (filename)
     Q_UNUSED (value)
     return false;
