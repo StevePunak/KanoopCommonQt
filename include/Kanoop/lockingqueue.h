@@ -8,6 +8,7 @@
 #ifndef LOCKINGQUEUE_H
 #define LOCKINGQUEUE_H
 
+#include <QDeadlineTimer>
 #include <QList>
 #include <QWaitCondition>
 #include <QMutex>
@@ -37,26 +38,23 @@ public:
         T result = T();
         success = false;
 
-        _queueLock.lock();              // don't allow anyone to add until we check the count
+        QDeadlineTimer deadline(waitTimeMs);
 
-        if(_items.count() > 0)
+        _queueLock.lock();              // don't allow anyone to add until we check the count
+        while(true)
         {
-            result = _items.takeFirst();
-            success = true;
-            _queueLock.unlock();
-        }
-        else
-        {
-            if(_condition.wait(&_queueLock, quint32(waitTimeMs)))
+            if(_items.count() > 0)
             {
-                if(_items.count() > 0)
-                {
-                    result = _items.takeFirst();
-                    success = true;
-                }
+                result = _items.takeFirst();
+                success = true;
+                break;
             }
-            _queueLock.unlock();
+            if(_condition.wait(&_queueLock, deadline) == false)
+            {
+                break;
+            }
         }
+        _queueLock.unlock();
         return result;
     }
 
