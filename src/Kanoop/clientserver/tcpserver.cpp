@@ -63,10 +63,9 @@ QList<TcpServerClientObject*> TcpServer::takeClients()
 void TcpServer::reapClients(const QList<TcpServerClientObject*>& clients)
 {
     for(TcpServerClientObject* client : clients) {
-        // Both directions, before stop(). The join inside stop() delivers whatever is
-        // already queued each way, and subclasses wire the server-to-client direction in
-        // createClient(). Reached from ~TcpServer, those land on a server whose derived
-        // sub-object is gone.
+        // Sever both directions before the client is stopped and deleted. Subclasses wire
+        // the server-to-client direction in createClient(), so by the time ~TcpServer runs,
+        // the derived sub-object those connections reach is already destroyed.
         disconnect(client, nullptr, this, nullptr);
         disconnect(this, nullptr, client, nullptr);
 

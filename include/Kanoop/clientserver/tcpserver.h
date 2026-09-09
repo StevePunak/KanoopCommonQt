@@ -124,7 +124,7 @@ private:
 
     // _clients is guarded by _clientsLock. The roster is reached from two threads:
     // incomingConnection() and onClientFinished() run on _thread, while stop() and the
-    // destructor run on whichever thread owns this server.
+    // destructor run on the caller's thread.
     QList<TcpServerClientObject*> _clients;
     mutable QMutex _clientsLock;
 
