@@ -10,9 +10,10 @@
 /**
  * @brief Represents an angle in degrees with wraparound-aware addition and subtraction.
  *
- * Angles are stored in degrees. The arithmetic operators correct a single wrap past 360
- * or below 0, so an operand of 360 or more leaves the result outside [0, 360).
- * A default-constructed Angle holds -1.
+ * Angles are stored in degrees. The arithmetic operators normalize their result into
+ * [0, 360) for any operand.
+ * ⚠ A default-constructed Angle holds -1, which is not distinguishable from a set value
+ * and is normalized like any other: Angle() - 0.0 yields 359.
  */
 class KANOOP_EXPORT Angle
 {
@@ -27,28 +28,28 @@ public:
     Angle(double degrees) : _degrees(degrees) {}
 
     /**
-     * @brief Add another Angle, correcting a single wrap past 360.
+     * @brief Add another Angle, normalizing the result into [0, 360).
      * @param other Angle to add
      * @return Resulting angle
      */
     Angle operator+(const Angle& other) const { return *this + other._degrees; }
 
     /**
-     * @brief Add a scalar degree value, correcting a single wrap past 360.
+     * @brief Add a scalar degree value, normalizing the result into [0, 360).
      * @param degrees Degrees to add
      * @return Resulting angle
      */
     Angle operator+(double degrees) const;
 
     /**
-     * @brief Subtract another Angle, correcting a single wrap below 0.
+     * @brief Subtract another Angle, normalizing the result into [0, 360).
      * @param other Angle to subtract
      * @return Resulting angle
      */
     Angle operator-(const Angle& other) const { return *this - other._degrees; }
 
     /**
-     * @brief Subtract a scalar degree value, correcting a single wrap below 0.
+     * @brief Subtract a scalar degree value, normalizing the result into [0, 360).
      * @param degrees Degrees to subtract
      * @return Resulting angle
      */
@@ -98,10 +99,12 @@ public:
     QString toString() const { return QString("%1 deg").arg(_degrees); }
 
 private:
-    /** @brief Add an amount to a degree value with wraparound. */
+    /** @brief Add an amount to a degree value, normalized into [0, 360). */
     static double add(double degrees, double amount);
-    /** @brief Subtract an amount from a degree value with wraparound. */
+    /** @brief Subtract an amount from a degree value, normalized into [0, 360). */
     static double subtract(double degrees, double amount);
+    /** @brief Reduce any degree value into [0, 360). */
+    static double normalize(double degrees);
 
     double _degrees;
 };
