@@ -14,6 +14,16 @@ Angle Angle::operator-(double degrees) const
     return Angle(result);
 }
 
+void Angle::add(double degrees)
+{
+    _degrees = add(_degrees, degrees);
+}
+
+void Angle::subtract(double degrees)
+{
+    _degrees = subtract(_degrees, degrees);
+}
+
 double Angle::add(double degrees, double amount)
 {
     return normalize(degrees + amount);
