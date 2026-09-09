@@ -85,11 +85,12 @@ public:
     }
 
     /**
-     * @brief Format a QDateTime with a literal trailing "Z". ⚠ The Z is a format literal; the fields are the QDateTime's own, so a non-UTC input is labelled Zulu without being converted.
+     * @brief Format a QDateTime as ISO-8601 Zulu, converting to UTC first.
+     * ⚠ The trailing Z is a format literal; Qt has no Z specifier. Dropping the toUTC() leaves the literal standing on unconverted fields.
      * @param date Date/time to format
      * @return Formatted string, e.g. "2021-09-17T05:30:00.123Z"
      */
-    static QString toISOString(const QDateTime& date) { return date.toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
+    static QString toISOString(const QDateTime& date) { return date.toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
 
     /**
      * @brief Format a QDateTime as a compact squashed string.
