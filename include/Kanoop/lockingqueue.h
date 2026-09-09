@@ -13,12 +13,17 @@
 #include <QMutex>
 
 /**
- * @brief Blocking multi-producer multi-consumer queue. ⚠ The lock covers this class's own methods only; it derives publicly from QList<T>, so every inherited QList method reaches the container unlocked.
+ * @brief Blocking multi-producer multi-consumer queue.
+ *
+ * ⚠ Every accessor must take _queueLock before touching _items, which is why the
+ * container is a private member rather than a base class.
+ * ⚠ _queueLock is not recursive: no method here may call another method of this
+ * class while holding it.
  *
  * @tparam T Element type stored in the queue
  */
 template <class T>
-class LockingQueue : public QList<T>
+class LockingQueue
 {
 public:
     /**
@@ -34,9 +39,9 @@ public:
 
         _queueLock.lock();              // don't allow anyone to add until we check the count
 
-        if(this->count() > 0)
+        if(_items.count() > 0)
         {
-            result = this->takeFirst();
+            result = _items.takeFirst();
             success = true;
             _queueLock.unlock();
         }
@@ -44,9 +49,9 @@ public:
         {
             if(_condition.wait(&_queueLock, quint32(waitTimeMs)))
             {
-                if(this->count() > 0)
+                if(_items.count() > 0)
                 {
-                    result = this->takeFirst();
+                    result = _items.takeFirst();
                     success = true;
                 }
             }
@@ -62,14 +67,44 @@ public:
     void enqueue(const T& t)
     {
         _queueLock.lock();
-        this->append(t);
+        _items.append(t);
         _queueLock.unlock();
         _condition.notify_one();
     }
 
+    /**
+     * @brief Number of elements currently queued.
+     * @return Element count
+     */
+    qsizetype count() const
+    {
+        QMutexLocker locker(&_queueLock);
+        return _items.count();
+    }
+
+    /**
+     * @brief Whether the queue currently holds no elements.
+     * @return true when empty
+     */
+    bool isEmpty() const
+    {
+        QMutexLocker locker(&_queueLock);
+        return _items.isEmpty();
+    }
+
+    /**
+     * @brief Discard every queued element.
+     */
+    void clear()
+    {
+        QMutexLocker locker(&_queueLock);
+        _items.clear();
+    }
+
 private:
+    QList<T> _items;
     QWaitCondition _condition;
-    QMutex _queueLock;
+    mutable QMutex _queueLock;
 };
 
 #endif // LOCKINGQUEUE_H
