@@ -52,10 +52,10 @@ Three tests every comment, commit message and PR description must pass, in ascen
    comment names a specific function as the mechanism, check that the code beneath it calls that
    function. Two comments in one file asserting incompatible things means at least one is wrong.
 
-Two forms earn their keep: **paired BAD/GOOD blocks** where the wrong form is the idiomatic one (the
-brace-spacing and boolean-comparison bullets above are this form), and **contract before
-consequence** — state the rule, then what breaks, so a reader who stops after the first sentence
-is still correct.
+Two forms earn their keep: **a paired BAD/GOOD example** where the wrong form is the idiomatic one
+(the brace-spacing and boolean-comparison bullets above pair the two forms inline; in a code
+comment, use two adjacent code blocks rather than prose), and **contract before consequence** —
+state the rule, then what breaks, so a reader who stops after the first sentence is still correct.
 
 ## Commonly used classes
 

@@ -29,7 +29,14 @@ public:
     /**
      * @brief Parse an ISO-8601 string into a QDateTime.
      * @param date ISO-8601 date/time string with milliseconds
-     * @return The parsed QDateTime in whatever time spec the string carries, or an invalid QDateTime on error. ⚠ An offset in the string is preserved, not converted to UTC.
+     * @return The parsed QDateTime, always UTC-spec, or an invalid QDateTime on error.
+     *
+     * ⚠ An offset in the string is DROPPED. The body parses, then calls
+     * setTimeZone(QTimeZone::utc()), which in Qt 6 keeps date() and time() and moves the
+     * instant -- so the parsed wall clock is relabelled UTC. The fields are kept as they are
+     * and only the zone is set, exactly as KanoopDatabaseQt's utcTime() documents.
+     * "2021-09-17T05:30:00.123+02:00" names 03:30 UTC and comes back as 05:30 UTC, two hours
+     * later than the instant the string carries.
      */
     static QDateTime fromISOString(const QString& date)
     {
