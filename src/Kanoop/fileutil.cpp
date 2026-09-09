@@ -1,6 +1,7 @@
 #include "Kanoop/fileutil.h"
 #include "Kanoop/pathutil.h"
 #include "Kanoop/cryptoutil.h"
+#include "Kanoop/log.h"
 
 #include <QCryptographicHash>
 #include <QFile>
@@ -111,7 +112,7 @@ int FileUtil::lineCount(const QString& filename)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Could not open file for reading:" << file.errorString();
+        Log::logText(LVL_DEBUG, QString("Could not open file for reading: %1").arg(file.errorString()));
         return -1;
     }
 

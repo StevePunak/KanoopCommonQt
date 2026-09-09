@@ -1,5 +1,4 @@
 #include <QProcess>
-#include <QDebug>
 #include <QFileInfoList>
 #include <QDir>
 #include <pathutil.h>
@@ -70,9 +69,6 @@ QString ProcUtil::processNameFromPid(int pid)
     // TODO Windows
 
     QString result = readProcStatusString(pid, "Name");
-    if(result.startsWith("MSys")) {
-        qWarning() << "herhe";
-    }
     return result;
 }
 
