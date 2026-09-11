@@ -378,6 +378,94 @@ private slots:
         double rate = monitor.eventsPerSecond();
         QVERIFY2(rate >= 50.0, qPrintable(QString("Rate too low: %1").arg(rate)));
     }
+
+    // ---- LockingQueue: a wake that finds nothing must re-wait ----
+    //  lockingQueue_dequeueTimeout above never gets notified, and the
+    //  producer/consumer cases always have an element waiting once notified.
+    //  Neither reaches the case where a consumer is woken and the element is
+    //  gone before it re-acquires the lock.
+    //
+    //  The steal is a race, so the arrangement is retried until it actually
+    //  happens and the assertions only run once it has. stolenOk is the proof
+    //  that the consumer really was woken to an empty queue.
+
+    void lockingQueue_reWaitsWhenWokenElementIsStolen()
+    {
+        constexpr quint32 BUDGET_MS = 3000;
+        constexpr int STEAL_POINT_MS = 400;
+        constexpr int STOLEN = 111;
+        constexpr int LATER = 222;
+
+        bool arranged = false;
+        int consumerValue = 0;
+        bool consumerSuccess = false;
+        qint64 consumerElapsed = 0;
+        int attempts = 0;
+
+        for(attempts = 1; attempts <= 25 && arranged == false; ++attempts) {
+            LockingQueue<int> queue;
+            QElapsedTimer timer;
+
+            consumerValue = 0;
+            consumerSuccess = false;
+            consumerElapsed = 0;
+
+            QThread* consumer = QThread::create([&]() {
+                timer.start();
+                consumerValue = queue.dequeue(BUDGET_MS, consumerSuccess);
+                consumerElapsed = timer.elapsed();
+            });
+            consumer->start();
+            QThread::msleep(150);                       // let the consumer reach the wait
+
+            queue.enqueue(STOLEN);
+            bool stolenOk = false;
+            const int stolen = queue.dequeue(0, stolenOk);   // race the woken consumer for it
+
+            if(stolenOk == false) {
+                QVERIFY(consumer->wait(BUDGET_MS + 2000));   // consumer won; retry
+                delete consumer;
+                continue;
+            }
+            QCOMPARE(stolen, STOLEN);
+
+            QThread::msleep(STEAL_POINT_MS);
+            queue.enqueue(LATER);
+            QVERIFY(consumer->wait(BUDGET_MS + 2000));
+            delete consumer;
+            arranged = true;
+        }
+
+        QVERIFY2(arranged, "never won the steal race, so the case was never exercised");
+        QVERIFY2(consumerSuccess,
+                 qPrintable(QString("consumer gave up after its element was stolen (attempt %1)").arg(attempts)));
+        QCOMPARE(consumerValue, LATER);
+        QVERIFY2(consumerElapsed > STEAL_POINT_MS,
+                 qPrintable(QString("consumer returned after %1 ms, at or before the %2 ms steal point")
+                                .arg(consumerElapsed).arg(STEAL_POINT_MS)));
+        QVERIFY(consumerElapsed < BUDGET_MS);
+    }
+
+    void lockingQueue_countIsEmptyAndClear()
+    {
+        LockingQueue<int> queue;
+        QVERIFY(queue.isEmpty());
+        QCOMPARE(queue.count(), qsizetype(0));
+
+        queue.enqueue(1);
+        queue.enqueue(2);
+        QCOMPARE(queue.count(), qsizetype(2));
+        QVERIFY(queue.isEmpty() == false);
+
+        queue.clear();
+        QCOMPARE(queue.count(), qsizetype(0));
+        QVERIFY(queue.isEmpty());
+
+        bool ok = true;
+        queue.dequeue(20, ok);
+        QVERIFY(ok == false);
+    }
+
 };
 
 QTEST_MAIN(TstConcurrency)
