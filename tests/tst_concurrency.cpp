@@ -5,14 +5,14 @@
 
 #include <type_traits>
 
-// Deadlock guard for joining helper threads. Sized as a detector rather than a
-// performance assertion: the slowest of these cases runs in ~0.5 s, so this is far
-// above any healthy runtime and a trip means a thread never finished.
-static constexpr int THREAD_JOIN_TIMEOUT_MS = 10000;
-
 #include <Kanoop/mutexevent.h>
 #include <Kanoop/lockingqueue.h>
 #include <Kanoop/ratemonitor.h>
+
+// Deadlock guard for joining helper threads. The slowest of these cases runs in
+// ~0.5 s. A bound tightened toward that number trips on a loaded box, and a flaky
+// join gets muted.
+static constexpr int THREAD_JOIN_TIMEOUT_MS = 10000;
 
 
 // Detects whether an unlocked QList mutator is reachable on the queue's public
