@@ -3,9 +3,28 @@
 #include <QElapsedTimer>
 #include <QAtomicInt>
 
+#include <type_traits>
+
 #include <Kanoop/mutexevent.h>
 #include <Kanoop/lockingqueue.h>
 #include <Kanoop/ratemonitor.h>
+
+
+// Detects whether an unlocked QList mutator is reachable on the queue's public
+// surface. Compiles either way; the value is what differs.
+template <typename T, typename = void>
+struct HasReachableAppend : std::false_type {};
+
+template <typename T>
+struct HasReachableAppend<T, std::void_t<decltype(std::declval<T&>().append(std::declval<const int&>()))>>
+    : std::true_type {};
+
+template <typename T, typename = void>
+struct HasReachableTakeFirst : std::false_type {};
+
+template <typename T>
+struct HasReachableTakeFirst<T, std::void_t<decltype(std::declval<T&>().takeFirst())>>
+    : std::true_type {};
 
 class TstConcurrency : public QObject
 {
@@ -464,6 +483,29 @@ private slots:
         bool ok = true;
         queue.dequeue(20, ok);
         QVERIFY(ok == false);
+    }
+
+
+    // ---- LockingQueue: the container is not reachable unlocked ----
+    //  Every method of this class takes _queueLock. That is only worth anything
+    //  while the container cannot be reached around them, which is a property of
+    //  the type's public surface rather than of any particular interleaving: a
+    //  race detector only reports what the run happens to exercise, whereas an
+    //  unreachable mutator cannot be raced by anyone.
+
+    void lockingQueue_noUnlockedContainerAccess()
+    {
+        QVERIFY(HasReachableAppend<LockingQueue<int>>::value == false);
+        QVERIFY(HasReachableTakeFirst<LockingQueue<int>>::value == false);
+        QVERIFY((std::is_base_of<QList<int>, LockingQueue<int>>::value) == false);
+    }
+
+    // Control: the detectors do find these methods on the container itself, so a
+    // false above is not simply a detector that never matches anything.
+    void lockingQueue_detectorFindsQListSurface()
+    {
+        QVERIFY(HasReachableAppend<QList<int>>::value);
+        QVERIFY(HasReachableTakeFirst<QList<int>>::value);
     }
 
 };
