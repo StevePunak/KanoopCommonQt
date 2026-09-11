@@ -1,8 +1,11 @@
 #include <QTest>
 #include <QtMath>
 
+#include <cmath>
+
 #include <Kanoop/geometry/angle.h>
 #include <Kanoop/geometry/circle.h>
+#include <Kanoop/geometry/ellipse.h>
 #include <Kanoop/geometry/flatgeo.h>
 #include <Kanoop/geometry/geo.h>
 #include <Kanoop/geometry/line.h>
@@ -697,6 +700,155 @@ private slots:
         QCOMPARE(Geo::bearingToDirection(180.0), Geo::Down);
         QCOMPARE(Geo::bearingToDirection(270.0), Geo::ToLeft);
     }
+
+    // ---------------------------------------------------------------
+    // Angle — normalization for operands beyond a single turn
+    // ---------------------------------------------------------------
+    //  The angle_*Wraps* cases above use operands that cross 360 or 0 exactly
+    //  once. These use operands that do not.
+
+    void angle_additionBeyondFullTurn()
+    {
+        QVERIFY(fuzzyEqual((Angle(10.0) + 720.0).degrees(), 10.0));
+    }
+
+    void angle_additionOfNegativeAmount()
+    {
+        QVERIFY(fuzzyEqual((Angle(0.0) + -1.0).degrees(), 359.0));
+    }
+
+    void angle_subtractionOfNegativeAmount()
+    {
+        QVERIFY(fuzzyEqual((Angle(10.0) - -350.0).degrees(), 0.0));
+    }
+
+    void angle_subtractionBeyondFullTurn()
+    {
+        QVERIFY(fuzzyEqual((Angle(10.0) - -400.0).degrees(), 50.0));
+    }
+
+    void angle_resultAlwaysInRange()
+    {
+        const QList<double> operands = { 0.0, 1.0, 359.0, 360.0, 361.0, 720.0, 1080.5,
+                                         -1.0, -359.0, -360.0, -400.0, -1080.5 };
+        for(double operand : operands) {
+            const double sum = (Angle(10.0) + operand).degrees();
+            const double difference = (Angle(10.0) - operand).degrees();
+            QVERIFY2(sum >= 0.0 && sum < 360.0,
+                     qPrintable(QString("10 + %1 gave %2").arg(operand).arg(sum)));
+            QVERIFY2(difference >= 0.0 && difference < 360.0,
+                     qPrintable(QString("10 - %1 gave %2").arg(operand).arg(difference)));
+        }
+    }
+
+    // std::signbit is the assertion that does the work here: QString::arg formats
+    // -0.0 as "0", so the toString() check below cannot catch a negative zero and
+    // only guards a future change of formatter.
+    void angle_noNegativeZero()
+    {
+        const Angle result = Angle(0.0) - 360.0;
+        QCOMPARE(result.degrees(), 0.0);
+        QVERIFY2(std::signbit(result.degrees()) == false,
+                 qPrintable(QString("degrees() rendered as %1").arg(result.toString())));
+        QVERIFY(result.toString().contains("-0") == false);
+    }
+
+    // Documented behaviour, pinned so it is not changed without a ruling: the
+    // default -1 sentinel is a value like any other and normalizes to 359.
+    void angle_defaultSentinelNormalizes()
+    {
+        QVERIFY(fuzzyEqual((Angle() - 0.0).degrees(), 359.0));
+    }
+
+    void angle_inPlaceAddMatchesOperator()
+    {
+        Angle inPlace(10.0);
+        inPlace.add(720.0);
+        QVERIFY(fuzzyEqual(inPlace.degrees(), (Angle(10.0) + 720.0).degrees()));
+        QVERIFY(fuzzyEqual(inPlace.degrees(), 10.0));
+    }
+
+    void angle_inPlaceSubtractMatchesOperator()
+    {
+        Angle inPlace(10.0);
+        inPlace.subtract(-400.0);
+        QVERIFY(fuzzyEqual(inPlace.degrees(), (Angle(10.0) - -400.0).degrees()));
+        QVERIFY(fuzzyEqual(inPlace.degrees(), 50.0));
+    }
+
+    // ---------------------------------------------------------------
+    // Line::containsPoint — tolerance
+    // ---------------------------------------------------------------
+    //  line_containsPoint above uses a horizontal segment whose distance sum is
+    //  bit-exact against length(). A diagonal is not.
+
+    void line_containsPointOnDiagonal()
+    {
+        Line l(QPointF(0, 0), QPointF(3, 3));
+        QVERIFY(l.containsPoint(QPointF(1, 1)));
+        QVERIFY(l.containsPoint(QPointF(2, 2)));
+    }
+
+    // The test sums two distances, so the perpendicular offset it admits grows
+    // as the square root of the tolerance. A tolerance wide enough to swallow
+    // this point would admit points visibly off the segment.
+    void line_containsPointRejectsNearMiss()
+    {
+        Line l(QPointF(0, 0), QPointF(3, 3));
+        QVERIFY(l.containsPoint(QPointF(1.0, 1.0001)) == false);
+        QVERIFY(l.containsPoint(QPointF(1.5, 1.6)) == false);
+    }
+
+    void line_containsPointToleranceZeroIsExact()
+    {
+        Line l(QPointF(0, 0), QPointF(10, 0));
+        QVERIFY(l.containsPoint(QPointF(5, 0), 0.0));
+        QVERIFY(l.containsPoint(QPointF(5, 1), 0.0) == false);
+    }
+
+    // ---------------------------------------------------------------
+    // Ellipse
+    // ---------------------------------------------------------------
+    //  Angle is measured from vertical, so 0 and 180 give the vertical
+    //  semi-axis B and 90 and 270 give the horizontal semi-axis A.
+
+    void ellipse_radiusAtAngleOnAxes()
+    {
+        Ellipse e(Point(0, 0), 3.0, 4.0);
+        QVERIFY(fuzzyEqual(e.radiusAtAngle(0.0), 4.0));
+        QVERIFY(fuzzyEqual(e.radiusAtAngle(90.0), 3.0));
+        QVERIFY(fuzzyEqual(e.radiusAtAngle(180.0), 4.0));
+        QVERIFY(fuzzyEqual(e.radiusAtAngle(270.0), 3.0));
+    }
+
+    // a*b / sqrt(a^2 sin^2 t + b^2 cos^2 t) with t = -45 deg, a = 3, b = 4:
+    // 12 / sqrt(9*0.5 + 16*0.5) = 12 / sqrt(12.5) = 3.3941125496954285
+    void ellipse_radiusAtAngleHandComputed()
+    {
+        Ellipse e(Point(0, 0), 3.0, 4.0);
+        QVERIFY(fuzzyEqual(e.radiusAtAngle(45.0), 3.3941125496954285, 1e-9));
+    }
+
+    void ellipse_circleHasConstantRadius()
+    {
+        Ellipse e(Point(1, 2), 5.0, 5.0);
+        for(double angle : { 0.0, 17.0, 45.0, 90.0, 213.5, 359.0 }) {
+            QVERIFY2(fuzzyEqual(e.radiusAtAngle(angle), 5.0, 1e-9),
+                     qPrintable(QString("angle %1 gave %2").arg(angle).arg(e.radiusAtAngle(angle))));
+        }
+    }
+
+    void ellipse_accessorsAndToString()
+    {
+        Ellipse e(Point(1, 2), 3.0, 4.0);
+        QVERIFY(fuzzyEqual(e.semiAxisA(), 3.0));
+        QVERIFY(fuzzyEqual(e.semiAxisB(), 4.0));
+        QVERIFY(fuzzyEqual(e.center().x(), 1.0));
+        const QString text = e.toString();
+        QVERIFY(text.contains("3"));
+        QVERIFY(text.contains("4"));
+    }
+
 };
 
 QTEST_MAIN(TstGeometry)
