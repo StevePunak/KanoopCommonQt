@@ -395,6 +395,71 @@ private slots:
         QVERIFY2(dist < 1.0,
                  qPrintable(QString("toString round-trip drift: %1 m").arg(dist)));
     }
+
+    // ================================================================
+    //  Cardinal ordering within a single hemisphere
+    // ================================================================
+    //  The pairs in the isNorthOf_basic / isWestOf_basic cases above are
+    //  both-north or cross-hemisphere and both-west respectively. Ordering
+    //  within the southern and eastern hemispheres needs its own cases.
+
+    void isNorthOf_bothSouthernHemisphere()
+    {
+        const GeoCoordinate nearEquator(-20.0, 0.0);
+        const GeoCoordinate nearPole(-33.8688, 0.0);
+        QVERIFY(nearEquator.isNorthOf(nearPole));
+        QVERIFY(!nearPole.isNorthOf(nearEquator));
+    }
+
+    void isNorthOf_bothNorthernHemisphere()
+    {
+        QVERIFY(LONDON.isNorthOf(NYC));
+        QVERIFY(!NYC.isNorthOf(LONDON));
+    }
+
+    void isWestOf_bothEasternHemisphere()
+    {
+        QVERIFY(TOKYO.isWestOf(SYDNEY));        // 139.65 < 151.21
+        QVERIFY(!SYDNEY.isWestOf(TOKYO));
+    }
+
+    void isWestOf_bothWesternHemisphere()
+    {
+        QVERIFY(LA.isWestOf(NYC));              // -118.24 < -74.01
+        QVERIFY(!NYC.isWestOf(LA));
+    }
+
+    void isEastOf_bothEasternHemisphere()
+    {
+        QVERIFY(SYDNEY.isEastOf(TOKYO));
+        QVERIFY(!TOKYO.isEastOf(SYDNEY));
+    }
+
+    // ================================================================
+    //  isSouthOfOrEqualTo — the equality leg compares latitude to latitude
+    // ================================================================
+    //  Geo::North is 1 and Geo::South is 3 (geotypes.h). A latitude that
+    //  happens to equal one of those ordinals must not be treated as equal
+    //  to the other coordinate. Only the North ordinal is reachable here:
+    //  matching the South ordinal would need latitude 3.0 on a coordinate
+    //  whose cardinal is South, and a positive latitude is always North.
+
+    void isSouthOfOrEqualTo_latitudeMatchingNorthOrdinal()
+    {
+        const GeoCoordinate atOrdinal(1.0, 0.0);
+        const GeoCoordinate lower(0.5, 0.0);
+        QVERIFY(!atOrdinal.isSouthOfOrEqualTo(lower));
+    }
+
+    void isSouthOfOrEqualTo_trueCases()
+    {
+        const GeoCoordinate lower(0.5, 0.0);
+        const GeoCoordinate same(0.5, 0.0);
+        const GeoCoordinate higher(1.0, 0.0);
+        QVERIFY(lower.isSouthOfOrEqualTo(same));
+        QVERIFY(lower.isSouthOfOrEqualTo(higher));
+    }
+
 };
 
 QTEST_MAIN(TstGeo)
