@@ -369,6 +369,52 @@ private slots:
         QCOMPARE(parsed.date(), original.date());
         QCOMPARE(parsed.time(), original.time());
     }
+
+    // ========== toISOString converts before stamping the Z ==========
+    //  dateTimeUtil_toISOString above passes a UTC input, whose fields are
+    //  already Zulu. These pass the same instant carried on a non-UTC spec.
+    //  The offset-spec and named-zone cases are deterministic on any host; the
+    //  local-time case only discriminates when the host is not itself on UTC.
+
+    void toISOString_offsetSpecConvertsToUtc()
+    {
+        const QDateTime instant = utc(2021, 9, 17, 5, 30, 0, 123);
+        const QDateTime offsetSpec = instant.toTimeZone(QTimeZone::fromSecondsAheadOfUtc(-7 * 3600));
+
+        QCOMPARE(offsetSpec.time().hour(), 22);        // 22:30 the previous day
+        QCOMPARE(offsetSpec, instant);                 // same instant, different fields
+        QCOMPARE(DateTimeUtil::toISOString(offsetSpec), QStringLiteral("2021-09-17T05:30:00.123Z"));
+    }
+
+    void toISOString_namedZoneConvertsToUtc()
+    {
+        const QDateTime instant = utc(2021, 9, 17, 5, 30, 0, 123);
+        const QTimeZone losAngeles("America/Los_Angeles");
+        if(losAngeles.isValid() == false) {
+            QSKIP("tzdata has no America/Los_Angeles on this host");
+        }
+        const QDateTime zoned = instant.toTimeZone(losAngeles);
+        QVERIFY(zoned.time().hour() != instant.time().hour());
+        QCOMPARE(DateTimeUtil::toISOString(zoned), QStringLiteral("2021-09-17T05:30:00.123Z"));
+    }
+
+    void toISOString_localSpecConvertsToUtc()
+    {
+        const QDateTime instant = utc(2021, 9, 17, 5, 30, 0, 123);
+        QCOMPARE(DateTimeUtil::toISOString(instant.toLocalTime()),
+                 QStringLiteral("2021-09-17T05:30:00.123Z"));
+    }
+
+    // A different instant must give a different string, so an implementation
+    // returning a constant fails.
+    void toISOString_distinguishesInstants()
+    {
+        const QDateTime first = utc(2021, 9, 17, 5, 30, 0, 123);
+        const QDateTime second = utc(2021, 9, 17, 6, 30, 0, 123);
+        QVERIFY(DateTimeUtil::toISOString(first) != DateTimeUtil::toISOString(second));
+        QCOMPARE(DateTimeUtil::toISOString(second), QStringLiteral("2021-09-17T06:30:00.123Z"));
+    }
+
 };
 
 QTEST_MAIN(TstDateRange)
