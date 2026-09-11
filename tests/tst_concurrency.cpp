@@ -5,6 +5,11 @@
 
 #include <type_traits>
 
+// Deadlock guard for joining helper threads. Sized as a detector rather than a
+// performance assertion: the slowest of these cases runs in ~0.5 s, so this is far
+// above any healthy runtime and a trip means a thread never finished.
+static constexpr int THREAD_JOIN_TIMEOUT_MS = 10000;
+
 #include <Kanoop/mutexevent.h>
 #include <Kanoop/lockingqueue.h>
 #include <Kanoop/ratemonitor.h>
@@ -53,7 +58,7 @@ private slots:
         QThread::msleep(50);
         QVERIFY(event.isWaiting());
         event.set();
-        waiter->wait();
+        QVERIFY(waiter->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QVERIFY(result);
         QVERIFY(!event.isWaiting());
@@ -105,7 +110,7 @@ private slots:
         QVERIFY(event.isWaiting());
 
         event.set();
-        waiter->wait();
+        QVERIFY(waiter->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QVERIFY(!event.isWaiting());
         delete waiter;
@@ -125,7 +130,7 @@ private slots:
         QThread::msleep(50);
         event.setData(QVariant(42));
         event.set();
-        waiter->wait();
+        QVERIFY(waiter->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(received.toInt(), 42);
         delete waiter;
@@ -154,9 +159,9 @@ private slots:
         QThread::msleep(100); // let all threads enter wait()
         event.set();
 
-        w1->wait();
-        w2->wait();
-        w3->wait();
+        QVERIFY(w1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w3->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(wokenCount.loadRelaxed(), 3);
         delete w1;
@@ -188,9 +193,9 @@ private slots:
         event.set(); // should wake exactly 1
 
         // Wait for all threads to finish (2 will timeout at 200ms)
-        w1->wait();
-        w2->wait();
-        w3->wait();
+        QVERIFY(w1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w3->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(wokenCount.loadRelaxed(), 1);
         delete w1;
@@ -271,9 +276,9 @@ private slots:
         p1->start();
         p2->start();
 
-        p1->wait();
-        p2->wait();
-        consumer->wait();
+        QVERIFY(p1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(p2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(consumer->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(received.count(), itemCount);
 
@@ -329,10 +334,10 @@ private slots:
         c3->start();
         producer->start();
 
-        producer->wait();
-        c1->wait();
-        c2->wait();
-        c3->wait();
+        QVERIFY(producer->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(c1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(c2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(c3->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(received.count(), itemCount);
 
