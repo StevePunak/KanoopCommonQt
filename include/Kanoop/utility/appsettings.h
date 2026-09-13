@@ -35,6 +35,9 @@ public:
     /** @brief Construct an AppSettings object backed by the default QSettings store. */
     AppSettings();
 
+    /** @brief Construct an AppSettings object backed by the INI file at @p filePath. */
+    explicit AppSettings(const QString& filePath);
+
     /**
      * @brief Persist an arbitrary string value.
      * @param key Settings key

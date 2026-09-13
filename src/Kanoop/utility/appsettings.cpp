@@ -20,6 +20,12 @@ AppSettings::AppSettings() :
 {
 }
 
+AppSettings::AppSettings(const QString& filePath) :
+    _settings(filePath, QSettings::IniFormat),
+    _maxRecentFiles(10)
+{
+}
+
 void AppSettings::sync()
 {
     _settings.sync();
