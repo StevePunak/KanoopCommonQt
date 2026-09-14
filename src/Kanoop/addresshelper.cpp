@@ -64,32 +64,58 @@ QHostAddress AddressHelper::getLocalIP()
 /**
  * @brief AddressHelper::getLocalIP
  * @param allowedInterfaces
- * The list of allowed interface names to search (empty for all)
- * @return The first IPv4 address belonging to an interface in the list of allowed interfaces
+ * The list of allowed interface name patterns to search, in order of preference
+ * (empty for all)
+ * @return The first IPv4 address of the most-preferred up interface that has one,
+ * or a null QHostAddress if none does. With an empty list, loopback interfaces are
+ * skipped and the first up interface carrying an IPv4 address wins.
+ * @note The order QNetworkInterface::allInterfaces() returns is not defined by Qt;
+ * on Linux it is the netlink dump order, so an empty list gives a stable answer only
+ * while the set of interfaces is stable. Pass patterns when the choice matters.
  */
 QHostAddress AddressHelper::getLocalIP(const QStringList &allowedInterfaces)
 {
+    const bool matchAny = allowedInterfaces.count() == 0;
     QHostAddress result;
 
     int priority = 0x7fffffff;
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
     foreach (QNetworkInterface interface, interfaces)
     {
-        if(interface.flags() & QNetworkInterface::IsUp)
+        if((interface.flags() & QNetworkInterface::IsUp) == 0)
         {
-            int index = indexOfRegEx(allowedInterfaces, interface.name());
-            if((allowedInterfaces.count() == 0) || (index >= 0 && index < priority))
+            continue;
+        }
+        if(matchAny && (interface.flags() & QNetworkInterface::IsLoopBack))
+        {
+            continue;
+        }
+
+        int index = indexOfRegEx(allowedInterfaces, interface.name());
+        if(matchAny == false && (index < 0 || index >= priority))
+        {
+            continue;
+        }
+
+        QHostAddress found;
+        for(const QNetworkAddressEntry& address : interface.addressEntries())
+        {
+            if(address.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
-                priority = index;
-                QList<QNetworkAddressEntry> addresses = interface.addressEntries();
-                foreach (QNetworkAddressEntry address, addresses)
-                {
-                    if(address.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                    {
-                        result = address.ip();
-                    }
-                }
+                found = address.ip();
+                break;
             }
+        }
+        if(found.isNull())
+        {
+            continue;
+        }
+
+        result = found;
+        priority = index;
+        if(matchAny)
+        {
+            break;
         }
     }
     return result;

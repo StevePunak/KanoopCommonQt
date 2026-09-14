@@ -265,7 +265,7 @@ public:
     /** @brief Return the length (Euclidean distance between endpoints).
      * @return Length of the line */
     double length() const;
-    /** @brief Return the slope (rise/run), or infinity for vertical lines.
+    /** @brief Return the slope (rise/run), or DBL_MAX for vertical lines.
      * @return Slope value */
     double slope() const;
     /** @brief Return the Y-intercept of the line's equation.
@@ -327,7 +327,7 @@ public:
     Point rightMostPoint() const;
 
     /**
-     * @brief Test whether the line spans an X range.
+     * @brief Test whether either endpoint's X lies between x1 and x2.
      * @param x1 First X boundary
      * @param x2 Second X boundary
      * @return true if any part of the line falls between x1 and x2
@@ -342,7 +342,7 @@ public:
     bool crossesX(double x) const;
 
     /**
-     * @brief Test whether the line spans a Y range.
+     * @brief Test whether either endpoint's Y lies between y1 and y2.
      * @param y1 First Y boundary
      * @param y2 Second Y boundary
      * @return true if any part of the line falls between y1 and y2
@@ -393,27 +393,27 @@ public:
     Point intersection(const Line& other) const;
 
     /**
-     * @brief Test whether this line is entirely to the left of other.
+     * @brief Test whether this line begins further left than other.
      * @param other Line to compare against
-     * @return true if this line is entirely to the left
+     * @return true when this line's smallest X is less than other's smallest X
      */
     bool isLeftOf(const Line& other) const;
     /**
-     * @brief Test whether this line is entirely to the right of other.
+     * @brief Test whether this line begins further right than other.
      * @param other Line to compare against
-     * @return true if this line is entirely to the right
+     * @return true when this line's largest X is greater than other's largest X
      */
     bool isRightOf(const Line& other) const;
     /**
-     * @brief Test whether this line is entirely above other.
+     * @brief Test whether this line begins higher than other.
      * @param other Line to compare against
-     * @return true if this line is entirely above
+     * @return true when this line's smallest Y is less than other's smallest Y
      */
     bool isAbove(const Line& other) const;
     /**
-     * @brief Test whether this line is entirely below other.
+     * @brief Test whether this line ends lower than other.
      * @param other Line to compare against
-     * @return true if this line is entirely below
+     * @return true when this line's largest Y is greater than other's largest Y
      */
     bool isBelow(const Line& other) const;
     /** @brief Test whether this line is perpendicular (horizontal or vertical).
@@ -452,9 +452,15 @@ public:
     /**
      * @brief Test whether a point lies on this line segment.
      * @param point Point to test
-     * @return true if point lies on the segment
+     * @param tolerance Permitted error in distance(p1,point) + distance(p2,point) - length(),
+     * expressed as a fraction of length() (default 1e-12; pass 0 for an exact double comparison)
+     * @return true if the point lies on the segment within tolerance
+     *
+     * ⚠ The test compares a sum of distances, so the perpendicular offset it admits grows as the
+     * square root of tolerance: length() * sqrt(tolerance) / 2 at the midpoint. Changing the number
+     * moves the admitted offset far less than it appears to.
      */
-    bool containsPoint(const QPointF& point) const;
+    bool containsPoint(const QPointF& point, double tolerance = 1e-12) const;
 
     /**
      * @brief Shorten this line by removing length from the far end.
@@ -503,8 +509,8 @@ public:
     Line& round();
 
     /**
-     * @brief Create a rectangle of the given width centred on this line.
-     * @param expandedWidth Width of the resulting rectangle
+     * @brief Create a rectangle enclosing this line, inset outward on every side.
+     * @param expandedWidth Distance the rectangle extends beyond the line on each side; the rectangle is 2 * expandedWidth across the line and length() + 2 * expandedWidth along it
      * @return Rectangle enclosing the line
      */
     Rectangle makeRectangle(int expandedWidth) const;

@@ -66,8 +66,8 @@ public:
      * @brief Look up the enum value for a string name, with case sensitivity control.
      * @param name String to look up
      * @param caseSensitivity Qt::CaseSensitive or Qt::CaseInsensitive
-     * @param defaultValue Value returned when no match is found
-     * @return Matching enum value, or defaultValue
+     * @param defaultValue Value returned when the name matches no registered string and does not parse as an integer
+     * @return The matching enum value; for a name that parses as an integer, that integer cast directly to T; otherwise defaultValue
      */
     T getType(const QString& name, Qt::CaseSensitivity caseSensitivity, const T defaultValue = T()) const
     {
@@ -89,8 +89,8 @@ public:
     /**
      * @brief Look up the enum value for a string name using case-sensitive comparison.
      * @param name String to look up
-     * @param defaultValue Value returned when no match is found
-     * @return Matching enum value, or defaultValue
+     * @param defaultValue Value returned when the name matches no registered string and does not parse as an integer
+     * @return The matching enum value; for a name that parses as an integer, that integer cast directly to T; otherwise defaultValue
      */
     T getType(const QString& name, const T defaultValue = T()) const
     {

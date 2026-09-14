@@ -26,12 +26,12 @@ public:
      */
     SpanningTree(const Line::List& lines);
 
-    /** @brief Destructor — frees all dynamically allocated vertex objects. */
+    /** @brief Destructor — frees the vertex objects still held in _vertices. ⚠ Vertices removed from _vertices elsewhere are not freed here. */
     virtual ~SpanningTree();
 
     /**
      * @brief Compute the shortest path from origin to destination through the line network.
-     * @return Ordered list of lines forming the path, or an empty list if no path exists
+     * @return Ordered list of lines forming the path. ⚠ When the walk back from the destination never reaches the origin, the partial chain is returned as a non-empty list and the failure is reported only in the log; an empty list means fewer than two vertices were accumulated.
      */
     Line::List computePath();
 

@@ -1,3 +1,5 @@
+#include <QtMath>
+
 #include "Kanoop/geometry/angle.h"
 
 Angle Angle::operator+(double degrees) const
@@ -14,16 +16,15 @@ Angle Angle::operator-(double degrees) const
 
 double Angle::add(double degrees, double amount)
 {
-    double result = degrees + amount;
-    if(result >= 360)
-        result -= 360;
-    return result;
+    return normalize(degrees + amount);
 }
 
 double Angle::subtract(double degrees, double amount)
 {
-    double result = degrees - amount;
-    if(result < 0)
-        result += 360;
-    return result;
+    return normalize(degrees - amount);
+}
+
+double Angle::normalize(double degrees)
+{
+    return std::fmod(std::fmod(degrees, 360.0) + 360.0, 360.0);
 }

@@ -87,10 +87,10 @@ public:
     static Point getPoint(const QPointF& from, double bearing, double distance);
 
     /**
-     * @brief Compute the intersection point of two lines.
-     * @param l1 First line
-     * @param l2 Second line
-     * @return Intersection point, or an undefined point if lines are parallel
+     * @brief Compute the point where two line segments cross.
+     * @param l1 First segment
+     * @param l2 Second segment
+     * @return The crossing point, or a default-constructed QPointF when the lines are parallel or when the crossing falls outside either segment
      */
     static QPointF intersection(const Line& l1, const Line& l2);
 

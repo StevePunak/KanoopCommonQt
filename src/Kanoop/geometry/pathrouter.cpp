@@ -5,14 +5,16 @@
  *
  * Pass 1 -
  *   Resolve all the lines to get from source to destination without crossing any obstacles
- *     a) Find a direct shot from 'a' to diestination if it exists.
+ *     a) Find a direct shot from 'a' to the destination if it exists.
  *        This will yield the final result when successful.
  *
  *     b) Choose a direction for this segment
  *
- *     c) Find our way off of any obstacle whos edge we are currently on
+ *     c) Try a simple 'L' between the two points
  *
- *     d) Find the next point
+ *     d) Find our way off of any obstacle whose edge we are currently on
+ *
+ *     e) Find the next point
  *
  * Pass 2 -
  *   Squash any segments which contain unncessary lines. That is, three consecutive sides which would
@@ -452,7 +454,7 @@ bool PathRouter::cycleFindWayOffObstacle(const Point &a, const Point &b)
  *
  * @param a
  * @param b
- * @return true if a line was added
+ * @return true when a line was added and the router changed direction; false when it continued along the previous axis, which also appends a line
  */
 bool PathRouter::cycleFindNextPoint(const Point &a, const Point &b)
 {
@@ -747,10 +749,10 @@ bool PathRouter::lineLiesNearObstacleEdge(const Line &line, double margin, Recta
 }
 
 /**
- * @brief PathRouter::consolidateLines
- * The three lines at 'index' will be turned into a single line
+ * @brief PathRouter::replaceLines
+ * The 'count' lines starting at 'index' are replaced by 'newLines'
  * @param index
- * @param consolidationRectangle
+ * @param count
  */
 void PathRouter::replaceLines(int index, int count, const Line::List& newLines)
 {
@@ -1076,7 +1078,7 @@ Line PathRouter::findClosestCornerPathOffObstacle(const Point &origin, const Rec
  * @param origin
  * @param obstacle
  * @param directions  - The possible directions on which to search
- * @return The resultant line off the obstacle
+ * @return The shortest line from origin to a qualifying obstacle corner, or an invalid Line when no corner lies in one of the given directions
  */
 Line PathRouter::findPathOffObstacleInDirections(const Point &origin, const Rectangle &obstacle, const QList<Geo::Direction> &directions) const
 {

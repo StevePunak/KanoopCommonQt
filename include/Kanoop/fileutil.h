@@ -106,7 +106,7 @@ public:
     static bool remove(const QString& filename);
 
     /**
-     * @brief Create an empty file or update its modification time if it exists.
+     * @brief Create the file if it does not exist. An existing file is opened and closed unchanged; its modification time is not touched.
      * @param filename Path to the file
      * @return true on success, false on error
      */
@@ -124,7 +124,7 @@ public:
      * @brief Move a file into a destination directory, preserving its basename.
      * @param sourceFilename Path to the source file
      * @param destinationDirectory Path to the target directory
-     * @return true on success, false on error
+     * @return true on success, false on error.
      */
     static bool moveToDirectory(const QString& sourceFilename, const QString& destinationDirectory);
 
@@ -132,7 +132,7 @@ public:
      * @brief Set the modification timestamp of a file.
      * @param filename Path to the file
      * @param value New modification timestamp
-     * @return true on success, false on error
+     * @return true on success, false on error. ⚠ Always false on Windows, where the function is not implemented.
      */
     static bool setModifyTime(const QString& filename, const QDateTime& value);
 

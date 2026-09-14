@@ -323,11 +323,12 @@ bool Line::isEndpoint(const QPointF &point, int precision) const
     return FlatGeo::arePointsEqual(_p1, point, precision) || FlatGeo::arePointsEqual(_p2, point, precision);
 }
 
-bool Line::containsPoint(const QPointF &point) const
+bool Line::containsPoint(const QPointF &point, double tolerance) const
 {
     double d1 = FlatGeo::distance(_p1, point);
     double d2 = FlatGeo::distance(_p2, point);
-    return d1 + d2 == length();
+    double len = length();
+    return qFabs((d1 + d2) - len) <= tolerance * len;
 }
 
 Line &Line::shorten(double howMuch)
@@ -674,7 +675,7 @@ double Line::List::maxY() const
 }
 
 /**
- * @brief Line::List::rectangle
+ * @brief Line::List::boundingRectangle
  * @return a rectangle containing all our lines
  */
 Rectangle Line::List::boundingRectangle() const

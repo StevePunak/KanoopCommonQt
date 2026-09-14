@@ -15,7 +15,7 @@
  * @brief Orthogonal path-routing algorithm that navigates around rectangular obstacles.
  *
  * PathRouter computes a list of horizontal/vertical line segments connecting an origin
- * point to a destination point while avoiding a set of rectangular obstacles on a canvas.
+ * point to a destination point around a set of rectangular obstacles on a canvas.
  * Call calcluatePath() after configuration to obtain the routed Line::List.
  */
 class KANOOP_EXPORT PathRouter
@@ -44,7 +44,7 @@ public:
     PathRouter(const Point& origin, const Point& destination, const QRectF &canvas, const QList<Rectangle> &obstacles = QList<Rectangle>());
 
     /**
-     * @brief Compute the routed path from origin to destination avoiding all obstacles.
+     * @brief Compute the routed path from origin to destination around the configured obstacles. ⚠ The path built so far is returned unconditionally; when routing is abandoned (repeated segment, or the cycle ceiling) the returned list may cross an obstacle and the only signal is an error in the log.
      * @return Ordered list of line segments forming the routed path
      */
     Line::List calcluatePath();
@@ -98,13 +98,13 @@ public:
     void setRoutingMargin(int value) { _routingMargin = value; }
 
     /**
-     * @brief Return whether empty (non-obstacle) rectangles are consolidated before routing.
+     * @brief Return whether a three-segment detour whose enclosing rectangle holds no obstacle is collapsed to a single line during path cleanup.
      * @return true if consolidation is enabled
      */
     bool consolidateEmptyRectangles() const { return _consolidateEmptyRectangles; }
 
     /**
-     * @brief Enable or disable consolidation of empty rectangles before routing.
+     * @brief Enable or disable collapsing a three-segment detour whose enclosing rectangle holds no obstacle into a single line during path cleanup.
      * @param value true to enable consolidation
      */
     void setConsolidateEmptyRectangles(bool value) { _consolidateEmptyRectangles = value; }
@@ -134,26 +134,26 @@ public:
     void setFirstSegmentLength(double value) { _firstSegmentLength = value; }
 
     /**
-     * @brief Return the vertical constraint (maximum Y coordinate the path may reach).
-     * @return Constraint Y value, or -1 if unconstrained
+     * @brief Return the X coordinate of the vertical line the path may not cross.
+     * @return Constraint X value; any negative value means unconstrained
      */
     int verticalConstraint() const { return _verticalConstraint; }
 
     /**
-     * @brief Set the vertical constraint (maximum Y the path may reach).
-     * @param value Y constraint value, or -1 to disable
+     * @brief Set the X coordinate of the vertical line the path may not cross.
+     * @param value Constraint X value; any negative value disables the constraint
      */
     void setVerticalConstraint(int value) { _verticalConstraint = value; }
 
     /**
-     * @brief Return the debug verbosity level.
-     * @return Debug level (0 = silent)
+     * @brief Return the log severity threshold for this router's own messages.
+     * @return A Log::LogLevel value held as an int: messages at or below it are logged
      */
     int debugLevel() const { return _debugLevel; }
 
     /**
-     * @brief Set the debug verbosity level.
-     * @param value Debug level (0 = silent, higher = more verbose)
+     * @brief Set the log severity threshold for this router's own messages.
+     * @param value A Log::LogLevel value (Emergency = 0 … Debug = 7); messages at or below it are logged
      */
     void setDebugLevel(int value) { _debugLevel = value; }
 

@@ -33,6 +33,30 @@ KanoopCommonQt is the foundational utility library underneath the rest of the Ka
 - Doxygen: single-line `/** @brief ... */`; multi-line with `@brief` on the line after `/**`. **Never** document member variables.
 - Single-exit functions preferred; avoid early returns.
 
+## Comment content
+
+Three tests every comment, commit message and PR description must pass, in ascending severity.
+
+1. **No "it's X, not Y" antithesis.** Delete the negated clause. If the sentence still says
+   everything it said, the construction was doing no work. Where a contrast carries real
+   information, give it its own sentence with its own subject and verb.
+2. **No reasoning narration.** A comment is OUT if it explains why the code is shaped the way it is
+   — design rationale, pattern names, cost or placement justification, pointers at other code, or an
+   account of what the previous code did wrong. That history belongs in the commit message. A
+   comment is IN only if it states something the code cannot show and a plausible future edit would
+   silently break: lifetime and ownership rules, ordering constraints, wire and file-format
+   contracts, naming contracts that auto-wiring depends on. A ⚠ prefix confers nothing — a
+   rationale with a warning glyph on it is still a rationale.
+3. **No false facts.** Outranks both habits above, and outranks latent code defects that have no
+   live caller. Grep the call sites before writing any claim about what other code does. Where a
+   comment names a specific function as the mechanism, check that the code beneath it calls that
+   function. Two comments in one file asserting incompatible things means at least one is wrong.
+
+Two forms earn their keep: **a paired BAD/GOOD example** where the wrong form is the idiomatic one
+(the brace-spacing and boolean-comparison bullets above pair the two forms inline; in a code
+comment, use two adjacent code blocks rather than prose), and **contract before consequence** —
+state the rule, then what breaks, so a reader who stops after the first sentence is still correct.
+
 ## Commonly used classes
 
 ### `Log` and `LVL_*` — `<Kanoop/log.h>`

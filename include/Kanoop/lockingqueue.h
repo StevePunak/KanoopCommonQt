@@ -1,24 +1,30 @@
 /**
  *  LockingQueue
  *
- *  Thread-safe Multi-producer Multi-consumer blocking queue
+ *  Blocking multi-producer multi-consumer queue
  *
  *  Stephen Punak, July 08 2019
  */
 #ifndef LOCKINGQUEUE_H
 #define LOCKINGQUEUE_H
 
+#include <QDeadlineTimer>
 #include <QList>
 #include <QWaitCondition>
 #include <QMutex>
 
 /**
- * @brief Thread-safe, blocking multi-producer multi-consumer queue.
+ * @brief Blocking multi-producer multi-consumer queue.
+ *
+ * ⚠ Every accessor must take _queueLock before touching _items, which is why the
+ * container is a private member rather than a base class.
+ * ⚠ _queueLock is not recursive: no method here may call another method of this
+ * class while holding it.
  *
  * @tparam T Element type stored in the queue
  */
 template <class T>
-class LockingQueue : public QList<T>
+class LockingQueue
 {
 public:
     /**
@@ -32,26 +38,23 @@ public:
         T result = T();
         success = false;
 
-        _queueLock.lock();              // don't allow anyone to add until we check the count
+        QDeadlineTimer deadline(waitTimeMs);
 
-        if(this->count() > 0)
+        _queueLock.lock();              // don't allow anyone to add until we check the count
+        while(true)
         {
-            result = this->takeFirst();
-            success = true;
-            _queueLock.unlock();
-        }
-        else
-        {
-            if(_condition.wait(&_queueLock, quint32(waitTimeMs)))
+            if(_items.count() > 0)
             {
-                if(this->count() > 0)
-                {
-                    result = this->takeFirst();
-                    success = true;
-                }
+                result = _items.takeFirst();
+                success = true;
+                break;
             }
-            _queueLock.unlock();
+            if(_condition.wait(&_queueLock, deadline) == false)
+            {
+                break;
+            }
         }
+        _queueLock.unlock();
         return result;
     }
 
@@ -62,14 +65,44 @@ public:
     void enqueue(const T& t)
     {
         _queueLock.lock();
-        this->append(t);
+        _items.append(t);
         _queueLock.unlock();
         _condition.notify_one();
     }
 
+    /**
+     * @brief Number of elements currently queued.
+     * @return Element count
+     */
+    qsizetype count() const
+    {
+        QMutexLocker locker(&_queueLock);
+        return _items.count();
+    }
+
+    /**
+     * @brief Whether the queue currently holds no elements.
+     * @return true when empty
+     */
+    bool isEmpty() const
+    {
+        QMutexLocker locker(&_queueLock);
+        return _items.isEmpty();
+    }
+
+    /**
+     * @brief Discard every queued element.
+     */
+    void clear()
+    {
+        QMutexLocker locker(&_queueLock);
+        _items.clear();
+    }
+
 private:
+    QList<T> _items;
     QWaitCondition _condition;
-    QMutex _queueLock;
+    mutable QMutex _queueLock;
 };
 
 #endif // LOCKINGQUEUE_H

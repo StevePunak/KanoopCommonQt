@@ -87,9 +87,9 @@ public:
         Parsable,   ///< Format suitable for round-trip parsing by fromString()
     };
 
-    /** @brief Equality comparison at the configured precision.
+    /** @brief Exact equality comparison of latitude, longitude and altitude.
      * @param other Coordinate to compare against
-     * @return true if coordinates are equal within the configured precision */
+     * @return true when all three compare equal as doubles. ⚠ The configured precision is not applied here; the precision-aware comparisons are isNorthOfOrEqualTo() and its siblings. */
     bool operator==(const GeoCoordinate& other) const;
     /** @brief Inequality comparison.
      * @param other Coordinate to compare against
@@ -190,7 +190,7 @@ public:
      */
     bool isSouthOfOrEqualTo(const GeoCoordinate& other) const
     {
-        return isSouthOf(other) || (equalAtPrecision(_latitude, other._cardinalLatitude, _precision) && _cardinalLatitude == other._cardinalLatitude);
+        return isSouthOf(other) || (equalAtPrecision(_latitude, other._latitude, _precision) && _cardinalLatitude == other._cardinalLatitude);
     }
 
     /**

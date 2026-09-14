@@ -27,9 +27,16 @@ class KANOOP_EXPORT DateTimeUtil
 {
 public:
     /**
-     * @brief Parse an ISO-8601 string into a UTC QDateTime.
+     * @brief Parse an ISO-8601 string into a QDateTime.
      * @param date ISO-8601 date/time string with milliseconds
-     * @return Parsed UTC QDateTime, or invalid QDateTime on error
+     * @return The parsed QDateTime, always UTC-spec, or an invalid QDateTime on error.
+     *
+     * ⚠ An offset in the string is DROPPED. The body parses, then calls
+     * setTimeZone(QTimeZone::utc()), which in Qt 6 keeps date() and time() and moves the
+     * instant -- so the parsed wall clock is relabelled UTC. The fields are kept as they are
+     * and only the zone is set, exactly as KanoopDatabaseQt's utcTime() documents.
+     * "2021-09-17T05:30:00.123+02:00" names 03:30 UTC and comes back as 05:30 UTC, two hours
+     * later than the instant the string carries.
      */
     static QDateTime fromISOString(const QString& date)
     {
@@ -39,14 +46,14 @@ public:
     }
 
     /**
-     * @brief Parse a MySQL-style "yyyy-MM-dd hh:mm:ss.zzz" string into a QDateTime.
+     * @brief Parse a date/time string, trying "yyyy-MM-dd hh:mm:ss.zzz" first and then the shorter and alternate forms the body accepts.
      * @param date MySQL format date/time string
      * @return Parsed QDateTime, or invalid QDateTime on error
      */
     static QDateTime fromStandardString(const QString& date);
 
     /**
-     * @brief Parse a compact "yyyyMMddhhmmsszzz" string into a QDateTime.
+     * @brief Parse a compact date/time string, trying "yyyyMMddhhmmsszzz" first and then the shorter forms the body accepts.
      * @param date Squashed format date/time string
      * @return Parsed QDateTime, or invalid QDateTime on error
      */
@@ -78,11 +85,12 @@ public:
     }
 
     /**
-     * @brief Format a QDateTime as an ISO-8601 Zulu string.
+     * @brief Format a QDateTime as ISO-8601 Zulu, converting to UTC first.
+     * ⚠ The trailing Z is a format literal; Qt has no Z specifier. Dropping the toUTC() leaves the literal standing on unconverted fields.
      * @param date Date/time to format
      * @return Formatted string, e.g. "2021-09-17T05:30:00.123Z"
      */
-    static QString toISOString(const QDateTime& date) { return date.toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
+    static QString toISOString(const QDateTime& date) { return date.toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ"); }
 
     /**
      * @brief Format a QDateTime as a compact squashed string.

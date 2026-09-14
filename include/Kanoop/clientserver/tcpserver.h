@@ -56,7 +56,11 @@ public:
      */
     TcpServer(const QHostAddress& serverAddress, int serverPort, const QSslKey& privateKey, const QSslCertificate& localCertificate, const QList<QSslCertificate>& caCerts, bool verifyPeer = false);
 
-    /** @brief Destructor — stops the server and cleans up all client connections. */
+    /** @brief Destructor — stops and deletes every client connection.
+     *
+     * ⚠ Does not stop the server. Call stop() first: this destructor never quits or joins
+     * _thread, and ~QThread on a still-running thread aborts the process. The listening socket
+     * is closed by ~QTcpServer, which this class derives from. */
     virtual ~TcpServer();
 
     /**
@@ -65,7 +69,7 @@ public:
      */
     bool start();
 
-    /** @brief Stop the server and close all active client connections. */
+    /** @brief Quit and join the server thread, then stop and delete every client connection. ⚠ Returns early without touching the clients when the server thread is not running, and never closes the listening socket — the port stays bound until this object is destroyed. */
     void stop();
 
     /** @brief Return the server's private key (SSL mode only).
