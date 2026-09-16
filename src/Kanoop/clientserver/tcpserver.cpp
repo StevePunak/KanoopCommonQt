@@ -49,7 +49,26 @@ void TcpServer::commonInit()
 
 TcpServer::~TcpServer()
 {
-    for(TcpServerClientObject* client : _clients) {
+    reapClients(takeClients());
+}
+
+QList<TcpServerClientObject*> TcpServer::takeClients()
+{
+    QMutexLocker l(&_clientsLock);
+    QList<TcpServerClientObject*> clients;
+    clients.swap(_clients);
+    return clients;
+}
+
+void TcpServer::reapClients(const QList<TcpServerClientObject*>& clients)
+{
+    for(TcpServerClientObject* client : clients) {
+        // Sever both directions before the client is stopped and deleted. Subclasses wire
+        // the server-to-client direction in createClient(), so by the time ~TcpServer runs,
+        // the derived sub-object those connections reach is already destroyed.
+        disconnect(client, nullptr, this, nullptr);
+        disconnect(this, nullptr, client, nullptr);
+
         client->stop();
         delete client;
     }
@@ -79,16 +98,12 @@ void TcpServer::stop()
     if(_stopEvent.wait(TimeSpan::fromSeconds(5)) == false) {
         logText(LVL_ERROR, QString("%1 failed to stop").arg(objectName()));
     }
+
+    // _stopEvent fires from inside QThread::finished, so the thread is still running here.
+    // Dropping this join makes ~QThread fatal for a caller that deletes the server on return.
     _thread.wait();
 
-    // ⚠ Clients are reaped only after the join. Each client's finished() is connected to
-    // onClientFinished, which deletes it — reap while the server thread still has an event
-    // loop and every client is deleted twice, with _clients mutated from two threads.
-    for(TcpServerClientObject* client : _clients) {
-        client->stop();
-        delete client;
-    }
-    _clients.clear();
+    reapClients(takeClients());
 }
 
 void TcpServer::incomingConnection(qintptr handle)
@@ -96,9 +111,14 @@ void TcpServer::incomingConnection(qintptr handle)
     logText(LVL_INFO, QString("%1: %2 on %3").arg(objectName()).arg(__FUNCTION__).arg(handle));
     TcpServerClientObject* client = createClient(this, handle);
     if(client != nullptr) {
-        client->start();
-        connect(client, &TcpServerClientObject::finished, this, &TcpServer::onClientFinished);
+        // Connected before it is started. A client that finishes between start() and a
+        // later connect() emits finished() into nothing, and nothing ever reaps it.
+        _clientsLock.lock();
         _clients.append(client);
+        _clientsLock.unlock();
+
+        connect(client, &TcpServerClientObject::finished, this, &TcpServer::onClientFinished);
+        client->start();
     }
 }
 
@@ -119,11 +139,20 @@ void TcpServer::onThreadFinished()
 
 void TcpServer::onClientFinished()
 {
-    logText(LVL_INFO, QString("%1: Client Finished").arg(objectName()));
     TcpServerClientObject* client = static_cast<TcpServerClientObject*>(sender());
-    _clients.removeAll(client);
-    delete client;
 
+    // Test liveness by presence on the roster, without dereferencing sender().
+    // finished() is queued from the client's own thread, so a delivery can outlive the
+    // client: a reap from ~TcpServer disconnects, stops and deletes it while this call is
+    // already posted, and Qt still places it with a dangling sender().
+    _clientsLock.lock();
+    const bool wasOnRoster = _clients.removeAll(client) > 0;
+    _clientsLock.unlock();
+
+    if(wasOnRoster == true) {
+        logText(LVL_INFO, QString("%1: Client Finished").arg(objectName()));
+        delete client;
+    }
 }
 
 #include "Kanoop/clientserver/moc_tcpserver.cpp"
