@@ -81,13 +81,13 @@ public:
     void setDegrees(double value) { _degrees = value; }
 
     /**
-     * @brief Add a degree amount with wraparound in place.
+     * @brief Add a degree amount in place, normalizing the result into [0, 360).
      * @param degrees Degrees to add
      */
     void add(double degrees);
 
     /**
-     * @brief Subtract a degree amount with wraparound in place.
+     * @brief Subtract a degree amount in place, normalizing the result into [0, 360).
      * @param degrees Degrees to subtract
      */
     void subtract(double degrees);

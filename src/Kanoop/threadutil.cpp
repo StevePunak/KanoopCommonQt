@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "Kanoop/threadutil.h"
 
 QString ThreadUtil::currentThreadString()

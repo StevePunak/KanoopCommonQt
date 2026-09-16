@@ -1,6 +1,7 @@
-#include "ellipse.h"
-#include "flatgeo.h"
-#include <Qt>
+#include "Kanoop/geometry/ellipse.h"
+#include "Kanoop/geometry/flatgeo.h"
+
+#include <cmath>
 #include <stringutil.h>
 
 double Ellipse::radiusAtAngle(double angle) const
