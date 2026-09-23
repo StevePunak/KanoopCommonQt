@@ -3,9 +3,33 @@
 #include <QElapsedTimer>
 #include <QAtomicInt>
 
+#include <type_traits>
+
 #include <Kanoop/mutexevent.h>
 #include <Kanoop/lockingqueue.h>
 #include <Kanoop/ratemonitor.h>
+
+// Deadlock guard for joining helper threads. The slowest of these cases runs in
+// ~0.5 s. A bound tightened toward that number trips on a loaded box, and a flaky
+// join gets muted.
+static constexpr int THREAD_JOIN_TIMEOUT_MS = 10000;
+
+
+// Detects whether an unlocked QList mutator is reachable on the queue's public
+// surface. Compiles either way; the value is what differs.
+template <typename T, typename = void>
+struct HasReachableAppend : std::false_type {};
+
+template <typename T>
+struct HasReachableAppend<T, std::void_t<decltype(std::declval<T&>().append(std::declval<const int&>()))>>
+    : std::true_type {};
+
+template <typename T, typename = void>
+struct HasReachableTakeFirst : std::false_type {};
+
+template <typename T>
+struct HasReachableTakeFirst<T, std::void_t<decltype(std::declval<T&>().takeFirst())>>
+    : std::true_type {};
 
 class TstConcurrency : public QObject
 {
@@ -34,7 +58,7 @@ private slots:
         QThread::msleep(50);
         QVERIFY(event.isWaiting());
         event.set();
-        waiter->wait();
+        QVERIFY(waiter->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QVERIFY(result);
         QVERIFY(!event.isWaiting());
@@ -86,7 +110,7 @@ private slots:
         QVERIFY(event.isWaiting());
 
         event.set();
-        waiter->wait();
+        QVERIFY(waiter->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QVERIFY(!event.isWaiting());
         delete waiter;
@@ -106,7 +130,7 @@ private slots:
         QThread::msleep(50);
         event.setData(QVariant(42));
         event.set();
-        waiter->wait();
+        QVERIFY(waiter->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(received.toInt(), 42);
         delete waiter;
@@ -135,9 +159,9 @@ private slots:
         QThread::msleep(100); // let all threads enter wait()
         event.set();
 
-        w1->wait();
-        w2->wait();
-        w3->wait();
+        QVERIFY(w1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w3->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(wokenCount.loadRelaxed(), 3);
         delete w1;
@@ -169,9 +193,9 @@ private slots:
         event.set(); // should wake exactly 1
 
         // Wait for all threads to finish (2 will timeout at 200ms)
-        w1->wait();
-        w2->wait();
-        w3->wait();
+        QVERIFY(w1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(w3->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(wokenCount.loadRelaxed(), 1);
         delete w1;
@@ -252,9 +276,9 @@ private slots:
         p1->start();
         p2->start();
 
-        p1->wait();
-        p2->wait();
-        consumer->wait();
+        QVERIFY(p1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(p2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(consumer->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(received.count(), itemCount);
 
@@ -310,10 +334,10 @@ private slots:
         c3->start();
         producer->start();
 
-        producer->wait();
-        c1->wait();
-        c2->wait();
-        c3->wait();
+        QVERIFY(producer->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(c1->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(c2->wait(THREAD_JOIN_TIMEOUT_MS));
+        QVERIFY(c3->wait(THREAD_JOIN_TIMEOUT_MS));
 
         QCOMPARE(received.count(), itemCount);
 
@@ -378,6 +402,117 @@ private slots:
         double rate = monitor.eventsPerSecond();
         QVERIFY2(rate >= 50.0, qPrintable(QString("Rate too low: %1").arg(rate)));
     }
+
+    // ---- LockingQueue: a wake that finds nothing must re-wait ----
+    //  lockingQueue_dequeueTimeout above never gets notified, and the
+    //  producer/consumer cases always have an element waiting once notified.
+    //  Neither reaches the case where a consumer is woken and the element is
+    //  gone before it re-acquires the lock.
+    //
+    //  The steal is a race, so the arrangement is retried until it actually
+    //  happens and the assertions only run once it has. stolenOk is the proof
+    //  that the consumer really was woken to an empty queue.
+
+    void lockingQueue_reWaitsWhenWokenElementIsStolen()
+    {
+        constexpr quint32 BUDGET_MS = 3000;
+        constexpr int STEAL_POINT_MS = 400;
+        constexpr int STOLEN = 111;
+        constexpr int LATER = 222;
+
+        bool arranged = false;
+        int consumerValue = 0;
+        bool consumerSuccess = false;
+        qint64 consumerElapsed = 0;
+        int attempts = 0;
+
+        for(attempts = 1; attempts <= 25 && arranged == false; ++attempts) {
+            LockingQueue<int> queue;
+            QElapsedTimer timer;
+
+            consumerValue = 0;
+            consumerSuccess = false;
+            consumerElapsed = 0;
+
+            QThread* consumer = QThread::create([&]() {
+                timer.start();
+                consumerValue = queue.dequeue(BUDGET_MS, consumerSuccess);
+                consumerElapsed = timer.elapsed();
+            });
+            consumer->start();
+            QThread::msleep(150);                       // let the consumer reach the wait
+
+            queue.enqueue(STOLEN);
+            bool stolenOk = false;
+            const int stolen = queue.dequeue(0, stolenOk);   // race the woken consumer for it
+
+            if(stolenOk == false) {
+                QVERIFY(consumer->wait(BUDGET_MS + 2000));   // consumer won; retry
+                delete consumer;
+                continue;
+            }
+            QCOMPARE(stolen, STOLEN);
+
+            QThread::msleep(STEAL_POINT_MS);
+            queue.enqueue(LATER);
+            QVERIFY(consumer->wait(BUDGET_MS + 2000));
+            delete consumer;
+            arranged = true;
+        }
+
+        QVERIFY2(arranged, "never won the steal race, so the case was never exercised");
+        QVERIFY2(consumerSuccess,
+                 qPrintable(QString("consumer gave up after its element was stolen (attempt %1)").arg(attempts)));
+        QCOMPARE(consumerValue, LATER);
+        QVERIFY2(consumerElapsed > STEAL_POINT_MS,
+                 qPrintable(QString("consumer returned after %1 ms, at or before the %2 ms steal point")
+                                .arg(consumerElapsed).arg(STEAL_POINT_MS)));
+        QVERIFY(consumerElapsed < BUDGET_MS);
+    }
+
+    void lockingQueue_countIsEmptyAndClear()
+    {
+        LockingQueue<int> queue;
+        QVERIFY(queue.isEmpty());
+        QCOMPARE(queue.count(), qsizetype(0));
+
+        queue.enqueue(1);
+        queue.enqueue(2);
+        QCOMPARE(queue.count(), qsizetype(2));
+        QVERIFY(queue.isEmpty() == false);
+
+        queue.clear();
+        QCOMPARE(queue.count(), qsizetype(0));
+        QVERIFY(queue.isEmpty());
+
+        bool ok = true;
+        queue.dequeue(20, ok);
+        QVERIFY(ok == false);
+    }
+
+
+    // ---- LockingQueue: the container is not reachable unlocked ----
+    //  Every method of this class takes _queueLock. That is only worth anything
+    //  while the container cannot be reached around them, which is a property of
+    //  the type's public surface rather than of any particular interleaving: a
+    //  race detector only reports what the run happens to exercise, whereas an
+    //  unreachable mutator cannot be raced by anyone.
+
+    void lockingQueue_noUnlockedContainerAccess()
+    {
+        QVERIFY(HasReachableAppend<LockingQueue<int>>::value == false);
+        QVERIFY(HasReachableTakeFirst<LockingQueue<int>>::value == false);
+        QVERIFY((std::is_base_of<QList<int>, LockingQueue<int>>::value) == false);
+    }
+
+    // Control: the detectors do find these methods on the container itself, so a
+    // false above is not simply a detector that never matches anything.
+    void lockingQueue_detectorFindsQListSurface()
+    {
+        QVERIFY(HasReachableAppend<QList<int>>::value);
+        QVERIFY(HasReachableTakeFirst<QList<int>>::value);
+    }
+
 };
 
 QTEST_MAIN(TstConcurrency)
