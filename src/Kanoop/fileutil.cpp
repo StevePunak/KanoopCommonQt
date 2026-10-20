@@ -6,6 +6,7 @@
 #include <QtGlobal>
 #include <QCryptographicHash>
 #include <QFile>
+#include <QSaveFile>
 #include <QTemporaryFile>
 #include <QTextStream>
 
@@ -60,42 +61,39 @@ bool FileUtil::readAllLines(const QString &filename, QStringList &lines, QString
 
 bool FileUtil::writeAllBytes(const QString &filename, const QByteArray &data)
 {
-    QFile file(filename);
-    if(file.open(QIODevice::WriteOnly))
-    {
-        file.write(data);
-        return true;
+    bool result = false;
+    QSaveFile file(filename);
+    file.setDirectWriteFallback(true);
+    if(file.open(QIODevice::WriteOnly)) {
+        result = file.write(data) == data.length() && file.commit();
     }
-    return false;
+    return result;
 }
 
 bool FileUtil::writeAllBytes(const QString& filename, const QByteArray& data, QStringConverter::Encoding encoding)
 {
     bool result = false;
     QString str(data);
-    QFile file(filename);
-    if(file.open(QFile::WriteOnly | QFile::Truncate)) {
+    QSaveFile file(filename);
+    file.setDirectWriteFallback(true);
+    if(file.open(QIODevice::WriteOnly)) {
         QTextStream output(&file);
         output.setEncoding(encoding);
         output << str;
-        result = true;
+        output.flush();
+        result = output.status() == QTextStream::Ok && file.commit();
     }
     return result;
 }
 
 bool FileUtil::writeAllLines(const QString &filename, const QStringList &lines)
 {
-    QFile file(filename);
-    if(file.open(QIODevice::WriteOnly))
-    {
-        foreach(const QString& line, lines)
-        {
-            file.write(line.toLatin1());
-            file.write("\n");
-        }
-        return true;
+    QByteArray data;
+    for(const QString& line : lines) {
+        data.append(line.toLatin1());
+        data.append('\n');
     }
-    return false;
+    return writeAllBytes(filename, data);
 }
 
 bool FileUtil::appendAllBytes(const QString& filename, const QByteArray& data)
