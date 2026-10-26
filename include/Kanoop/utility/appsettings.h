@@ -111,7 +111,7 @@ public:
      * @param fileType Application-defined file type integer
      * @return Last directory path string
      */
-    QString lastDirectory(int fileType) const { return _settings.value(makeFileTypeKey(KEY_LAST_DIRECTORY, fileType)).toString(); }
+    virtual QString lastDirectory(int fileType) const { return _settings.value(makeFileTypeKey(KEY_LAST_DIRECTORY, fileType)).toString(); }
 
     /**
      * @brief Save the last directory used for a given file extension.
