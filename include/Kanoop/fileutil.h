@@ -81,9 +81,11 @@ public:
     static bool writeAllBytes(const QString& filename, const QByteArray& data, QStringConverter::Encoding encoding);
 
     /**
-     * @brief Write a list of strings to a file, one per line.
+     * @brief Write a list of strings to a file, one per line, encoded as Latin-1.
      *
-     * The file is replaced atomically: it holds either its previous content or all of @p data. When no
+     * ⚠ A character outside Latin-1 is written as '?'.
+     *
+     * The file is replaced atomically: it holds either its previous content or all of @p lines. When no
      * temporary file can be created beside it (a read-only directory), it is written in place.
      *
      * ⚠ The replace gives the path a new inode. A QFileSystemWatcher watching the path stops after a
